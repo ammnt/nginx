@@ -11,8 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ammnt/nginx
-  IMAGE_TAG: http3
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
