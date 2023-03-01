@@ -1,7 +1,7 @@
 # NGINX with HTTP/3 and QUIC support
 
 The Docker image is ready to use:
-<code>docker pull ammnt/nginx:http3</code>
+<code>docker pull ghcr.io/ammnt/nginx:http3</code>
 
 # Features
 
@@ -22,5 +22,4 @@ https://github.com/quictls/openssl
 - Async I/O threads module;
 - Healthcheck added;
 - Removed unnecessary modules;
-- Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):
-https://gist.github.com/ammnt/cbad6052bba62ee8199f36b477cd038f
+- Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner").
