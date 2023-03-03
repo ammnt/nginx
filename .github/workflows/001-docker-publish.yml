@@ -2,7 +2,7 @@ name: Build and push image📦
 
 on:
   schedule:
-    - cron: '30 00 * * *'
+    - cron: '30 0 * * *'
   push:
     branches: [ "http3" ]
     tags: [ 'v*.*.*' ]
