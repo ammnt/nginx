@@ -100,8 +100,8 @@ CMD nc -vz -w1 127.0.0.1 8080 || exit 1
 
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 LABEL description="NGINX built with QUIC and HTTP/3 support" \
-      maintainer="ammnt <admin@msftcnsi.com>" \
-      org.opencontainers.image.description="NGINX built with QUIC and HTTP/3 support"
+      maintainer="ammnt <admin@msftcnsi.com>"
+LABEL org.opencontainers.image.description "NGINX built with QUIC and HTTP/3 support"
 
 STOPSIGNAL SIGQUIT
 USER nginx
