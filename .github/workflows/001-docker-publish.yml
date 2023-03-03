@@ -1,8 +1,8 @@
-name: Build and push image📦🚀
+name: Build and push image📦
 
 on:
   schedule:
-    - cron: '30 03 * * *'
+    - cron: '30 00 * * *'
   push:
     branches: [ "http3" ]
     tags: [ 'v*.*.*' ]
@@ -58,16 +58,19 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build and push Docker image
+      - name: Push the Docker image
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/ammnt/nginx:http3
+            ammnt/nginx:http3
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
+            labels: ${{ steps.meta.outputs.labels }}
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
