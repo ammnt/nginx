@@ -1,4 +1,4 @@
-# NGINX with HTTP/3 and QUIC support🚀
+# NGINX with HTTP/3 and QUIC support
 
 The Docker image is ready to use:<br>
 <code>docker pull ghcr.io/ammnt/nginx:http3</code><br>
