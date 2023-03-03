@@ -9,6 +9,14 @@ on:
   pull_request:
     branches: [ "http3" ]
 
+on:
+  schedule:
+    - cron: '00 03 * * *'
+  push:
+    branches: [ "http3" ]
+  pull_request:
+    branches: [ "http3" ]
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -25,6 +33,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag nginx:$(date +%s)
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
