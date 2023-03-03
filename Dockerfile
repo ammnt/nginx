@@ -105,7 +105,7 @@ LABEL description="NGINX built with QUIC and HTTP/3 support" \
       org.opencontainers.image.description="NGINX built with QUIC and HTTP/3 support" \
       org.opencontainers.image.authors='ammnt, admin@msftcnsi.com' \
       org.opencontainers.image.title='NGINX built with QUIC and HTTP/3 support' \
-      org.opencontainers.image.documentation="https://github.com/ammnt/nginx/"
+      org.opencontainers.image.source="https://github.com/ammnt/nginx/"
 
 STOPSIGNAL SIGQUIT
 USER nginx
