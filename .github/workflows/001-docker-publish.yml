@@ -61,6 +61,7 @@ jobs:
           tags: |
             ghcr.io/ammnt/nginx:http3
             ammnt/nginx:http3
+            labels: ${{ steps.meta.outputs.labels }}
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
