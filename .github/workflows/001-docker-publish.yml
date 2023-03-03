@@ -9,14 +9,6 @@ on:
   pull_request:
     branches: [ "http3" ]
 
-on:
-  schedule:
-    - cron: '00 03 * * *'
-  push:
-    branches: [ "http3" ]
-  pull_request:
-    branches: [ "http3" ]
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
