@@ -1,8 +1,8 @@
-name: Build and push image📦
+name: Build and push image
 
 on:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: '0 12 * * *'
   push:
     branches: [ "http3" ]
   pull_request:
