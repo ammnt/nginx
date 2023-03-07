@@ -63,6 +63,7 @@ jobs:
           tags: |
             ${{ steps.meta.outputs.tags }}
             ammnt/nginx:http3
+          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description="NGINX built with QUIC and HTTP/3 support"
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
