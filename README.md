@@ -5,7 +5,7 @@ The Docker image is ready to use:<br>
 or<br>
 <code>docker pull ammnt/nginx:http3</code>
 
-# Features
+# Description
 
 - Based on latest version of Alpine Linux - low size (~7 MB);
 - NGINX QUIC branch:<br>
@@ -26,3 +26,7 @@ https://github.com/quictls/openssl
 - Removed unnecessary modules;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
 https://github.com/ammnt/nginx/blob/http3/Dockerfile
+
+# Note:
+
+Feel free to <a href="https://github.com/ammnt/nginx/issues/new">contact me</a> with more security improvements🙋
