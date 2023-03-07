@@ -5,7 +5,7 @@ The Docker image is ready to use:<br>
 or<br>
 <code>docker pull ammnt/nginx:http3</code>
 
-# Description
+# Description:
 
 - Based on latest version of Alpine Linux - low size (~7 MB);
 - NGINX QUIC branch:<br>
