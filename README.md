@@ -24,6 +24,7 @@ https://github.com/quictls/openssl
 - Async I/O threads module;
 - Healthcheck added;
 - Removed unnecessary modules;
+- Added OCI labels and annotations;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
 https://github.com/ammnt/nginx/blob/http3/Dockerfile
 
