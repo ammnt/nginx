@@ -80,8 +80,8 @@ jobs:
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            ghcr.io/ammnt/nginx:http3
+            ghcr.io/${{ github.actor }}/nginx:http3@${{ steps.build-and-push.outputs.digest }}
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            ammnt/nginx:http3
+            ${{ github.actor }}/nginx:http3@${{ steps.build-and-push.outputs.digest }}
