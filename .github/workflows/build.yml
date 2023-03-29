@@ -76,12 +76,5 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: "true"
           COSIGN_PASSWORD: "${{ secrets.COSIGN_PASSWORD }}"
-        run: |
-          cosign sign --key cosign.key \
-            -a "repo=${{ github.repository }}" \
-            -a "ref=${{ github.sha }}" \
-            ghcr.io/${{ github.actor }}/nginx:http3@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --key cosign.key \
-            -a "repo=${{ github.repository }}" \
-            -a "ref=${{ github.sha }}" \
-            ${{ github.actor }}/nginx:http3@${{ steps.build-and-push.outputs.digest }}
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ steps.build-and-push.outputs.digest }}
+        
