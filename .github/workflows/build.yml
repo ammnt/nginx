@@ -72,9 +72,9 @@ jobs:
         run: echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
 
       - name: Sign the published Docker image
+        needs: build-and-push
         if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
           COSIGN_PASSWORD: "${{ secrets.COSIGN_PASSWORD }}"
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
-    
+        run: cosign sign --key cosign.key -a "repo=${{ github.repository }}" -a "ref=${{ github.sha }}" ${{ env.REGISTRY }}/${{ github.actor }}/nginx:http3@${{ steps.build-and-push.outputs.digest }}
