@@ -76,5 +76,5 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: "true"
           COSIGN_PASSWORD: "${{ secrets.COSIGN_PASSWORD }}"
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ steps.build-and-push.outputs.digest }}
-        
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+    
