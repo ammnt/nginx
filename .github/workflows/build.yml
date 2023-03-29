@@ -2,9 +2,9 @@ name: Build and push image📦
 
 on:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: "30 0 * * *"
   push:
-    branches: [ "http3" ]
+    branches: ["http3"]
   # pull_request:
   # branches: [ "http3" ]
 
@@ -28,8 +28,6 @@ jobs:
       - name: Install cosign
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3.0.1
-        with:
-          cosign-release: 'v1.13.1'
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2.5.0
@@ -69,8 +67,23 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - uses: sigstore/cosign-installer@v3.0.1
+      - name: Write signing key to disk
+        run: echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
+
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+          COSIGN_PASSWORD: "${COSIGN_PASSWORD}"
+        run: |
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "workflow=${{ github.workflow }}" \
+            -a "ref=${{ github.sha }}" \
+            ghcr.io/ammnt/nginx:http3
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "workflow=${{ github.workflow }}" \
+            -a "ref=${{ github.sha }}" \
+            ammnt/nginx:http3
