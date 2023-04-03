@@ -26,7 +26,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     mercurial \
     libxslt \
     libxslt-dev \
-&& cd /tmp && git clone https://github.com/google/ngx_brotli.git \
+&& cd /tmp && git clone --recursive --depth 1 https://github.com/google/ngx_brotli.git \
 && cd ngx_brotli && git submodule update --init --recursive \
 && cd /tmp && hg clone -r quic https://hg.nginx.org/nginx-quic \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx-quic/src/http/ngx_http_header_filter_module.c \
