@@ -7,7 +7,7 @@ or<br>
 
 # Description:
 
-- Based on latest version of Alpine Linux - low size (~7 MB);
+- Based on latest version of Alpine Linux - low size (~10 MB);
 - NGINX QUIC branch:<br>
 https://hg.nginx.org/nginx-quic
 - QuicTLS with kTLS module:<br>
