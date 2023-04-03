@@ -26,6 +26,8 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     mercurial \
     libxslt \
     libxslt-dev \
+&& cd /tmp && git clone https://github.com/google/ngx_brotli.git \
+&& cd ngx_brotli && git submodule update --init --recursive \
 && cd /tmp && hg clone -r quic https://hg.nginx.org/nginx-quic \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx-quic/src/http/ngx_http_header_filter_module.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx-quic/src/http/v2/ngx_http_v2_filter_module.c \
@@ -88,6 +90,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --without-mail_imap_module \
     --without-mail_smtp_module \
     --add-module=/tmp/njs/nginx \
+    --add-dynamic-module=/tmp/ngx_brotli \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
 && chown -R nginx:0 /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:0 /etc/nginx && chmod -R g+w /etc/nginx \
