@@ -18,7 +18,7 @@ https://github.com/quictls/openssl
 - TLS 1.2 and TCP Fast Open (TFO) support;
 - Built using hardening GCC flags;
 - NJS support;
-- Brotli compression support (module by Google):
+- Brotli compression support (module by Google):<br>
 https://github.com/google/ngx_brotli
 - PCRE with JIT compilation;
 - zlib library latest version;
