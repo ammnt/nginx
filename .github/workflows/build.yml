@@ -83,7 +83,7 @@ jobs:
             -a "ref=${{ github.sha }}" \
             ammnt/nginx:@${{ steps.build-and-push.outputs.digest }}
 
-      - name: Run deploy on server
+      - name: Run update on the server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
