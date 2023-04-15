@@ -2,7 +2,7 @@ name: Build and push image📦
 
 on:
   schedule:
-    - cron: "30 0 * * *"
+    - cron: "30 0 * * 6"
   push:
     branches: ["http3"]
 
@@ -21,13 +21,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3.5.0
+        uses: actions/checkout@v3.5.2
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3.0.1
-        with:
-          cosign-release: "v1.13.1"
+        uses: sigstore/cosign-installer@v3.0.2
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2.5.0
@@ -64,8 +62,8 @@ jobs:
             ${{ steps.meta.outputs.tags }}
             ammnt/nginx:http3
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
