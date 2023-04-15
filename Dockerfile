@@ -33,6 +33,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx-quic/src/http/v2/ngx_http_v2_filter_module.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx-quic/src/http/v3/ngx_http_v3_filter_module.c \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx-quic/src/http/ngx_http_special_response.c \
+&& sed -i -e 's@<hr><center>" NGINX_VER_BUILD "</center>@@g' /tmp/nginx-quic/src/http/ngx_http_special_response.c \
 && sed -i -e 's/listen       80;/listen 8080;/g' /tmp/nginx-quic/conf/nginx.conf \
 && sed -i -e '1i pid /tmp/nginx.pid;\n' /tmp/nginx-quic/conf/nginx.conf \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx-quic/src/event/ngx_event_openssl.c \
