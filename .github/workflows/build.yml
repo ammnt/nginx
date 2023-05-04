@@ -25,7 +25,7 @@ jobs:
 
     - name: Install cosign
       if: github.event_name != 'pull_request'
-      uses: sigstore/cosign-installer@v3.0.2
+      uses: sigstore/cosign-installer@v3.0.3
 
     - name: Setup Docker buildx
       uses: docker/setup-buildx-action@v2.5.0
@@ -46,28 +46,12 @@ jobs:
 
     - name: Extract Docker metadata
       id: meta
-      uses: docker/metadata-action@v4.3.0
+      uses: docker/metadata-action@v4.4.0
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-    - name: Build and export the image
-      uses: docker/build-push-action@v4.0.0
-      with:
-        provenance: false
-        context: .
-        platforms: linux/amd64
-        tags: |
-          ${{ steps.meta.outputs.tags }}
-          ammnt/nginx:http3
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Test of the image
-      run: |
-        docker run --rm ammnt/nginx:http3
-
-    - name: Push Docker image
+    - name: Build and push Docker image
+      id: build-and-push
       uses: docker/build-push-action@v4.0.0
       with:
         provenance: false
@@ -77,6 +61,9 @@ jobs:
         tags: |
           ${{ steps.meta.outputs.tags }}
           ammnt/nginx:http3
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Sign the published Docker image
       if: ${{ github.event_name != 'pull_request' }}
