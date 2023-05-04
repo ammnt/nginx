@@ -51,7 +51,6 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     - name: Build and export the image
-      id: build-and-push
       uses: docker/build-push-action@v4.0.0
       with:
         provenance: false
@@ -70,7 +69,6 @@ jobs:
         curl -vki http://127.0.0.1:8080 || exit 1
 
     - name: Build and push Docker image
-      id: build-and-push
       uses: docker/build-push-action@v4.0.0
       with:
         provenance: false
