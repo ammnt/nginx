@@ -65,10 +65,10 @@ jobs:
 
     - name: Test of the image
       run: |
-        docker run --rm ammnt/nginx:http3 -p 127.0.0.1:8080:8080
+        docker run --rm ${{ steps.meta.outputs.tags }} -p 127.0.0.1:8080:8080
         curl -vki http://127.0.0.1:8080 || exit 1
 
-    - name: Build and push Docker image
+    - name: Push Docker image
       uses: docker/build-push-action@v4.0.0
       with:
         provenance: false
