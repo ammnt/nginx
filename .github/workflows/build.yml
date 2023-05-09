@@ -62,8 +62,8 @@ jobs:
           ${{ steps.meta.outputs.tags }}
           ammnt/nginx:http3
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # cache-from: type=gha
+        # cache-to: type=gha,mode=max
 
     - name: Test
       run: |
