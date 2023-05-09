@@ -113,4 +113,4 @@ LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
 
 STOPSIGNAL SIGQUIT
 USER nginx
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
