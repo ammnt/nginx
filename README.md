@@ -27,7 +27,7 @@ https://github.com/google/ngx_brotli
 - Healthcheck added;
 - Removed unnecessary modules;
 - Added OCI labels and annotations;
-- No ENTRYPOINT in the image;
+- No excess ENTRYPOINT in the image;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
 https://github.com/ammnt/nginx/blob/http3/Dockerfile
 
