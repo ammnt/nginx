@@ -2,10 +2,10 @@ name: Build and push image📦
 
 on:
   workflow_dispatch:
-  schedule:
-  - cron: "30 0 * * *"
-  push:
-    branches: ["http3"]
+  # schedule:
+  # - cron: "30 0 * * *"
+  # push:
+  #  branches: ["http3"]
 
 env:
   REGISTRY: ghcr.io
@@ -26,7 +26,7 @@ jobs:
 
     - name: Install cosign
       if: github.event_name != 'pull_request'
-      uses: sigstore/cosign-installer@v3.0.3
+      uses: sigstore/cosign-installer@v3.0.5
 
     - name: Setup Docker buildx
       uses: docker/setup-buildx-action@v2.5.0
