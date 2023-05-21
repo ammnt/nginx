@@ -8,8 +8,6 @@ or<br>
 # Description:
 
 - Based on latest version of Alpine Linux - low size (~10 MB);
-- NGINX QUIC branch:<br>
-https://hg.nginx.org/nginx-quic
 - QuicTLS with kTLS module:<br>
 https://github.com/quictls/openssl
 - HTTP/3 + QUIC native support from NGINX;
