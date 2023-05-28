@@ -26,8 +26,6 @@ https://github.com/google/ngx_brotli
 - Removed unnecessary modules;
 - Added OCI labels and annotations;
 - No excess ENTRYPOINT in the image;
-- HTTP2 HPACK Encoding support;
-- Dynamic TLS Record support;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
 https://github.com/ammnt/nginx/blob/http3/Dockerfile
 

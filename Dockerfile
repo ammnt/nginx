@@ -26,11 +26,9 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     mercurial \
     libxslt \
     libxslt-dev \
-    wget \
 && cd /tmp && git clone --recursive --depth 1 https://github.com/google/ngx_brotli.git \
 && cd ngx_brotli && git submodule update --init --recursive \
-&& cd /tmp && hg clone -r default https://hg.nginx.org/nginx && cd nginx \
-&& wget https://raw.githubusercontent.com/kn007/patch/master/nginx_1.25.0.patch && patch -p1 < nginx_1.25.0.patch \
+&& cd /tmp && hg clone -r default https://hg.nginx.org/nginx \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/v2/ngx_http_v2_filter_module.c \
