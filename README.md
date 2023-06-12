@@ -7,7 +7,7 @@ or<br>
 
 # Description:
 
-- Based on latest version of Alpine Linux - low size (~11 MB);
+- Based on latest version of Alpine Linux - low size (~7 MB);
 - QuicTLS with kTLS module:<br>
 https://github.com/quictls/openssl
 - HTTP/3 + QUIC native support from NGINX;
@@ -16,8 +16,6 @@ https://github.com/quictls/openssl
 - TLS 1.2 and TCP Fast Open (TFO) support;
 - Built using hardening GCC flags;
 - NJS support;
-- Brotli compression support (module by Google):<br>
-https://github.com/google/ngx_brotli
 - PCRE with JIT compilation;
 - zlib library latest version;
 - Rootless master process - unprivileged container;
