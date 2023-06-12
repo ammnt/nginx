@@ -7,7 +7,7 @@ or<br>
 
 # Description:
 
-- Based on latest version of Alpine Linux - low size (~7 MB);
+- Based on latest version of Alpine Linux - low size (~8 MB);
 - QuicTLS with kTLS module:<br>
 https://github.com/quictls/openssl
 - HTTP/3 + QUIC native support from NGINX;
