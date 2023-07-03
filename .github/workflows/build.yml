@@ -111,5 +111,5 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         script: |
           cd /home/${{ secrets.SERVER_USERNAME }}/agh
-          docker-compose pull nginx
-          docker-compose up -d nginx
+          docker-compose pull nginx dns
+          docker-compose up -d nginx dns
