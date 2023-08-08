@@ -113,3 +113,4 @@ jobs:
           cd /home/${{ secrets.SERVER_USERNAME }}/agh
           docker-compose pull nginx dns
           docker-compose up -d nginx dns
+          docker system prune -f
