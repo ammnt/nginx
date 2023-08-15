@@ -39,14 +39,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --no-create-home \
 && cd /tmp && git clone --recursive --depth 1 https://github.com/quictls/openssl && hg clone http://hg.nginx.org/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
-
-&& mkdir -p /var/cache/nginx/client_temp \
-&& mkdir -p /var/cache/nginx/fastcgi_temp \
-&& mkdir -p /var/cache/nginx/proxy_temp \
-&& chown -R nginx:nginx /var/cache/nginx/client_temp \
-&& chown -R nginx:nginx /var/cache/nginx/proxy_temp \
-&& chown -R nginx:nginx /var/cache/nginx/fastcgi_temp \
-
 cd /tmp/nginx && ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
