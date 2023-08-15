@@ -39,7 +39,15 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --no-create-home \
 && cd /tmp && git clone --recursive --depth 1 https://github.com/quictls/openssl && hg clone http://hg.nginx.org/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
-&& mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
+
+&& mkdir -p /var/cache/nginx/client_temp \
+&& mkdir -p /var/cache/nginx/fastcgi_temp \
+&& mkdir -p /var/cache/nginx/proxy_temp \
+&& chown -R nginx:nginx /var/cache/nginx/client_temp \
+&& chown -R nginx:nginx /var/cache/nginx/proxy_temp \
+&& chown -R nginx:nginx /var/cache/nginx/fastcgi_temp \
+
+cd /tmp/nginx && ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
@@ -90,8 +98,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --without-mail_smtp_module \
     --add-module=/tmp/njs/nginx \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
-&& cd /var/cache/nginx/ && mkdir {client_temp,fastcgi_temp,proxy_temp} \
-&& chown -R nginx:nginx client_temp fastcgi_temp proxy_temp \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
 && update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl apk-tools libxslt-dev \
