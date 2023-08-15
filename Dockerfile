@@ -39,7 +39,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --no-create-home \
 && cd /tmp && git clone --recursive --depth 1 https://github.com/quictls/openssl && hg clone http://hg.nginx.org/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
-cd /tmp/nginx && ./auto/configure \
+&& mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
@@ -93,7 +93,7 @@ cd /tmp/nginx && ./auto/configure \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
 && update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl apk-tools libxslt-dev \
-&& rm -rf /tmp/* /var/cache/apk /root/.gnupg /root/.cache /root/go /etc/apk \
+&& rm -rf /tmp/* /var/cache/apk/* /root/.gnupg /root/.cache /root/go /etc/apk \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
 HEALTHCHECK --interval=3s --timeout=1s \
