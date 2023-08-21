@@ -92,12 +92,12 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
-&& ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log \
+&& update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl apk-tools libxslt-dev \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk \
-&& update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl apk-tools libxslt-dev alpine-baselayout
+&& ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
 HEALTHCHECK --interval=3s --timeout=1s \
-CMD /usr/sbin/nginx -t || exit 1
+CMD nc -vz -w1 127.0.0.1 8080 || exit 1
 
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
