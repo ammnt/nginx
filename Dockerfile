@@ -94,7 +94,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk \
-&& update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl apk-tools libxslt-dev busybox
+&& update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl apk-tools libxslt-dev alpine-baselayout
 
 HEALTHCHECK --interval=3s --timeout=1s \
 CMD /usr/sbin/nginx -t || exit 1
