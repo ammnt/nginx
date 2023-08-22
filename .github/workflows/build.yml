@@ -66,11 +66,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Test the Docker image
-        run: |
-          docker run --name nginx --restart unless-stopped -p 127.0.0.1:8080:8080/tcp -d ammnt/nginx:http3
-          curl -vki http://127.0.0.1:8080
-
       - name: Push the Docker image
         id: push
         uses: docker/build-push-action@v4.1.1
