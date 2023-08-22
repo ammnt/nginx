@@ -97,7 +97,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
 HEALTHCHECK --interval=3s --timeout=1s \
-CMD nc -vz -w1 127.0.0.1 8080 || exit 1
+CMD /usr/bin/nc -vz -w1 127.0.0.1 8080 || exit 1
 
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
