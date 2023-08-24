@@ -26,7 +26,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     mercurial \
     libxslt \
     libxslt-dev \
-    tini \
 && cd /tmp && hg clone -r default https://hg.nginx.org/nginx \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -98,10 +97,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
 HEALTHCHECK --interval=3s --timeout=1s \
-CMD nc -vz -w1 127.0.0.1 8080 || exit 1
-
-ENTRYPOINT [ "/sbin/tini", "--" ]
-CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+CMD /usr/bin/nc -vz -w1 127.0.0.1 8080 || exit 1
 
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
@@ -113,3 +109,4 @@ LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
 
 STOPSIGNAL SIGQUIT
 USER nginx
+ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
