@@ -100,6 +100,9 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 HEALTHCHECK --interval=3s --timeout=1s \
 CMD nc -vz -w1 127.0.0.1 8080 || exit 1
 
+ENTRYPOINT [ "/sbin/tini", "--" ]
+CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
       maintainer="ammnt <admin@msftcnsi.com>" \
@@ -110,4 +113,3 @@ LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
 
 STOPSIGNAL SIGQUIT
 USER nginx
-ENTRYPOINT ["/sbin/tini", "--", "nginx", "-g", "daemon off;"]
