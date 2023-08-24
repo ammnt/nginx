@@ -110,4 +110,4 @@ LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
 
 STOPSIGNAL SIGQUIT
 USER nginx
-ENTRYPOINT ["/usr/sbin/tini", "--", "nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/sbin/tini", "--", "nginx", "-g", "daemon off;"]
