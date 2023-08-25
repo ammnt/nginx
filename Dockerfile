@@ -36,7 +36,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e 's/listen       80;/listen 8080;/g' /tmp/nginx/conf/nginx.conf \
 && sed -i -e '1i pid /tmp/nginx.pid;\n' /tmp/nginx/conf/nginx.conf \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& addgroup -S nginx && adduser -S nginx -s /bin/false -G nginx --no-create-home \
+&& addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --no-create-home \
 && cd /tmp && git clone --recursive --depth 1 https://github.com/quictls/openssl && hg clone http://hg.nginx.org/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
@@ -94,7 +94,10 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
 && update-ca-certificates && apk --purge del libgcc libstdc++ tini g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl libxslt-dev apk-tools \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk \
-&& ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log && rm -rf /bin/busybox
+&& ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
+
+HEALTHCHECK --interval=3s --timeout=1s \
+CMD nc -vz -w1 127.0.0.1 8080 || exit 1
 
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
@@ -106,4 +109,4 @@ LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
 
 STOPSIGNAL SIGQUIT
 USER nginx
-ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
