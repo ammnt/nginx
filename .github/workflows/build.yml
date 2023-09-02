@@ -3,7 +3,7 @@ name: Build and push image📦
 on:
   workflow_dispatch:
   schedule:
-    - cron: "00 20 * * SAT"
+    - cron: "00 23 * * SAT"
   push:
     branches: ["http3"]
 
