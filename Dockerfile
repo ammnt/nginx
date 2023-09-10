@@ -96,6 +96,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
+RUN rm -f /bin/sh
 HEALTHCHECK --interval=3s --timeout=1s \
 CMD ["/usr/bin/nc", "-vz", "-w1", "127.0.0.1", "8080"]
 
