@@ -93,10 +93,9 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
-&& update-ca-certificates && apk --purge del libgcc libstdc++ g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl libxslt-dev \
-&& ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
-
-RUN apk --purge del busybox apk-tools && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
+&& update-ca-certificates && apk --purge del libgcc libstdc++ g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl libxslt-dev busybox apk-tools \
+&& ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log \
+&& rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
 
 HEALTHCHECK --interval=3s --timeout=1s \
 CMD ["/usr/bin/nc", "-vz", "-w1", "127.0.0.1", "8080"]
