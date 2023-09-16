@@ -94,10 +94,9 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
 && update-ca-certificates && apk --purge del libgcc libstdc++ g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl libxslt-dev \
-# && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
-RUN apk --purge del busybox apk-tools
+RUN apk --purge del busybox apk-tools && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
 
 HEALTHCHECK --interval=3s --timeout=1s \
 CMD ["/usr/bin/nc", "-vz", "-w1", "127.0.0.1", "8080"]
