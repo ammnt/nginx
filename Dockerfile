@@ -99,8 +99,8 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 
 RUN apk --purge del busybox apk-tools
 
-# HEALTHCHECK --interval=3s --timeout=1s \
-# CMD ["/usr/bin/nc", "-vz", "-w1", "127.0.0.1", "8080"]
+HEALTHCHECK --interval=3s --timeout=1s \
+CMD ["/usr/bin/nc", "-vz", "-w1", "127.0.0.1", "8080"]
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 
