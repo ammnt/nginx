@@ -7,7 +7,7 @@ on:
   # push:
   #  branches: ["http3"]
   # pull_request:
-  #   branches: [ "http3" ]
+  #  branches: ["http3"]
 
 env:
   REGISTRY: ghcr.io
