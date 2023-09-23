@@ -29,6 +29,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     tini \
 && cd /tmp && hg clone -r default https://hg.nginx.org/nginx \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
+&& sed -i -e 's@"nginx version: "@" "@g' /tmp/angie/src/core/nginx.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/v2/ngx_http_v2_filter_module.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/v3/ngx_http_v3_filter_module.c \
