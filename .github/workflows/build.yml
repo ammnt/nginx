@@ -28,7 +28,7 @@ jobs:
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3.1.2
+        uses: sigstore/cosign-installer@v3.2.0
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3.0.0
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build the Docker image
         id: build
-        uses: docker/build-push-action@v5.0.0
+        uses: docker/build-push-action@v5.1.0
         with:
           provenance: false
           context: .
@@ -65,17 +65,17 @@ jobs:
             ${{ steps.meta.outputs.tags }}
             ammnt/nginx:http3
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
 
       - name: Test the Docker image
         run: |
           docker run --name nginx --restart unless-stopped -p 127.0.0.1:8080:8080/tcp -d ammnt/nginx:http3
-          curl -vki http://127.0.0.1:8080
+          curl -vvv http://127.0.0.1:8080 || exit 1
 
       - name: Push the Docker image
         id: push
-        uses: docker/build-push-action@v5.0.0
+        uses: docker/build-push-action@v5.1.0
         with:
           provenance: false
           context: .
@@ -85,8 +85,8 @@ jobs:
             ${{ steps.meta.outputs.tags }}
             ammnt/nginx:http3
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
