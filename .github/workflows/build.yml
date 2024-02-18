@@ -67,7 +67,7 @@ jobs:
       - name: Slim the Docker image
         uses: kitabisa/docker-slim-action@v1.0.3
         env:
-          DSLIM_HTTP_PROBE: false
+          DSLIM_HTTP_PROBE: true
         with:
           target: ammnt/nginx:http3
           tag: ammnt/nginx:http3
@@ -76,17 +76,11 @@ jobs:
       - name: Slim the Docker image for GHCR
         uses: kitabisa/docker-slim-action@v1.0.3
         env:
-          DSLIM_HTTP_PROBE: false
+          DSLIM_HTTP_PROBE: true
         with:
           target: ghcr.io/ammnt/nginx:http3
           tag: ghcr.io/ammnt/nginx:http3
           overwrite: true
-
-      - name: Debug Docker information
-        run: |
-          docker version
-          docker info
-          docker images
 
       - name: Push the Docker images
         run: |
