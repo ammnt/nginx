@@ -110,9 +110,9 @@ jobs:
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ghcr.io/ammnt/nginx:@${{ steps.push.outputs.digest }}
+            ghcr.io/ammnt/nginx:http3
           cosign sign -y \
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ammnt/nginx:@${{ steps.push.outputs.digest }}
+            ammnt/nginx:@http3
