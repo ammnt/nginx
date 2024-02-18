@@ -69,7 +69,7 @@ jobs:
           # cache-to: type=gha,mode=max
 
       - name: Slim the Docker image
-        uses: kitabisa/docker-slim-action@v1
+        uses: kitabisa/docker-slim-action@v1.0.3
         env:
           DSLIM_HTTP_PROBE: false
         with:
@@ -78,7 +78,7 @@ jobs:
           overwrite: true
 
       - name: Slim the Docker image with digest
-        uses: kitabisa/docker-slim-action@v1
+        uses: kitabisa/docker-slim-action@v1.0.3
         env:
           DSLIM_HTTP_PROBE: false
         with:
@@ -90,7 +90,7 @@ jobs:
         run: |
           docker version
           docker info
-          docker images | grep "ammnt/nginx"
+          docker images
 
       - name: Test the Docker image
         run: |
@@ -98,19 +98,9 @@ jobs:
           curl -i http://127.0.0.1:8080 || exit 1
 
       - name: Push the Docker image
-        id: push
-        uses: docker/build-push-action@v5.1.0
-        with:
-          provenance: false
-          context: .
-          platforms: linux/amd64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ammnt/nginx:http3
-          labels: ${{ steps.meta.outputs.labels }}
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
+        run: |
+          docker image push ammnt/nginx:http3
+          docker image push ammnt/nginx:@${{ steps.push.outputs.digest }}
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
