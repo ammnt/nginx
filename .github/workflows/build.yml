@@ -65,8 +65,8 @@ jobs:
             ${{ steps.meta.outputs.tags }}
             ammnt/nginx:http3
           labels: ${{ steps.meta.outputs.labels }}
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Slim the Docker image
         uses: kitabisa/docker-slim-action@v1.0.3
@@ -91,8 +91,6 @@ jobs:
           docker version
           docker info
           docker images
-          DIGESTHUB="$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)"
-          DIGESTGHCR="$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)"
 
       - name: Test the Docker image
         run: |
@@ -103,6 +101,11 @@ jobs:
         run: |
           docker image push ammnt/nginx:http3
           docker image push ghcr.io/ammnt/nginx:http3
+
+      - name: Get Digest of Docker images
+        run: |
+          DIGESTHUB="$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)"
+          DIGESTGHCR="$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)"
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
