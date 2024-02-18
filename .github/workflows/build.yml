@@ -104,8 +104,8 @@ jobs:
 
       - name: Get Digest of Docker images
         run: |
-          DIGESTHUB=$(docker inspect ammnt/nginx:http3 | jq -r '.[].RepoDigests[0] | split(":") | .[1]'
-          DIGESTGHCR=$(docker inspect ghcr.io/ammnt/nginx:http3 | jq -r '.[].RepoDigests[0] | split(":") | .[1]'
+          DIGESTHUB=$(docker inspect ammnt/nginx:http3 | jq -r '.[].RepoDigests[0] | split(":") | .[1]')
+          DIGESTGHCR=$(docker inspect ghcr.io/ammnt/nginx:http3 | jq -r '.[].RepoDigests[0] | split(":") | .[1]')
           echo $DIGESTHUB
           echo $DIGESTGHCR
 
