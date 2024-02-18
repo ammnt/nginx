@@ -104,8 +104,10 @@ jobs:
 
       - name: Get Digest of Docker images
         run: |
-          DIGESTHUB="$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)"
-          DIGESTGHCR="$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)"
+          DIGESTHUB=$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)
+          DIGESTGHCR=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)
+          echo $DIGESTHUB
+          echo $DIGESTGHCR
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
@@ -116,9 +118,9 @@ jobs:
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ${DIGESTHUB}
+            $DIGESTHUB
           cosign sign -y \
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ${DIGESTGHCR}
+            $DIGESTGHCR
