@@ -53,13 +53,6 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Debug Docker information
-        run: |
-          docker version
-          docker info
-          slim --version
-          docker images | grep "ammnt/nginx"
-
       - name: Build the Docker image
         id: build
         uses: docker/build-push-action@v5.1.0
@@ -83,6 +76,12 @@ jobs:
           target: IMAGE_NAME:ammnt/nginx:http3
           tag: ammnt/nginx:http3
           overwrite: true
+
+      - name: Debug Docker information
+        run: |
+          docker version
+          docker info
+          docker images | grep "ammnt/nginx"
 
       - name: Test the Docker image
         run: |
