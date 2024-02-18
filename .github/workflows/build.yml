@@ -73,7 +73,7 @@ jobs:
         env:
           DSLIM_HTTP_PROBE: true
         with:
-          target: IMAGE_NAME:ammnt/nginx:http3
+          target: ammnt/nginx:http3
           tag: ammnt/nginx:http3
           overwrite: true
 
