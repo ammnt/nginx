@@ -53,6 +53,13 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Debug Docker information
+        run: |
+          docker version
+          docker info
+          slim --version
+          docker images | grep "ammnt/nginx"
+
       - name: Build the Docker image
         id: build
         uses: docker/build-push-action@v5.1.0
@@ -71,17 +78,11 @@ jobs:
       - name: Slim the Docker image
         uses: kitabisa/docker-slim-action@v1.0.3
         env:
-          DSLIM_HTTP_PROBE: false
+          DSLIM_HTTP_PROBE: true
         with:
           target: IMAGE_NAME:ammnt/nginx:http3
-          tag: "ammnt/nginx:http3"
-
-      - name: Info
-        run: |
-          docker version
-          docker info
-          slim --version
-          docker images | grep "ammnt/nginx"
+          tag: ammnt/nginx:http3
+          overwrite: true
 
       - name: Test the Docker image
         run: |
