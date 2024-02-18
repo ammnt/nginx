@@ -91,6 +91,8 @@ jobs:
           docker version
           docker info
           docker images
+          DIGESTHUB=$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)
+          DIGESTGHCR=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)
 
       - name: Test the Docker image
         run: |
@@ -100,6 +102,7 @@ jobs:
       - name: Push the Docker images
         run: |
           docker image push ammnt/nginx:http3
+          docker image push ghcr.io/ammnt/nginx:http3
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
@@ -110,9 +113,9 @@ jobs:
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ghcr.io/ammnt/nginx:http3
+            ${DIGESTHUB}
           cosign sign -y \
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ammnt/nginx:http3
+            ${DIGESTGHCR}
