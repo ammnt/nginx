@@ -71,10 +71,19 @@ jobs:
       - name: Slim the Docker image
         uses: kitabisa/docker-slim-action@v1
         env:
-          DSLIM_HTTP_PROBE: true
+          DSLIM_HTTP_PROBE: false
         with:
           target: ammnt/nginx:http3
           tag: ammnt/nginx:http3
+          overwrite: true
+
+      - name: Slim the Docker image with digest
+        uses: kitabisa/docker-slim-action@v1
+        env:
+          DSLIM_HTTP_PROBE: false
+        with:
+          target: ${{ steps.meta.outputs.tags }}
+          tag: ${{ steps.meta.outputs.tags }}
           overwrite: true
 
       - name: Debug Docker information
