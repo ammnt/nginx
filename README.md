@@ -20,7 +20,7 @@ https://github.com/openssl/openssl
 - zlib library latest version;
 - Rootless master process - unprivileged container;
 - Async I/O threads module;
-- Shell removed from $PATH;
+- Shell removed from the image;
 - Removed unnecessary modules;
 - Added OCI labels and annotations;
 - No excess ENTRYPOINT in the image;
