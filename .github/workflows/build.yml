@@ -68,10 +68,25 @@ jobs:
           # cache-from: type=gha
           # cache-to: type=gha,mode=max
 
+      - name: Slim the Docker image
+        uses: kitabisa/docker-slim-action@v1.0.3
+        env:
+          DSLIM_HTTP_PROBE: false
+        with:
+          target: IMAGE_NAME:ammnt/nginx:http3
+          tag: "ammnt/nginx:http3"
+
+      - name: Info
+        run: |
+          docker version
+          docker info
+          slim --version
+          docker images | grep "ammnt/nginx"
+
       - name: Test the Docker image
         run: |
           docker run -idt -p 127.0.0.1:8080:8080/tcp ammnt/nginx:http3
-          curl -vvv http://127.0.0.1:8080 || exit 1
+          curl -i http://127.0.0.1:8080 || exit 1
 
       - name: Push the Docker image
         id: push
