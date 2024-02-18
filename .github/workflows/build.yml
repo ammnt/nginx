@@ -77,13 +77,13 @@ jobs:
           tag: ammnt/nginx:http3
           overwrite: true
 
-      - name: Slim the Docker image with digest
+      - name: Slim the Docker image for GHCR
         uses: kitabisa/docker-slim-action@v1.0.3
         env:
           DSLIM_HTTP_PROBE: false
         with:
-          target: ${{ steps.meta.outputs.tags }}
-          tag: ${{ steps.meta.outputs.tags }}
+          target: ghcr.io/ammnt/nginx:http3
+          tag: ghcr.io/ammnt/nginx:http3
           overwrite: true
 
       - name: Debug Docker information
@@ -91,8 +91,8 @@ jobs:
           docker version
           docker info
           docker images
-          DIGESTHUB=$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)
-          DIGESTGHCR=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)
+          DIGESTHUB="$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:http3)"
+          DIGESTGHCR="$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:http3)"
 
       - name: Test the Docker image
         run: |
