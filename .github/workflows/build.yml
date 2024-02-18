@@ -115,4 +115,4 @@ jobs:
             -a "repo=${{ github.repository }}" \
             -a "workflow=${{ github.workflow }}" \
             -a "ref=${{ github.sha }}" \
-            ammnt/nginx:@http3
+            ammnt/nginx:http3
