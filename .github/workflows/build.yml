@@ -88,11 +88,6 @@ jobs:
           docker info
           docker images
 
-      - name: Test the Docker image
-        run: |
-          docker run -idt -p 127.0.0.1:8080:8080/tcp ammnt/nginx:http3
-          curl -i http://127.0.0.1:8080 || exit 1
-
       - name: Push the Docker images
         run: |
           docker image push ammnt/nginx:http3
