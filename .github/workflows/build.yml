@@ -24,21 +24,25 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.2
+
+      - name: Install cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v3.5.0
 
       - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v3.0.0
+        uses: docker/setup-buildx-action@v3.3.0
 
       - name: Log into ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log into Docker Hub
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.1.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -51,38 +55,51 @@ jobs:
 
       - name: Build the Docker image
         id: build
-        uses: docker/build-push-action@v5.1.0
+        uses: docker/build-push-action@v5.3.0
         with:
           provenance: false
           context: .
           platforms: linux/amd64
           load: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ammnt/nginx:http3
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Slim the Docker image
-        uses: kitabisa/docker-slim-action@v1.0.3
-        env:
-          DSLIM_HTTP_PROBE: false
-        with:
-          target: ammnt/nginx:http3
-          tag: ammnt/nginx:http3
-          overwrite: true
-
-      - name: Slim the Docker image for GHCR
-        uses: kitabisa/docker-slim-action@v1.0.3
+        uses: kitabisa/docker-slim-action@v1.1.1
         env:
           DSLIM_HTTP_PROBE: false
         with:
           target: ghcr.io/ammnt/nginx:http3
           tag: ghcr.io/ammnt/nginx:http3
           overwrite: true
+      - run: echo "${REPORT}"
+        env:
+          REPORT: ${{ steps.slim.outputs.report }}
 
-      - name: Push the Docker images
+      - name: Test the Docker image
         run: |
-          docker image push ammnt/nginx:http3
-          docker image push ghcr.io/ammnt/nginx:http3
+          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:http3
+          curl -v http://127.0.0.1:8080 || exit 1
+
+      - name: Scan the Docker image
+        uses: anchore/sbom-action@v0.15.10
+        with:
+          image: ghcr.io/ammnt/nginx:http3
+
+      - name: Push the Docker images to ghcr.io
+        run: docker push ghcr.io/ammnt/nginx:http3
+
+      - name: Push the Docker images to docker.io
+        run: |
+          docker tag ghcr.io/ammnt/nginx:http3 ammnt/nginx:http3
+          docker push ammnt/nginx:http3
+
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: |
+          cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          cosign sign docker.io/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}

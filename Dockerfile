@@ -3,7 +3,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && apk -U upgrade && apk add --no-cache \
     openssl \
     pcre \
-    zlib \
+    zlib-ng \
     libgcc \
     libstdc++ \
     g++ \
@@ -18,7 +18,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     talloc-dev \
     libtool \
     pcre-dev \
-    zlib-dev \
+    zlib-ng-dev \
     binutils \
     gnupg \
     cmake \
@@ -36,12 +36,16 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/listen       80;/listen 8080;/g' /tmp/nginx/conf/nginx.conf \
+&& sed -i -e 's@#tcp_nopush     on;@client_body_temp_path /tmp/client_temp;@g' /tmp/nginx/conf/nginx.conf \
+&& sed -i -e 's@#keepalive_timeout  0;@proxy_temp_path /tmp/proxy_temp;@g' /tmp/nginx/conf/nginx.conf \
+&& sed -i -e 's@#gzip  on;@fastcgi_temp_path /tmp/fastcgi_temp;@g' /tmp/nginx/conf/nginx.conf \
 && sed -i -e '1i pid /tmp/nginx.pid;\n' /tmp/nginx/conf/nginx.conf \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
 && addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --no-create-home \
-&& cd /tmp && git clone --recursive --depth 1 https://github.com/openssl/openssl && hg clone http://hg.nginx.org/njs \
+&& git clone --recursive --depth 1 https://github.com/openssl/openssl && hg clone https://hg.nginx.org/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
+    --with-debug \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
@@ -94,18 +98,18 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
-&& update-ca-certificates && apk --purge del libgcc libstdc++ g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl libxslt-dev apk-tools \
+&& update-ca-certificates && apk --purge del libgcc libstdc++ g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-ng-dev binutils gnupg cmake mercurial go pcre-dev ca-certificates openssl libxslt-dev apk-tools \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk \
 && ln -sf /dev/stdout /tmp/access.log && ln -sf /dev/stderr /tmp/error.log
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 
 EXPOSE 8080/tcp 8443/tcp 8443/udp
-LABEL description="NGINX built with QUIC and HTTP/3 support🚀" \
+LABEL description="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       maintainer="ammnt <admin@msftcnsi.com>" \
-      org.opencontainers.image.description="NGINX built with QUIC and HTTP/3 support🚀" \
+      org.opencontainers.image.description="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       org.opencontainers.image.authors="ammnt, admin@msftcnsi.com" \
-      org.opencontainers.image.title="NGINX built with QUIC and HTTP/3 support🚀" \
+      org.opencontainers.image.title="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       org.opencontainers.image.source="https://github.com/ammnt/nginx/"
 
 STOPSIGNAL SIGQUIT
