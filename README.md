@@ -1,9 +1,9 @@
 # Distroless NGINX with HTTP/3 and QUIC support🚀
 
 The Docker image is ready to use:<br>
-<code>docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:http3</code><br>
+<code>docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main</code><br>
 or<br>
-<code>docker run -d --rm -p 127.0.0.1:8080:8080/tcp ammnt/nginx:http3</code>
+<code>docker run -d --rm -p 127.0.0.1:8080:8080/tcp ammnt/nginx:main</code>
 
 # Description:
 

@@ -5,9 +5,9 @@ on:
   # schedule:
   #  - cron: "00 17 * * SAT"
   push:
-    branches: ["http3"]
+    branches: ["main"]
   # pull_request:
-  #  branches: ["http3"]
+  #  branches: ["main"]
 
 env:
   REGISTRY: ghcr.io
@@ -72,8 +72,8 @@ jobs:
         env:
           DSLIM_HTTP_PROBE: false
         with:
-          target: ghcr.io/ammnt/nginx:http3
-          tag: ghcr.io/ammnt/nginx:http3
+          target: ghcr.io/ammnt/nginx:main
+          tag: ghcr.io/ammnt/nginx:main
           overwrite: true
       - run: echo "${REPORT}"
         env:
@@ -81,7 +81,7 @@ jobs:
 
       - name: Test the Docker image🧪
         run: |
-          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:http3
+          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Analyze for critical and high CVEs💊
@@ -90,7 +90,7 @@ jobs:
         uses: docker/scout-action@v1.7.0
         with:
           command: cves,sbom
-          image: ghcr.io/ammnt/nginx:http3
+          image: ghcr.io/ammnt/nginx:main
           sarif-file: sarif.output.json
           summary: true
 
@@ -103,9 +103,9 @@ jobs:
 
       - name: Push the Docker images to registries💾
         run: |
-          docker push ghcr.io/ammnt/nginx:http3
-          docker tag ghcr.io/ammnt/nginx:http3 ammnt/nginx:http3
-          docker push ammnt/nginx:http3
+          docker push ghcr.io/ammnt/nginx:main
+          docker tag ghcr.io/ammnt/nginx:main ammnt/nginx:main
+          docker push ammnt/nginx:main
 
       - name: Sign the published Docker image🔐
         if: ${{ github.event_name != 'pull_request' }}
