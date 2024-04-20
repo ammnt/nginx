@@ -41,7 +41,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e 's@#gzip  on;@fastcgi_temp_path /tmp/fastcgi_temp;@g' /tmp/nginx/conf/nginx.conf \
 && sed -i -e '1i pid /tmp/nginx.pid;\n' /tmp/nginx/conf/nginx.conf \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --no-create-home \
+&& addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
 && git clone --recursive --depth 1 https://github.com/openssl/openssl && hg clone https://hg.nginx.org/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
@@ -72,6 +72,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --with-http_ssl_module \
     --with-http_v2_module \
     --with-http_v3_module \
+    --with-http_gzip_static_module \
     --with-stream \
     --with-stream_realip_module \
     --with-stream_ssl_module \
