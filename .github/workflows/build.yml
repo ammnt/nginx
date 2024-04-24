@@ -18,24 +18,22 @@ jobs:
     if: github.actor == 'ammnt'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       id-token: write
       security-events: write
 
     steps:
       - name: Checkout repository🧱
-        uses: actions/checkout@v4.1.3
+        uses: actions/checkout@v4.1.4
 
       - name: Install cosign🔒
-        if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3.5.0
 
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.3.0
 
       - name: Log into ${{ env.REGISTRY }}🔑
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3.1.0
         with:
           registry: ${{ env.REGISTRY }}
@@ -75,9 +73,6 @@ jobs:
           target: ghcr.io/ammnt/nginx:main
           tag: ghcr.io/ammnt/nginx:main
           overwrite: true
-      - run: echo "${REPORT}"
-        env:
-          REPORT: ${{ steps.slim.outputs.report }}
 
       - name: Test the Docker image🧪
         run: |
@@ -85,8 +80,6 @@ jobs:
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Analyze for critical and high CVEs💊
-        id: docker-scout-cves
-        if: ${{ github.event_name != 'pull_request_target' }}
         uses: docker/scout-action@v1.7.0
         with:
           command: cves,sbom
@@ -95,11 +88,26 @@ jobs:
           summary: true
 
       - name: Upload SARIF result📊
-        id: upload-sarif
-        if: ${{ github.event_name != 'pull_request_target' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: sarif.output.json
+
+      - name: Run Trivy vulnerability scanner💊
+        uses: aquasecurity/trivy-action@0.19.0
+        with:
+          image-ref: ghcr.io/ammnt/nginx:main
+          scan-type: image
+          format: "github"
+          output: "dependency-results.sbom.json"
+          severity: "MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+
+      - name: Upload Trivy report as a Github artifact📊
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: trivy-sbom-report
+          path: "${{ github.workspace }}/dependency-results.sbom.json"
+          retention-days: 20
 
       - name: Push the Docker images to registries💾
         run: |
@@ -108,7 +116,6 @@ jobs:
           docker push ammnt/nginx:main
 
       - name: Sign the published Docker image🔐
-        if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
         run: |
