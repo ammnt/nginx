@@ -109,6 +109,28 @@ jobs:
           path: "${{ github.workspace }}/dependency-results.sbom.json"
           retention-days: 20
 
+      - name: Scan the image and upload dependency results🔍
+        uses: anchore/sbom-action@v0.15.11
+        with:
+          syft-version: v1.3.0
+          image: ghcr.io/ammnt/nginx:main
+          artifact-name: image.spdx.json
+          dependency-snapshot: false
+
+      - name: Run Snyk to check Docker image for vulnerabilities🔍
+        continue-on-error: true
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ghcr.io/ammnt/nginx:main
+          args: --file=Dockerfile
+
+      - name: Upload result to GitHub Code Scanning📊
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+
       - name: Push the Docker images to registries💾
         run: |
           docker push ghcr.io/ammnt/nginx:main
