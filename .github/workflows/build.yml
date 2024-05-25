@@ -22,10 +22,11 @@ jobs:
       packages: write
       id-token: write
       security-events: write
+      attestations: write
 
     steps:
       - name: Checkout repository🧱
-        uses: actions/checkout@v4.1.4
+        uses: actions/checkout@v4.1.5
 
       - name: Install cosign🔒
         uses: sigstore/cosign-installer@v3.5.0
@@ -80,7 +81,7 @@ jobs:
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Analyze for critical and high CVEs💊
-        uses: docker/scout-action@v1.7.0
+        uses: docker/scout-action@v1.8.0
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:main
@@ -93,7 +94,7 @@ jobs:
           sarif_file: sarif.output.json
 
       - name: Run Trivy vulnerability scanner💊
-        uses: aquasecurity/trivy-action@0.19.0
+        uses: aquasecurity/trivy-action@0.21.0
         with:
           image-ref: ghcr.io/ammnt/nginx:main
           scan-type: image
@@ -135,7 +136,16 @@ jobs:
         run: |
           docker push ghcr.io/ammnt/nginx:main
           docker tag ghcr.io/ammnt/nginx:main ammnt/nginx:main
+          export DIGEST=$(docker images --no-trunc --quiet ghcr.io/ammnt/nginx:main) >> $GITHUB_ENV
+          echo "The digest is: ${DIGEST}"
           docker push ammnt/nginx:main
+
+      - name: Attest📍
+        uses: actions/attest-build-provenance@v1.1.2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ env.DIGEST }}
+          push-to-registry: true
 
       - name: Sign the published Docker image🔐
         env:
