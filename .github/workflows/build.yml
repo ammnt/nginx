@@ -145,11 +145,11 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ env.DIGEST }}
-          push-to-registry: true
+          push-to-registry: false
 
       - name: Sign the published Docker image🔐
         env:
           COSIGN_EXPERIMENTAL: "true"
         run: |
-          cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
-          cosign sign docker.io/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
+          cosign sign docker.io/${{ env.IMAGE_NAME }}@${{ env.DIGEST }}
