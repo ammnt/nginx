@@ -138,6 +138,7 @@ jobs:
           docker tag ghcr.io/ammnt/nginx:main ammnt/nginx:main
           export DIGEST=$(docker images --no-trunc --quiet ghcr.io/ammnt/nginx:main) >> $GITHUB_ENV
           docker push ammnt/nginx:main
+          echo ${{ env.DIGEST }}
 
       - name: Attest📍
         uses: actions/attest-build-provenance@v1.1.2
