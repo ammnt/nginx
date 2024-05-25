@@ -12,7 +12,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  DIGEST: ${{ DIGEST }}
 
 jobs:
   build:
@@ -137,8 +136,8 @@ jobs:
         run: |
           docker push ghcr.io/ammnt/nginx:main
           docker tag ghcr.io/ammnt/nginx:main ammnt/nginx:main
-          export DIGEST=$(docker images --no-trunc --quiet ghcr.io/ammnt/nginx:main)
-          echo "The digest is: ${DIGEST}"
+          echo "DIGEST=docker images --no-trunc --quiet ghcr.io/ammnt/nginx:main)" >> $GITHUB_ENV
+          echo "The  is: ${DIGEST}"
           docker push ammnt/nginx:main
 
       - name: Attest📍
