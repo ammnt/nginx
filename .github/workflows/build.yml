@@ -116,18 +116,6 @@ jobs:
           image: ghcr.io/ammnt/nginx:main
           fail-build: true
 
-      - name: Run Clair V4 image scanner🔍
-        uses: quay/clair-action@main
-        with:
-          image-ref: ghcr.io/ammnt/nginx:main
-          format: sarif
-          output: clair_results.sarif
-
-      - name: Upload Clair result to GitHub Code Scanning📊
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: clair_results.sarif
-
       - name: Scan the image and upload dependency results🔍
         uses: anchore/sbom-action@v0.15.11
         with:
