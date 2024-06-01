@@ -34,7 +34,7 @@ jobs:
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.3.0
 
-      - name: Log into ${{ env.REGISTRY }}🔑
+      - name: Log into GHCR🔑
         uses: docker/login-action@v3.2.0
         with:
           registry: ${{ env.REGISTRY }}
@@ -80,7 +80,7 @@ jobs:
           docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main
           curl -v http://127.0.0.1:8080 || exit 1
 
-      - name: Analyze for critical and high CVEs💊
+      - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.9.3
         with:
           command: cves,sbom
@@ -88,12 +88,12 @@ jobs:
           sarif-file: sarif.output.json
           summary: true
 
-      - name: Upload SARIF result📊
+      - name: Upload Docker Scout report📊
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: sarif.output.json
 
-      - name: Run Trivy vulnerability scanner💊
+      - name: Analyze image with Trivy💊
         uses: aquasecurity/trivy-action@0.21.0
         with:
           image-ref: ghcr.io/ammnt/nginx:main
@@ -103,20 +103,26 @@ jobs:
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
 
-      - name: Upload Trivy report as a Github artifact📊
-        uses: actions/upload-artifact@v4.3.3
+      - name: Upload Trivy report📊
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-sbom-report
           path: "${{ github.workspace }}/dependency-results.sbom.json"
           retention-days: 20
 
-      - name: Scan image with Anchore scanner🔍
+      - name: Analyze image with Anchore💊
+        id: anchore
         uses: anchore/scan-action@v3.6.4
         with:
           image: ghcr.io/ammnt/nginx:main
           fail-build: true
 
-      - name: Scan the image and upload dependency results🔍
+      - name: Upload Anchore report📊
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.anchore.outputs.sarif }}
+
+      - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.15.11
         with:
           syft-version: v1.5.0
@@ -124,7 +130,7 @@ jobs:
           artifact-name: image.spdx.json
           dependency-snapshot: false
 
-      - name: Run Snyk to check Docker image for vulnerabilities🔍
+      - name: Analyze image with Snyk💊
         continue-on-error: true
         uses: snyk/actions/docker@master
         env:
@@ -133,7 +139,7 @@ jobs:
           image: ghcr.io/ammnt/nginx:main
           args: --file=Dockerfile
 
-      - name: Upload Snyk result to GitHub Code Scanning📊
+      - name: Upload Snyk report📊
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk.sarif
