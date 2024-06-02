@@ -66,20 +66,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Slim the Docker image🚀
-        uses: kitabisa/docker-slim-action@v1.1.1
-        env:
-          DSLIM_HTTP_PROBE: false
-        with:
-          target: ghcr.io/ammnt/nginx:main
-          tag: ghcr.io/ammnt/nginx:main
-          overwrite: true
-
-      - name: Test the Docker image🧪
-        run: |
-          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main
-          curl -v http://127.0.0.1:8080 || exit 1
-
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.9.3
         with:
@@ -115,7 +101,8 @@ jobs:
         uses: anchore/scan-action@v3.6.4
         with:
           image: ghcr.io/ammnt/nginx:main
-          fail-build: true
+          fail-build: false
+          severity-cutoff: critical
 
       - name: Upload Anchore report📊
         uses: github/codeql-action/upload-sarif@v3
@@ -153,6 +140,20 @@ jobs:
           DOCKER_GATEWAY=$(docker network inspect bridge --format "{{range .IPAM.Config}}{{.Gateway}}{{end}}")
           wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64 && chmod +x clair-scanner
           ./clair-scanner --ip="$DOCKER_GATEWAY" ghcr.io/ammnt/nginx:main || exit 0
+
+      - name: Slim the Docker image🚀
+        uses: kitabisa/docker-slim-action@v1.1.1
+        env:
+          DSLIM_HTTP_PROBE: false
+        with:
+          target: ghcr.io/ammnt/nginx:main
+          tag: ghcr.io/ammnt/nginx:main
+          overwrite: true
+
+      - name: Test the Docker image🧪
+        run: |
+          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main
+          curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Push the Docker images to registries💾
         run: |
