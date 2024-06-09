@@ -80,7 +80,7 @@ jobs:
           sarif_file: sarif.output.json
 
       - name: Analyze image with Trivy💊
-        uses: aquasecurity/trivy-action@0.21.0
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           image-ref: ghcr.io/ammnt/nginx:main
           scan-type: image
