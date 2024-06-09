@@ -1,5 +1,9 @@
 # Distroless NGINX with HTTP/3 and QUIC support🚀
 
+[![Build and push image📦](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
+![version](https://img.shields.io/badge/version-1.27.0-blue)
+[![GitHub issues open](https://img.shields.io/github/issues/ammnt/nginx.svg)](https://github.com/ammnt/nginx/issues)
+
 The Docker image is ready to use:<br>
 <code>docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main</code><br>
 or<br>
@@ -25,6 +29,7 @@ https://github.com/openssl/openssl
 - Added OCI labels and annotations;
 - No excess ENTRYPOINT in the image;
 - Slimmed version by Docker Slim tool;
+- Scanned effiniefficiency result with Dive tool;
 - Scanned by vulnerability scanners: GitHub, Docker Scout, Snyk, Anchore, Clair and Syft;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
 https://github.com/ammnt/nginx/blob/http3/Dockerfile

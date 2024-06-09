@@ -2,8 +2,8 @@ name: Build and push image📦
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "00 12 1 * *"
+  # schedule:
+  # - cron: "00 12 1 * *"
   push:
     branches: ["main"]
   # pull_request:
