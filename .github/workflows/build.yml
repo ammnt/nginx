@@ -97,7 +97,7 @@ jobs:
           path: "${{ github.workspace }}/dependency-results.sbom.json"
           retention-days: 20
 
-      - name: Analyze image with Anchore💊
+      - name: Analyze image with Grype💊
         id: anchore
         uses: anchore/scan-action@v3.6.4
         with:
@@ -105,7 +105,7 @@ jobs:
           fail-build: false
           severity-cutoff: critical
 
-      - name: Upload Anchore report📊
+      - name: Upload Grype report📊
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ${{ steps.anchore.outputs.sarif }}
@@ -113,7 +113,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.16.0
         with:
-          syft-version: v1.6.0
+          syft-version: v1.8.0
           image: ghcr.io/ammnt/nginx:main
           artifact-name: image.spdx.json
           dependency-snapshot: false
