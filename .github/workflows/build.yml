@@ -4,10 +4,8 @@ on:
   workflow_dispatch:
   # schedule:
   # - cron: "00 12 1 * *"
-  push:
-    branches: ["main"]
-  pull_request:
-    branches-ignore: ["main"]
+  # push:
+  #   branches: ["main"]
 
 env:
   REGISTRY: ghcr.io
@@ -113,7 +111,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.16.0
         with:
-          syft-version: v1.8.0
+          syft-version: v1.9.0
           image: ghcr.io/ammnt/nginx:main
           artifact-name: image.spdx.json
           dependency-snapshot: false
