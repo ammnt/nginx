@@ -141,7 +141,7 @@ jobs:
           ./clair-scanner --ip="$DOCKER_GATEWAY" ghcr.io/ammnt/nginx:main || exit 0
 
       - name: Slim the Docker image🚀
-        uses: kitabisa/docker-slim-action@v1.1.1
+        uses: kitabisa/docker-slim-action@v1.1.2
         env:
           DSLIM_HTTP_PROBE: false
         with:
