@@ -65,7 +65,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Analyze image with Docker Scout💊
-        uses: docker/scout-action@v1.11.0
+        uses: docker/scout-action@v1.12.0
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:main
