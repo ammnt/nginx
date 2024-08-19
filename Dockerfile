@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 docker.io/library/alpine:latest
+FROM docker.io/library/alpine:latest
 RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && apk -U upgrade && apk add --no-cache \
     openssl \
@@ -79,7 +79,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --with-stream_ssl_preread_module \
     --without-stream_split_clients_module \
     --without-stream_set_module \
-    --without-stream_map_module \
     --without-http_geo_module \
     --without-http_scgi_module \
     --without-http_uwsgi_module \
