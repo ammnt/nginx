@@ -109,7 +109,7 @@ jobs:
           sarif_file: ${{ steps.anchore.outputs.sarif }}
 
       - name: Analyze image with Syft💊
-        uses: anchore/sbom-action@v0.17.1
+        uses: anchore/sbom-action@v0.17.2
         with:
           syft-version: v1.11.0
           image: ghcr.io/ammnt/nginx:main
