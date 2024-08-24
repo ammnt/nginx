@@ -111,7 +111,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.17.2
         with:
-          syft-version: v1.11.0
+          syft-version: v1.11.1
           image: ghcr.io/ammnt/nginx:main
           artifact-name: image.spdx.json
           dependency-snapshot: false
