@@ -43,7 +43,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e '1i pid /tmp/nginx.pid;\n' /tmp/nginx/conf/nginx.conf \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
 && addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
-&& git clone --recursive --depth 1 --single-branch -b $OPENSSL_BRANCH https://github.com/openssl/openssl && git clone https://github.com/nginx/njs \
+&& echo ${OPENSSL_BRANCH} && git clone --recursive --depth 1 --single-branch -b ${OPENSSL_BRANCH} https://github.com/openssl/openssl && git clone https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
     --with-debug \
