@@ -1,4 +1,6 @@
 FROM docker.io/library/alpine:latest
+ENV OPENSSL_BRANCH openssl-3.3
+
 RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && apk -U upgrade && apk add --no-cache \
     openssl \
@@ -41,8 +43,8 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e '1i pid /tmp/nginx.pid;\n' /tmp/nginx/conf/nginx.conf \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
 && addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
-&& git clone --recursive --depth 1 --single-branch -b openssl-3.3 https://github.com/openssl/openssl && git clone https://github.com/nginx/njs \
-&& cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
+&& git clone --recursive --depth 1 --single-branch -b ${OPENSSL_BRANCH} https://github.com/openssl/openssl && git clone --depth=1 --recursive --shallow-submodules https://github.com/nginx/njs \
+&& git clone --depth=1 --recursive --shallow-submodules https://github.com/google/ngx_brotli && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
     --with-debug \
     --prefix=/etc/nginx \
@@ -94,6 +96,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --without-mail_imap_module \
     --without-mail_smtp_module \
     --add-module=/tmp/njs/nginx \
+    --add-module=/tmp/ngx_brotli \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
