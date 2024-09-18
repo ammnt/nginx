@@ -12,9 +12,8 @@ or<br>
 # Description:
 
 - Based on latest version of Alpine Linux - low size (~5 MB);
-- OpenSSL with kTLS module:<br>
+- OpenSSL with HTTP/3 and QUIC native support:<br>
 https://github.com/openssl/openssl
-- HTTP/3 and QUIC native support from NGINX;
 - HTTP/2 with ALPN support;
 - TLS 1.3 and 0-RTT support;
 - TLS 1.2 and TCP Fast Open (TFO) support;
