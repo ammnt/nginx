@@ -12,7 +12,7 @@ or<br>
 # Description:
 
 - Based on latest version of Alpine Linux - low size (~5 MB);
-- OpenSSL with HTTP/3 and QUIC native support:<br>
+- OpenSSL with HTTP/3 and QUIC support:<br>
 https://github.com/openssl/openssl
 - HTTP/2 with ALPN support;
 - TLS 1.3 and 0-RTT support;
