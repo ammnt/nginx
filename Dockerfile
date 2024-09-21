@@ -32,7 +32,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     ncurses-libs \
     gd-dev \
     brotli-libs \
-&& cd /tmp && git clone -b "${APP_BRANCH}" https://github.com/nginx/nginx \
+&& cd /tmp && git clone -b "${APP_BRANCH}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \

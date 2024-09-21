@@ -160,7 +160,7 @@ jobs:
 
       - name: Test the Docker image🧪
         run: |
-          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:main
+          docker run -d --rm -p 127.0.0.1:8080:35400/tcp ghcr.io/ammnt/nginx:main
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Push the Docker images to registries💾
