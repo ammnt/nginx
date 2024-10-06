@@ -1,4 +1,5 @@
-FROM docker.io/library/alpine:latest
+ARG BASE_VERSION=3.20
+FROM docker.io/library/alpine:${BASE_VERSION}
 ENV OPENSSL_BRANCH=openssl-3.3
 ENV APP_BRANCH=release-1.27.2
 RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
