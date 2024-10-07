@@ -60,7 +60,7 @@ jobs:
           context: .
           platforms: linux/amd64
           load: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          tags: ${{ github.repository }}:${{ env.APP_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -69,7 +69,7 @@ jobs:
         uses: docker/scout-action@v1.14.0
         with:
           command: cves,sbom
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ${{ github.repository }}:${{ env.APP_VERSION }}
           sarif-file: sarif.output.json
           summary: false
 
@@ -81,7 +81,7 @@ jobs:
       - name: Analyze image with Trivy💊
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image-ref: ${{ github.repository }}:${{ env.APP_VERSION }}
           scan-type: image
           format: "github"
           output: "dependency-results.sbom.json"
@@ -100,7 +100,7 @@ jobs:
         id: anchore
         uses: anchore/scan-action@v4.1.2
         with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ${{ github.repository }}:${{ env.APP_VERSION }}
           fail-build: false
           severity-cutoff: critical
 
@@ -113,7 +113,7 @@ jobs:
         uses: anchore/sbom-action@v0.17.2
         with:
           syft-version: v1.13.0
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ${{ github.repository }}:${{ env.APP_VERSION }}
           artifact-name: image.spdx.json
           dependency-snapshot: false
 
@@ -123,7 +123,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ${{ github.repository }}:${{ env.APP_VERSION }}
           args: --file=Dockerfile
 
       - name: Upload Snyk report📊
@@ -139,15 +139,15 @@ jobs:
           sleep 1
           DOCKER_GATEWAY=$(docker network inspect bridge --format "{{range .IPAM.Config}}{{.Gateway}}{{end}}")
           wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64 && chmod +x clair-scanner
-          ./clair-scanner --ip="$DOCKER_GATEWAY" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} || exit 0
+          ./clair-scanner --ip="$DOCKER_GATEWAY" ${{ github.repository }}:${{ env.APP_VERSION }} || exit 0
 
       - name: Slim the Docker image🚀
         uses: kitabisa/docker-slim-action@v1.1.2
         env:
           DSLIM_HTTP_PROBE: false
         with:
-          target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          target: ${{ github.repository }}:${{ env.APP_VERSION }}
+          tag: ${{ github.repository }}:${{ env.APP_VERSION }}
           overwrite: true
 
       - name: Explore the Docker image with Dive🔍
@@ -157,23 +157,23 @@ jobs:
         run: |
           wget -q https://github.com/wagoodman/dive/releases/download/v0.12.0/dive_0.12.0_linux_amd64.tar.gz
           tar xvzf dive_0.12.0_linux_amd64.tar.gz -C /usr/local/bin
-          dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          dive --ci-config "${{ github.workspace }}/.dive-ci/" ${{ github.repository }}:${{ env.APP_VERSION }}
 
       - name: Test the Docker image🧪
         run: |
-          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ${{ github.repository }}:${{ env.APP_VERSION }}
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Push the Docker images to registries💾
         run: |
-          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ghcr.io/ammnt/nginx:latest
-          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
-          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
-          docker push ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker tag ${{ github.repository }}:${{ env.APP_VERSION }} ${{ github.repository }}:latest
+          docker tag ${{ github.repository }}:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
+          docker tag ${{ github.repository }}:${{ env.APP_VERSION }} ammnt/nginx:latest
+          docker push ${{ github.repository }}:${{ env.APP_VERSION }}
           docker push ammnt/nginx:${{ env.APP_VERSION }}
-          docker push ghcr.io/ammnt/nginx:latest
+          docker push ${{ github.repository }}:latest
           docker push ammnt/nginx:latest
-          DIGEST=$(docker images --no-trunc --quiet ghcr.io/ammnt/nginx:${{ env.APP_VERSION }})
+          DIGEST=$(docker images --no-trunc --quiet ${{ github.repository }}:${{ env.APP_VERSION }})
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attestation the Docker image📍
