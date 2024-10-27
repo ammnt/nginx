@@ -12,6 +12,14 @@ The Docker image is ready to use:<br>
 or<br>
 <code>docker run -d --rm -p 127.0.0.1:8080:8080/tcp ammnt/nginx:latest</code>
 
+# Attention:
+
+The server-side QIUC support expected in OpenSSL 3.4 has been delayed until the next release:
+https://github.com/openssl/openssl/discussions/25767#discussioncomment-11025047
+```
+It is being actively worked on. It is now planned to be released as part of OpenSSL-3.5 which will be out in April 2025.
+```
+
 # Description:
 
 - Based on latest version of Alpine Linux - low size (~5 MB);
