@@ -1,7 +1,8 @@
 ARG BASE_VERSION=3.21.0
-FROM docker.io/library/alpine:${BASE_VERSION}
-ENV OPENSSL_BRANCH=openssl-3.4
-ENV APP_BRANCH=release-1.27.3
+ARG BASE_HASH=21dc6063fd678b478f57c0e13f47560d0ea4eeba26dfc947b2a4f81f686b9f45
+FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH}
+ARG OPENSSL_BRANCH=openssl-3.4
+ARG APP_BRANCH=release-1.27.3
 RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && apk -U upgrade && apk add --no-cache \
     openssl \
