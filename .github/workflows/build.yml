@@ -103,7 +103,6 @@ jobs:
         with:
           name: trivy-sbom-report
           path: "${{ github.workspace }}/dependency-results.sbom.json"
-          retention-days: 20
 
       - name: Analyze image with Grype💊
         id: anchore
@@ -161,7 +160,7 @@ jobs:
       #     version: 1.40.11
 
       # - name: Dump the report📊
-      # - run: echo "${REPORT}"
+      #   run: echo "${REPORT}"
       #   env:
       #     REPORT: ${{ steps.slim.outputs.report }}
 
