@@ -4,6 +4,7 @@ FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH}
 ARG OPENSSL_BRANCH=openssl-3.4
 ARG APP_BRANCH=release-1.27.3
 RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
+&& addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
 && apk -U upgrade && apk add --no-cache \
     openssl \
     pcre \
@@ -43,7 +44,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
 && git clone --recursive --depth 1 --single-branch -b ${OPENSSL_BRANCH} https://github.com/openssl/openssl \
 && git clone --depth=1 --recursive --shallow-submodules https://github.com/google/ngx_brotli && git clone --depth=1 --recursive --shallow-submodules https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
