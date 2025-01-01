@@ -1,0 +1,77 @@
+#include <tunables/global>
+
+profile docker-nginx flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  network inet tcp,
+  network inet udp,
+  deny network raw,
+  deny network packet,
+
+  file,
+  umount,
+
+  deny /bin/** rwmlk,
+  deny /boot/** rwmlk,
+  deny /dev/** rwmlk,
+  deny /etc/** wl,
+  deny /home/** rwmlk,
+  deny /lib/** wl,
+  deny /lib64/** rwmlk,
+  deny /media/** rwmlk,
+  deny /mnt/** rwmlk,
+  deny /opt/** rwmlk,
+  deny /proc/** rwmlk,
+  deny /root/** rwmlk,
+  deny /sbin/** rwmlk,
+  deny /srv/** rwmlk,
+  deny /sys/** rwmlk,
+  deny /usr/** wl,
+
+  audit /** w,
+
+  owner /tmp/nginx.pid rw,
+  owner /tmp/nginx.lock rw,
+  owner /usr/sbin/nginx ix,
+  owner /etc/nginx/** r,
+  owner /etc/nginx/ssl/** r,
+  owner /var/cache/nginx/** rw,
+  owner /tmp/client_temp/** rw,
+  owner /tmp/proxy_temp_path/** rw,
+  owner /tmp/fastcgi_temp/** rw,
+
+  /etc/timezone r,
+  /etc/localtime r,
+  /dev/stderr rw,
+  /dev/stdout rw,
+
+  deny /bin/dash mrwklx,
+  deny /bin/sh mrwklx,
+  deny /bin/bash mrwklx,
+  deny /bin/fish mrwklx,
+  deny /etc/passwd rw,
+  deny /etc/sudoers w,
+
+  capability,
+
+  # deny write for all files directly in /proc (not in a subdir)
+  deny @{PROC}/* w,
+  # deny write to files not in /proc/<number>/** or /proc/sys/**
+  deny @{PROC}/{[^1-9],[^1-9][^0-9],[^1-9s][^0-9y][^0-9s],[^1-9][^0-9][^0-9][^0-9]*}/** w,
+  deny @{PROC}/sys/[^k]** w,  # deny /proc/sys except /proc/sys/k* (effectively /proc/sys/kernel)
+  deny @{PROC}/sys/kernel/{?,??,[^s][^h][^m]**} w,  # deny everything except shm* in /proc/sys/kernel/
+  deny @{PROC}/sysrq-trigger rwklx,
+  deny @{PROC}/mem rwklx,
+  deny @{PROC}/kmem rwklx,
+  deny @{PROC}/kcore rwklx,
+
+  deny mount,
+
+  deny /sys/[^f]*/** wklx,
+  deny /sys/f[^s]*/** wklx,
+  deny /sys/fs/[^c]*/** wklx,
+  deny /sys/fs/c[^g]*/** wklx,
+  deny /sys/fs/cg[^r]*/** wklx,
+  deny /sys/firmware/** rwklx,
+  deny /sys/kernel/security/** rwklx,
+}
