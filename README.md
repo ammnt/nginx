@@ -27,6 +27,10 @@ services:
     security_opt:
       - no-new-privileges:true
       - apparmor:docker-nginx
+    volumes:
+      - "./conf:/etc/nginx:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
 ...
 ```
 

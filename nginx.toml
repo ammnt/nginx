@@ -1,3 +1,4 @@
+# This is an example of a AppArmor profile. Further configuration is required.
 #include <tunables/global>
 
 profile docker-nginx flags=(attach_disconnected,mediate_deleted) {
