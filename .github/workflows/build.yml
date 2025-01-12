@@ -162,7 +162,7 @@ jobs:
           overwrite: true
           version: 1.40.11
 
-      - name: Dump the report📊
+      - name: Dump the Slim report📊
         run: echo "${REPORT}"
         env:
           REPORT: ${{ steps.slim.outputs.report }}
@@ -181,7 +181,7 @@ jobs:
       #     --label org.opencontainers.image.source="https://github.com/ammnt/nginx/" \
       #     --continue-after=5
 
-      - name: Upload the report📊
+      - name: Upload the Slim report📊
         uses: actions/upload-artifact@v4.5.0
         with:
           name: slim.report
