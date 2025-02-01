@@ -102,7 +102,7 @@ jobs:
           github-pat: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Trivy report📊
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: trivy-sbom-report
           path: "${{ github.workspace }}/dependency-results.sbom.json"
@@ -182,7 +182,7 @@ jobs:
       #     --continue-after=5
 
       - name: Upload the Slim report📊
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: slim.report
           path: "${{ github.workspace }}/slim.report.json"
