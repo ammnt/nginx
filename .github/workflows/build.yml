@@ -212,7 +212,7 @@ jobs:
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attestation the Docker image📍
-        uses: actions/attest-build-provenance@v2.1.0
+        uses: actions/attest-build-provenance@v2.2.0
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ env.DIGEST }}
