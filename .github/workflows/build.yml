@@ -152,6 +152,23 @@ jobs:
           wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64 && chmod +x clair-scanner
           ./clair-scanner --ip="$DOCKER_GATEWAY" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} || exit 0
 
+      - name: Analyze image with Dockle💊
+        uses: goodwithtech/dockle-action@main
+        with:
+          image: ghcr.io/ammnt/angie:${{ env.APP_VERSION }}
+          format: "json"
+          output: "result.json"
+          exit-code: "1"
+          exit-level: "warn"
+          ignore: "CIS-DI-0001,DKL-DI-0006,DKL-LI-0001"
+
+      - name: Upload Dockle report📊
+        uses: actions/upload-artifact@v4.6.0
+        if: always()
+        with:
+          name: Report
+          path: result.json
+
       - name: Slim the Docker image🚀
         uses: kitabisa/docker-slim-action@v1.2.0
         env:
