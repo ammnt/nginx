@@ -155,7 +155,7 @@ jobs:
       - name: Analyze image with Dockle💊
         uses: goodwithtech/dockle-action@main
         with:
-          image: ghcr.io/ammnt/angie:${{ env.APP_VERSION }}
+          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: "json"
           output: "result.json"
           exit-code: "1"
