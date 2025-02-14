@@ -179,9 +179,8 @@ jobs:
 
       - name: Dump the Slim report📊
         run: |
-          echo "${REPORT}" | tee -a slim.report.json
+          echo "${REPORT}" > slim.report.json
           ls -lash
-          cat slim.report.json
         env:
           REPORT: ${{ steps.slim.outputs.report }}
 
