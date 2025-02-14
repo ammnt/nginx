@@ -28,12 +28,12 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Install cosign🔒
-        uses: sigstore/cosign-installer@v3.7.0
+        uses: sigstore/cosign-installer@v3.8.0
         with:
           cosign-release: "v2.4.2"
 
       - name: Setup Docker buildx🛠️
-        uses: docker/setup-buildx-action@v3.8.0
+        uses: docker/setup-buildx-action@v3.9.0
         with:
           version: v0.20.1
           driver-opts: image=moby/buildkit:v0.19.0
@@ -78,17 +78,18 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Analyze image with Docker Scout💊
-        uses: docker/scout-action@v1.16.1
+        uses: docker/scout-action@v1.16.3
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          sarif-file: sarif.output.json
+          sarif-file: scout.report.json
           summary: false
 
       - name: Upload Docker Scout report📊
-        uses: github/codeql-action/upload-sarif@v3
+        uses: actions/upload-artifact@v4.6.0
         with:
-          sarif_file: sarif.output.json
+          name: Scout Report
+          path: "${{ github.workspace }}/scout.report.json"
 
       - name: Analyze image with Trivy💊
         uses: aquasecurity/trivy-action@0.29.0
@@ -96,7 +97,7 @@ jobs:
           image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           scan-type: image
           format: "github"
-          output: "dependency-results.sbom.json"
+          output: "trivy.report.json"
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
           github-pat: ${{ secrets.GH_TOKEN }}
@@ -104,8 +105,8 @@ jobs:
       - name: Upload Trivy report📊
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: trivy-sbom-report
-          path: "${{ github.workspace }}/dependency-results.sbom.json"
+          name: Trivy Report
+          path: "${{ github.workspace }}/trivy.report.json"
 
       - name: Analyze image with Grype💊
         id: anchore
@@ -114,19 +115,14 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           fail-build: false
           severity-cutoff: critical
+          grype-version: v0.87.0
+          output-file: "${{ github.workspace }}/grype.report.json"
 
       - name: Upload Grype report📊
-        uses: github/codeql-action/upload-sarif@v3
+        uses: actions/upload-artifact@v4.6.0
         with:
-          sarif_file: ${{ steps.anchore.outputs.sarif }}
-
-      - name: Analyze image with Syft💊
-        uses: anchore/sbom-action@v0.18.0
-        with:
-          syft-version: v1.19.0
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          artifact-name: image.spdx.json
-          dependency-snapshot: false
+          name: Grype Report
+          path: "${{ github.workspace }}/grype.report.json"
 
       - name: Analyze image with Snyk💊
         continue-on-error: true
@@ -138,9 +134,10 @@ jobs:
           args: --file=Dockerfile
 
       - name: Upload Snyk report📊
-        uses: github/codeql-action/upload-sarif@v3
+        uses: actions/upload-artifact@v4.6.0
         with:
-          sarif_file: snyk.sarif
+          name: Snyk Report
+          path: "${{ github.workspace }}/snyk.sarif"
 
       - name: Analyze image with Clair💊
         run: |
@@ -157,19 +154,20 @@ jobs:
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: "json"
-          output: "result.json"
+          output: "dockle.report.json"
           exit-code: "1"
           exit-level: "warn"
-          ignore: "CIS-DI-0001,DKL-DI-0006,DKL-LI-0001"
+          ignore: "CIS-DI-0010"
 
       - name: Upload Dockle report📊
         uses: actions/upload-artifact@v4.6.0
         if: always()
         with:
-          name: Report
-          path: result.json
+          name: Dockle Report
+          path: "${{ github.workspace }}/dockle.report.json"
 
       - name: Slim the Docker image🚀
+        id: slim
         uses: kitabisa/docker-slim-action@v1.2.0
         env:
           DSLIM_HTTP_PROBE: false
@@ -180,15 +178,18 @@ jobs:
           version: 1.40.11
 
       - name: Dump the Slim report📊
-        run: echo "${REPORT}"
+        run: |
+          echo "${REPORT}" | tee -a slim.report.json
+          ls -lash
+          cat slim.report.json
         env:
           REPORT: ${{ steps.slim.outputs.report }}
 
       - name: Upload the Slim report📊
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: slim.report.json
-          path: ${{ steps.slim.outputs.report }}
+          name: Slim Report
+          path: "${{ github.workspace }}/slim.report.json"
 
       - name: Explore the Docker image with Dive🔍
         timeout-minutes: 2
@@ -203,6 +204,21 @@ jobs:
         run: |
           docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           curl -v http://127.0.0.1:8080 || exit 1
+
+      - name: Analyze image with Syft💊
+        uses: anchore/sbom-action@v0.18.0
+        with:
+          syft-version: v1.19.0
+          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          format: spdx-json
+          output-file: syft.report.json
+          upload-artifact: false
+
+      - name: Upload the Syft report (SBOM)📊
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: Syft Report (SBOM)
+          path: syft.report.json
 
       - name: Push the Docker images to registries💾
         run: |
