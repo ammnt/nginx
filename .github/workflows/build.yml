@@ -68,6 +68,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v6.13.0
         env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
           DOCKER_CONTENT_TRUST: 1
         with:
           provenance: false
@@ -78,6 +79,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            SQUASH=true
+          squash: true
 
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.16.3
