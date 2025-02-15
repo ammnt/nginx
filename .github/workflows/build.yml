@@ -201,7 +201,8 @@ jobs:
 
       - name: Test the Docker image🧪
         run: |
-          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker logs nginx
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Analyze image with Syft💊
