@@ -146,7 +146,7 @@ jobs:
           docker run -d --name db arminc/clair-db
           docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan
           DOCKER_GATEWAY=$(docker network inspect bridge --format "{{range .IPAM.Config}}{{.Gateway}}{{end}}")
-          wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64 && chmod +x clair-scanner
+          wget -qO clair-scanner https://github.com/arminc/clair-scanner/releases/download/14.0.0/clair-scanner_linux-amd64 && chmod +x clair-scanner
           ./clair-scanner --ip="$DOCKER_GATEWAY" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} || exit 0
 
       - name: Analyze image with Dockle💊
