@@ -113,7 +113,10 @@ RUN addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --
     libstdc++ \
     tini \
     brotli-libs \
-    libxslt
+    libxslt \
+    ca-certificates \
+&& update-ca-certificates && apk --purge del ca-certificates apk-tools \
+&& rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
 
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /etc/nginx /etc/nginx
