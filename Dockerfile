@@ -8,7 +8,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && apk -U upgrade && apk add --no-cache \
     openssl \
     pcre \
-    zlib-ng \
     libgcc \
     libstdc++ \
     g++ \
@@ -23,7 +22,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     talloc-dev \
     libtool \
     pcre-dev \
-    zlib-ng-dev \
     binutils \
     gnupg \
     cmake \
@@ -103,17 +101,14 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx
 
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH}
-RUN addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
+RUN addgroup -S angie && adduser -S angie -s /sbin/nologin -G angie --uid 101 --no-create-home \
 && apk -U upgrade && apk add --no-cache \
-    openssl \
     pcre \
-    zlib-ng \
-    libstdc++ \
     tini \
     brotli-libs \
     libxslt \
     ca-certificates \
-&& update-ca-certificates && apk --purge del libgcc g++ make build-base linux-headers automake autoconf git talloc talloc-dev libtool zlib-ng-dev binutils gnupg cmake go pcre-dev ca-certificates openssl libxslt-dev apk-tools musl-dev zlib gd-dev \
+&& update-ca-certificates && apk --purge del ca-certificates libstdc++ libgcc apk-tools \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
 
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
