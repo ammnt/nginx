@@ -101,7 +101,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx
 
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH}
-RUN addgroup -S angie && adduser -S angie -s /sbin/nologin -G angie --uid 101 --no-create-home \
+RUN addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
 && apk -U upgrade && apk add --no-cache \
     pcre \
     tini \
