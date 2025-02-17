@@ -221,40 +221,40 @@ jobs:
           name: Syft Report (SBOM)
           path: syft.report.json
 
-      # - name: Push the Docker images to registries💾
-      #   run: |
-      #     docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ghcr.io/ammnt/nginx:latest
-      #     docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
-      #     docker push ghcr.io/ammnt/nginx --all-tags
-      #     docker push ammnt/nginx --all-tags
-      #     DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} | sed -e "s|ghcr.io/ammnt/nginx@||g" | sed -e "s|ammnt/nginx@||g")
-      #     echo "DIGEST=$DIGEST" >> $GITHUB_ENV
+      - name: Push the Docker images to registries💾
+        run: |
+          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ghcr.io/ammnt/nginx:latest
+          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
+          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
+          docker push ghcr.io/ammnt/nginx --all-tags
+          docker push ammnt/nginx --all-tags
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} | sed -e "s|ghcr.io/ammnt/nginx@||g" | sed -e "s|ammnt/nginx@||g")
+          echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
-      # - name: Attestation the Docker image📍
-      #   uses: actions/attest-build-provenance@v2.2.0
-      #   with:
-      #     subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      #     subject-digest: ${{ env.DIGEST }}
-      #     push-to-registry: true
-      #     show-summary: true
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Attestation the Docker image📍
+        uses: actions/attest-build-provenance@v2.2.0
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ env.DIGEST }}
+          push-to-registry: true
+          show-summary: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Sign the published Docker image🔐
-      #   env:
-      #     COSIGN_EXPERIMENTAL: "true"
-      #     COSIGN_KEY: ${{secrets.COSIGN_KEY}}
-      #     COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
-      #   run: |
-      #     cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-      #     cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
-      #   shell: bash
+      - name: Sign the published Docker image🔐
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_KEY: ${{secrets.COSIGN_KEY}}
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+        run: |
+          cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
+        shell: bash
 
-      # - name: Check the published Docker image👌
-      #   run: |
-      #     docker buildx imagetools inspect ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker buildx imagetools inspect ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker pull ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker pull ammnt/nginx:${{ env.APP_VERSION }}
-      #     cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-      #     cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
+      - name: Check the published Docker image👌
+        run: |
+          docker buildx imagetools inspect ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker buildx imagetools inspect ammnt/nginx:${{ env.APP_VERSION }}
+          docker pull ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker pull ammnt/nginx:${{ env.APP_VERSION }}
+          cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
