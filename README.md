@@ -34,14 +34,6 @@ services:
 ...
 ```
 
-# Attention:
-
-The server-side QIUC support expected in OpenSSL 3.4 has been delayed until the next release:
-https://github.com/openssl/openssl/discussions/25767#discussioncomment-11025047
-```
-It is being actively worked on. It is now planned to be released as part of OpenSSL-3.5 which will be out in April 2025.
-```
-
 # Description:
 
 - Based on latest version of Alpine Linux - low size (~5 MB);
@@ -53,6 +45,7 @@ https://github.com/openssl/openssl
 - Built using hardening GCC flags;
 - NJS and Brotli support;
 - PCRE with JIT compilation;
+- zlib library latest version;
 - Rootless master process - unprivileged container;
 - Async I/O threads module;
 - "Distroless" image - shell removed from the image;
