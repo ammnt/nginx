@@ -66,42 +66,38 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
     --with-openssl="/tmp/openssl" \
     --with-openssl-opt=enable-ec_nistp_64_gcc_128 \
-    --with-cc-opt="-s" \
-    --with-cc-opt="-static" \
-    --with-cc-opt="-O3" \
-    --with-cc-opt="-g" \
+    --with-cc-opt="-O2" \
     --with-cc-opt="-m64" \
-    --with-cc-opt="-march=westmere" \
+    --with-cc-opt="-march=native" \
     --with-cc-opt="-falign-functions=32" \
     --with-cc-opt="-flto" \
-    --with-cc-opt="-funsafe-math-optimizations" \
     --with-cc-opt="-fstack-protector-strong" \
     --with-cc-opt="--param=ssp-buffer-size=4" \
     --with-cc-opt="-Wimplicit-fallthrough=0" \
-    --with-cc-opt="-Wno-error=strict-aliasing" \
     --with-cc-opt="-Wformat" \
-    --with-cc-opt="-Wno-error=pointer-sign" \
-    --with-cc-opt="-Wno-implicit-function-declaration" \
-    --with-cc-opt="-Wno-int-conversion" \
-    --with-cc-opt="-Wno-error=unused-result" \
-    --with-cc-opt="-Wno-unused-result" \
-    --with-cc-opt="-fcode-hoisting" \
+    --with-cc-opt="-Wformat-security" \
     --with-cc-opt="-Werror=format-security" \
+    --with-cc-opt="-fcode-hoisting" \
     --with-cc-opt="-Wno-deprecated-declarations" \
     --with-cc-opt="-Wp,-D_FORTIFY_SOURCE=2" \
     --with-cc-opt="-DTCP_FASTOPEN=23" \
-    --with-cc-opt="-fPIC" \
+    --with-cc-opt="-fPIE" \
+    --with-cc-opt="-fno-semantic-interposition" \
+    --with-cc-opt="-fno-plt" \
+    --with-cc-opt="-std=c11" \
+    --with-cc-opt="-fstack-clash-protection" \
+    --with-cc-opt="-fdata-sections" \
+    --with-cc-opt="-ffunction-sections" \
+    --with-ld-opt="-s" \
     --with-ld-opt="-static" \
     --with-ld-opt="-lrt" \
     --with-ld-opt="-ltalloc" \
-    --with-ld-opt="-Wl,-Bsymbolic-functions" \
     --with-ld-opt="-lpcre" \
     --with-ld-opt="-Wl,-z,relro" \
     --with-ld-opt="-Wl,-z,now" \
-    --with-ld-opt="-Wl,--as-needed" \
     --with-ld-opt="-pie" \
+    --with-ld-opt="-Wl,--gc-sections" \
     --with-compat \
-    --with-file-aio \
     --with-pcre-jit \
     --with-threads \
     --with-http_realip_module \
