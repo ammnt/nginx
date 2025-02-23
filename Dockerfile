@@ -51,7 +51,6 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && git clone --depth 1 --recursive --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
-    --with-debug \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
@@ -129,7 +128,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --without-mail_smtp_module \
     --add-module=/tmp/njs/nginx \
     --add-module=/tmp/ngx_brotli \
-&& make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx* \
+&& make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx
 

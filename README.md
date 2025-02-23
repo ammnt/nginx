@@ -54,7 +54,7 @@ https://github.com/openssl/openssl
 - Added OCI labels and annotations;
 - No excess ENTRYPOINT in the image;
 - Slimmed version by Docker Slim tool;
-- 100% efficiency from Dive tool scans result;
+- Image efficiency score 100% according to Dive utility;
 - Scanned by vulnerability scanners: GitHub, Docker Scout, Snyk, Grype, Dockle and Syft;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
 https://github.com/ammnt/nginx/blob/main/Dockerfile
