@@ -35,6 +35,8 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     ncurses-libs \
     gd-dev \
     brotli-libs \
+    ca-certificates \
+&& update-ca-certificates \
 && cd /tmp && git clone -b "${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
@@ -142,8 +144,7 @@ RUN addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --
     tini \
     brotli-libs \
     libxslt \
-    ca-certificates \
-&& update-ca-certificates && apk del --purge ca-certificates apk-tools \
+&& apk del --purge ca-certificates apk-tools \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
 
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
