@@ -64,8 +64,40 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
     --with-openssl="/tmp/openssl" \
     --with-openssl-opt=enable-ec_nistp_64_gcc_128 \
-    --with-cc-opt="-O3 -g -m64 -march=westmere -falign-functions=32 -flto -funsafe-math-optimizations -fstack-protector-strong --param=ssp-buffer-size=4 -Wimplicit-fallthrough=0 -Wno-error=strict-aliasing -Wformat -Wno-error=pointer-sign -Wno-implicit-function-declaration -Wno-int-conversion -Wno-error=unused-result -Wno-unused-result -fcode-hoisting -Werror=format-security -Wno-deprecated-declarations -Wp,-D_FORTIFY_SOURCE=2 -DTCP_FASTOPEN=23 -fPIC" \
-    --with-ld-opt="-lrt -ltalloc -Wl,-Bsymbolic-functions -lpcre -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie" \
+    --with-cc-opt="-s" \
+    --with-cc-opt="-static" \
+    --with-cc-opt="-O3" \
+    --with-cc-opt="-g" \
+    --with-cc-opt="-m64" \
+    --with-cc-opt="-march=westmere" \
+    --with-cc-opt="-falign-functions=32" \
+    --with-cc-opt="-flto" \
+    --with-cc-opt="-funsafe-math-optimizations" \
+    --with-cc-opt="-fstack-protector-strong" \
+    --with-cc-opt="--param=ssp-buffer-size=4" \
+    --with-cc-opt="-Wimplicit-fallthrough=0" \
+    --with-cc-opt="-Wno-error=strict-aliasing" \
+    --with-cc-opt="-Wformat" \
+    --with-cc-opt="-Wno-error=pointer-sign" \
+    --with-cc-opt="-Wno-implicit-function-declaration" \
+    --with-cc-opt="-Wno-int-conversion" \
+    --with-cc-opt="-Wno-error=unused-result" \
+    --with-cc-opt="-Wno-unused-result" \
+    --with-cc-opt="-fcode-hoisting" \
+    --with-cc-opt="-Werror=format-security" \
+    --with-cc-opt="-Wno-deprecated-declarations" \
+    --with-cc-opt="-Wp,-D_FORTIFY_SOURCE=2" \
+    --with-cc-opt="-DTCP_FASTOPEN=23" \
+    --with-cc-opt="-fPIC" \
+    --with-ld-opt="-static" \
+    --with-ld-opt="-lrt" \
+    --with-ld-opt="-ltalloc" \
+    --with-ld-opt="-Wl,-Bsymbolic-functions" \
+    --with-ld-opt="-lpcre" \
+    --with-ld-opt="-Wl,-z,relro" \
+    --with-ld-opt="-Wl,-z,now" \
+    --with-ld-opt="-Wl,--as-needed" \
+    --with-ld-opt="-pie" \
     --with-compat \
     --with-file-aio \
     --with-pcre-jit \
