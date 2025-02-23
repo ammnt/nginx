@@ -36,8 +36,8 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     gd-dev \
     brotli-libs \
     ca-certificates \
-&& update-ca-certificates \
-&& cd /tmp && git clone -b "${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
+&& update-ca-certificates && cd /tmp \
+&& git clone --depth 1 --recursive --single-branch -b "${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -46,9 +46,9 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& git clone --recursive --depth 1 --single-branch -b ${OPENSSL_VERSION} https://github.com/openssl/openssl \
-&& git clone --depth=1 --recursive --shallow-submodules https://github.com/google/ngx_brotli \
-&& git clone --depth=1 --recursive --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
+&& git clone --depth 1 --recursive --single-branch -b ${OPENSSL_VERSION} https://github.com/openssl/openssl \
+&& git clone --depth 1 --recursive --shallow-submodules https://github.com/google/ngx_brotli \
+&& git clone --depth 1 --recursive --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j "${NB_CORES}" && make clean \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
     --with-debug \
