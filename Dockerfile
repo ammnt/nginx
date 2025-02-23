@@ -147,11 +147,11 @@ RUN set -ex && addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx -
 && apk del --purge apk-tools \
 && rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
 
-COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
-COPY --from=builder /etc/nginx /etc/nginx
-COPY --from=builder /var/cache/nginx /var/cache/nginx
-COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
+COPY --from=builder --chown=nginx:nginx /var/cache/nginx /var/cache/nginx
+COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 
