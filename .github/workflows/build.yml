@@ -70,6 +70,7 @@ jobs:
         env:
           DOCKER_CONTENT_TRUST: 1
           DOCKER_BUILD_RECORD_UPLOAD: false
+          DOCKER_BUILDKIT: 1
         with:
           provenance: false
           context: .
@@ -79,6 +80,23 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Slim the Docker image🚀
+        id: slim
+        uses: kitabisa/docker-slim-action@v1.2.0
+        env:
+          DSLIM_HTTP_PROBE: false
+        with:
+          target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          overwrite: true
+          version: 1.40.11
+
+      - name: Dump the Slim report📊
+        run: |
+          echo "${REPORT}" > slim.report.json
+        env:
+          REPORT: ${{ steps.slim.outputs.report }}
 
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.16.3
@@ -158,23 +176,6 @@ jobs:
         with:
           name: Dockle Report
           path: "${{ github.workspace }}/dockle.report.json"
-
-      - name: Slim the Docker image🚀
-        id: slim
-        uses: kitabisa/docker-slim-action@v1.2.0
-        env:
-          DSLIM_HTTP_PROBE: false
-        with:
-          target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          overwrite: true
-          version: 1.40.11
-
-      - name: Dump the Slim report📊
-        run: |
-          echo "${REPORT}" > slim.report.json
-        env:
-          REPORT: ${{ steps.slim.outputs.report }}
 
       - name: Upload the Slim report📊
         uses: actions/upload-artifact@v4.6.0

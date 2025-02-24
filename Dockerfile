@@ -96,6 +96,7 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --with-ld-opt="-Wl,-z,now" \
     --with-ld-opt="-pie" \
     --with-ld-opt="-Wl,--gc-sections" \
+    --with-file-aio \
     --with-compat \
     --with-pcre-jit \
     --with-threads \
@@ -130,23 +131,25 @@ RUN NB_CORES="${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}" \
     --add-module=/tmp/ngx_brotli \
 && make -j "${NB_CORES}" && make install && make clean && strip /usr/sbin/nginx \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
-&& chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx
+&& chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx && touch /tmp/error.log
 
-FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH}
-RUN set -ex && addgroup -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
-&& apk -U upgrade && apk add --no-cache \
-    pcre \
-    tini \
-    brotli-libs \
-    libxslt \
-&& apk del --purge apk-tools \
-&& rm -rf /tmp/* /var/cache/apk/ /var/cache/misc /root/.gnupg /root/.cache /root/go /etc/apk
-
+FROM scratch
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+COPY --from=builder /sbin/tini /sbin/tini
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
+COPY --from=builder --chown=nginx:nginx /tmp/error.log /tmp/error.log
 COPY --from=builder --chown=nginx:nginx /var/cache/nginx /var/cache/nginx
 COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
+COPY --from=builder /usr/lib/libbrotlienc.so.1 \
+                    /usr/lib/libpcre.so.1 \
+                    /usr/lib/libz.so.1 \
+                    /usr/lib/libxml2.so.2 \
+                    /usr/lib/libbrotlicommon.so.1 \
+                    /usr/lib/liblzma.so.5 /usr/lib/
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 

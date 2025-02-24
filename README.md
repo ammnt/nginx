@@ -36,7 +36,8 @@ services:
 
 # Description:
 
-- Based on latest version of Alpine Linux - low size (~5 MB);
+- Built on latest version of Alpine Linux - low size (~5 MB);
+- Runtime on scratch image - with zero bloat;
 - Multi-stage building with statically linked binary;
 - OpenSSL with HTTP/3 and QUIC support:<br>
 https://github.com/openssl/openssl
@@ -49,7 +50,7 @@ https://github.com/openssl/openssl
 - zlib library latest version;
 - Rootless master process - unprivileged container;
 - Async I/O threads module;
-- "Distroless" image - shell removed from the image;
+- "Distroless" image - reduced attack surface (removed SHELL, UNIX tools, package manager etc);
 - Removed unnecessary modules;
 - Added OCI labels and annotations;
 - No excess ENTRYPOINT in the image;
