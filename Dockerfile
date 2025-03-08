@@ -1,17 +1,17 @@
-ARG BASE_VERSION=3.21.2
-ARG BASE_HASH=56fa17d2a7e7f168a043a2712e63aed1f8543aeafdcee47c58dcffe38ed51099
+ARG BASE_VERSION=3.21.3
+ARG BASE_HASH=a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION=openssl-3.4.1
 ARG APP_VERSION=release-1.27.4
 ARG NJS_VERSION=0.8.9
+ARG PCRE_VERSION=pcre2-10.45
+ARG ZLIB_VERSION=v1.3.1
 
 RUN set -ex \
-&& set -ex && addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
+&& addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
 && apk -U upgrade && apk add --no-cache \
-    pcre \
     gcc \
     make \
-    ca-certificates \
     git \
     talloc-dev \
     pcre-dev \
@@ -32,10 +32,12 @@ RUN set -ex \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& git clone --depth 1 --recursive --single-branch -b ${OPENSSL_VERSION} https://github.com/openssl/openssl \
-&& git clone --depth 1 --recursive --shallow-submodules https://github.com/google/ngx_brotli \
-&& git clone --depth 1 --recursive --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
+&& git clone --recursive --depth 1 --single-branch -b ${OPENSSL_VERSION} https://github.com/openssl/openssl \
+&& git clone --recursive --depth 1 --shallow-submodules https://github.com/google/ngx_brotli \
+&& git clone --recursive --depth 1 --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j $(nproc) && make clean \
+&& cd /tmp && git clone --depth 1 --recursive --single-branch -b "${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+&& git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/madler/zlib.git \
 && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
@@ -55,13 +57,18 @@ RUN set -ex \
     --with-openssl-opt=no-ssl3 \
     --with-openssl-opt=no-shared \
     --with-openssl-opt=no-weak-ssl-ciphers \
+    --with-pcre=/tmp/pcre2 \
+    --with-zlib=/tmp/zlib \
+    --with-cpu-opt="generic" \
+    --with-cc-opt="-static -static-libgcc" \
+    --with-ld-opt="-static" \
     --with-cc-opt="-O2" \
     --with-cc-opt="-m64" \
     --with-cc-opt="-march=x86-64" \
     --with-cc-opt="-falign-functions=32" \
     --with-cc-opt="-flto" \
     --with-cc-opt="-fstack-protector-strong" \
-    --with-cc-opt="--param=ssp-buffer-size=4" \
+    --with-cc-opt="-param=ssp-buffer-size=4" \
     --with-cc-opt="-Wimplicit-fallthrough=0" \
     --with-cc-opt="-Wformat" \
     --with-cc-opt="-Wformat-security" \
@@ -78,7 +85,6 @@ RUN set -ex \
     --with-cc-opt="-fdata-sections" \
     --with-cc-opt="-ffunction-sections" \
     --with-ld-opt="-s" \
-    --with-ld-opt="-static" \
     --with-ld-opt="-lrt" \
     --with-ld-opt="-ltalloc" \
     --with-ld-opt="-lpcre" \
@@ -134,7 +140,6 @@ COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
 COPY --from=builder /usr/lib/libbrotlienc.so.1 \
-                    /usr/lib/libpcre.so.1 \
                     /usr/lib/libz.so.1 \
                     /usr/lib/libxml2.so.2 \
                     /usr/lib/libbrotlicommon.so.1 \
