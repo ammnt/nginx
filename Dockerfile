@@ -8,7 +8,7 @@ ARG PCRE_VERSION=pcre2-10.45
 ARG ZLIB_VERSION=v1.3.1
 
 RUN set -ex \
-&& addgroup --gid 101 -S nginx && adduser -S nginx -s /sbin/nologin -G nginx --uid 101 --no-create-home \
+&& addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
 && apk -U upgrade && apk add --no-cache \
     gcc \
     make \
