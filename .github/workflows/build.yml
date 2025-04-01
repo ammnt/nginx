@@ -107,7 +107,7 @@ jobs:
           summary: false
 
       - name: Upload Docker Scout report📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Scout Report
           path: "${{ github.workspace }}/scout.report.json"
@@ -124,7 +124,7 @@ jobs:
           github-pat: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Trivy report📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Trivy Report
           path: "${{ github.workspace }}/trivy.report.json"
@@ -140,7 +140,7 @@ jobs:
           output-file: "${{ github.workspace }}/grype.report.json"
 
       - name: Upload Grype report📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Grype Report
           path: "${{ github.workspace }}/grype.report.json"
@@ -155,7 +155,7 @@ jobs:
           args: --file=Dockerfile
 
       - name: Upload Snyk report📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Snyk Report
           path: "${{ github.workspace }}/snyk.sarif"
@@ -171,14 +171,14 @@ jobs:
           ignore: "CIS-DI-0010"
 
       - name: Upload Dockle report📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         if: always()
         with:
           name: Dockle Report
           path: "${{ github.workspace }}/dockle.report.json"
 
       - name: Upload the Slim report📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Slim Report
           path: "${{ github.workspace }}/slim.report.json"
@@ -208,7 +208,7 @@ jobs:
           upload-artifact: false
 
       - name: Upload the Syft report (SBOM)📊
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Syft Report (SBOM)
           path: syft.report.json
