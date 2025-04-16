@@ -1,8 +1,8 @@
 ARG BASE_VERSION=3.21.3
 ARG BASE_HASH=a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
-ARG OPENSSL_VERSION=openssl-3.4.1
-ARG APP_VERSION=release-1.27.4
+ARG OPENSSL_VERSION=openssl-3.5.0
+ARG APP_VERSION=release-1.27.5
 ARG NJS_VERSION=0.8.9
 ARG PCRE_VERSION=pcre2-10.45
 ARG ZLIB_VERSION=v1.3.1
@@ -58,6 +58,7 @@ RUN set -ex \
     --with-openssl-opt=no-shared \
     --with-openssl-opt=no-weak-ssl-ciphers \
     --with-openssl-opt=no-tls-deprecated-ec \
+    --with-openssl-opt=enable-quic \
     --with-pcre=/tmp/pcre2 \
     --with-zlib=/tmp/zlib \
     --with-cpu-opt="generic" \
@@ -93,7 +94,6 @@ RUN set -ex \
     --with-ld-opt="-Wl,-z,now" \
     --with-ld-opt="-pie" \
     --with-ld-opt="-Wl,--gc-sections" \
-    --with-file-aio \
     --with-compat \
     --with-pcre-jit \
     --with-threads \
