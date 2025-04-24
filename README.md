@@ -1,20 +1,20 @@
 # Distroless NGINX with HTTP/3 and QUIC support🚀
 
 [![Build and push image📦](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
-![version](https://img.shields.io/badge/version-1.27.5-blue)
+![version](https://img.shields.io/badge/version-1.28.0-blue)
 [![GitHub issues open](https://img.shields.io/github/issues/ammnt/nginx.svg)](https://github.com/ammnt/nginx/issues)
 ![GitHub Maintained](https://img.shields.io/badge/open%20source-yes-orange)
 ![GitHub Maintained](https://img.shields.io/badge/maintained-yes-yellow)
 
 The Docker image is ready to use:<br>
-<code>docker run -d --name nginx -p 80:8080/tcp -p 443:8443/tcp -p 443:8443/udp ghcr.io/ammnt/nginx:latest</code><br>
+<code>ghcr.io/ammnt/nginx:latest</code><br>
 or<br>
-<code>docker run -d --name nginx -p 80:8080/tcp -p 443:8443/tcp -p 443:8443/udp ammnt/nginx:latest</code><br>
+<code>docker.io/ammnt/nginx:latest</code><br>
 or with Docker Compose deployment:
 ```
 services:
   nginx:
-    image: ammnt/nginx:latest
+    image: docker.io/ammnt/nginx:latest
     user: "101:101"
     read_only: true
     privileged: false
@@ -26,6 +26,7 @@ services:
     security_opt:
       - no-new-privileges:true
       - apparmor:docker-nginx
+      - seccomp:./nginx-seccomp.json
     volumes:
       - "./conf:/etc/nginx:ro"
       - "/etc/timezone:/etc/timezone:ro"
@@ -35,7 +36,7 @@ services:
 
 # Description:
 
-- Built on latest version of Alpine Linux - low size (~5 MB);
+- Base image: Alpine Linux (only ~5 MB);
 - Runtime on scratch image - with zero bloat;
 - Multi-stage building with statically linked binary;
 - OpenSSL with HTTP/3 and QUIC support:<br>
@@ -47,7 +48,7 @@ https://github.com/openssl/openssl
 - NJS and Brotli support;
 - PCRE with JIT compilation;
 - zlib library latest version;
-- Rootless master process - unprivileged container;
+- Rootless master process (unprivileged container);
 - Async I/O threads module;
 - "Distroless" image - reduced attack surface (removed SHELL, UNIX tools, package manager etc);
 - Removed unnecessary modules;
