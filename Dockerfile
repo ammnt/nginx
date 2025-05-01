@@ -128,7 +128,7 @@ RUN set -ex \
     --add-module=/tmp/ngx_brotli \
 && make -j $(nproc) && make install && make clean && strip /usr/sbin/nginx \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
-&& chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx && touch /tmp/error.log
+&& chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx && rm -rf /tmp/* && touch /tmp/error.log
 
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
