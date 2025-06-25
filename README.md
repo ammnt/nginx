@@ -37,7 +37,7 @@ services:
 # Description:
 
 - Base image: Alpine Linux (only ~5 MB);
-- Hardened image (secure, minimal and production-ready) - recommended to use in Rootless mode:
+- Hardened image (secure, minimal and production-ready) - recommended to use in Rootless mode:<br>
 https://docs.docker.com/engine/security/rootless/
 - Runtime on scratch image - with zero bloat;
 - Multi-stage building with statically linked binary;
