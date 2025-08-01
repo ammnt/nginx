@@ -99,7 +99,7 @@ jobs:
           REPORT: ${{ steps.slim.outputs.report }}
 
       - name: Analyze image with Docker Scout💊
-        uses: docker/scout-action@v1.18.1
+        uses: docker/scout-action@v1.18.2
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
