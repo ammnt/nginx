@@ -3,9 +3,9 @@ ARG BASE_HASH=8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION=openssl-3.5.1
 ARG APP_VERSION=release-1.29.0
-ARG NJS_VERSION=0.9.0
+ARG NJS_VERSION=0.9.1
 ARG PCRE_VERSION=pcre2-10.45
-ARG ZLIB_VERSION=v1.3.1
+ARG ZLIB_VERSION=2.2.4
 
 RUN set -ex \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
@@ -37,8 +37,9 @@ RUN set -ex \
 && git clone --recursive --depth 1 --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j $(nproc) && make clean \
 && cd /tmp && git clone --depth 1 --recursive --single-branch -b "${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
-&& git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/madler/zlib.git \
-&& mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
+&& git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
+&& sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd zlib-ng && ./configure --zlib-compat \
+&& make && make install && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
@@ -59,8 +60,9 @@ RUN set -ex \
     --with-openssl-opt=no-weak-ssl-ciphers \
     --with-openssl-opt=no-tls-deprecated-ec \
     --with-openssl-opt=enable-quic \
+    --with-openssl-opt=enable-ktls \
     --with-pcre=/tmp/pcre2 \
-    --with-zlib=/tmp/zlib \
+    --with-zlib=/tmp/zlib-ng \
     --with-cpu-opt="generic" \
     --with-cc-opt="-static -static-libgcc" \
     --with-ld-opt="-static" \
@@ -142,10 +144,10 @@ COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
 COPY --from=builder /usr/lib/libbrotlienc.so.1 \
-                    /usr/lib/libz.so.1 \
                     /usr/lib/libxml2.so.2 \
                     /usr/lib/libbrotlicommon.so.1 \
                     /usr/lib/liblzma.so.5 /usr/lib/
+COPY --from=builder /usr/local/lib/libz.so.1.3.1.zlib-ng /usr/local/lib/libz.so.1
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 

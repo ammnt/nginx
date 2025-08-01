@@ -6,11 +6,17 @@
 ![GitHub Maintained](https://img.shields.io/badge/open%20source-yes-orange)
 ![GitHub Maintained](https://img.shields.io/badge/maintained-yes-yellow)
 
+> [!IMPORTANT]
+> QuicTLS is now deprecated. I made a choice in favor of OpenSSL, since this library natively supports OCSP, PQC and QUIC⚠️
+
+> [!TIP]
+> You can find an example configuration file in the repository for successfully configuring HTTP3 and PQC💡
+
 The Docker image is ready to use:<br>
 <code>ghcr.io/ammnt/nginx:latest</code><br>
 or<br>
 <code>docker.io/ammnt/nginx:latest</code><br>
-or with Docker Compose deployment:
+or with Docker Compose deploy:
 ```
 services:
   nginx:
@@ -41,6 +47,7 @@ services:
 https://docs.docker.com/engine/security/rootless/
 - Runtime on scratch image - with zero bloat;
 - Multi-stage building with statically linked binary;
+- Support for hybrid post-quantum key exchange algorithms in elliptic curves (PQC);
 - OpenSSL with HTTP/3 and QUIC support:<br>
 https://github.com/openssl/openssl
 - HTTP/2 with ALPN support;
@@ -49,7 +56,7 @@ https://github.com/openssl/openssl
 - Built using hardening GCC flags;
 - NJS and Brotli support;
 - PCRE with JIT compilation;
-- zlib library latest version;
+- zlib-ng library latest version;
 - Rootless master process (unprivileged container);
 - Async I/O threads module;
 - "Distroless" image - reduced attack surface (removed SHELL, UNIX tools, package manager etc);
