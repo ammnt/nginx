@@ -131,7 +131,7 @@ jobs:
 
       - name: Analyze image with Grype💊
         id: anchore
-        uses: anchore/scan-action@v6.3.0
+        uses: anchore/scan-action@v6.5.0
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           fail-build: false
