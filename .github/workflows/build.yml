@@ -200,7 +200,7 @@ jobs:
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Analyze image with Syft💊
-        uses: anchore/sbom-action@v0.20.1
+        uses: anchore/sbom-action@v0.20.4
         with:
           syft-version: v1.29.1
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
