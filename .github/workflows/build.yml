@@ -137,7 +137,7 @@ jobs:
           fail-build: false
           severity-cutoff: critical
           output-format: sarif
-          grype-version: v0.97.0
+          grype-version: v0.97.2
           output-file: "${{ github.workspace }}/grype.report.json"
 
       - name: Upload Grype report📊
@@ -202,7 +202,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.4
         with:
-          syft-version: v1.29.1
+          syft-version: v1.31.0
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: spdx-json
           output-file: syft.report.json

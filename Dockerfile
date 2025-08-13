@@ -1,11 +1,11 @@
 ARG BASE_VERSION=3.22.0
 ARG BASE_HASH=8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
-ARG OPENSSL_VERSION=openssl-3.5.1
-ARG APP_VERSION=release-1.29.0
+ARG OPENSSL_VERSION=openssl-3.5.2
+ARG APP_VERSION=release-1.29.1
 ARG NJS_VERSION=0.9.1
 ARG PCRE_VERSION=pcre2-10.45
-ARG ZLIB_VERSION=2.2.4
+ARG ZLIB_VERSION=2.2.5
 
 RUN set -ex \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
@@ -13,7 +13,7 @@ RUN set -ex \
     gcc \
     make \
     git \
-    talloc-dev \
+    jemalloc-dev \
     pcre-dev \
     libxslt-dev \
     tini \
@@ -79,7 +79,11 @@ RUN set -ex \
     --with-cc-opt="-Werror=format-security" \
     --with-cc-opt="-fcode-hoisting" \
     --with-cc-opt="-Wno-deprecated-declarations" \
-    --with-cc-opt="-Wp,-D_FORTIFY_SOURCE=2" \
+    --with-cc-opt="-fhardened" \
+    --with-cc-opt="-D_FORTIFY_SOURCE=3" \
+    --with-cc-opt="-D_GLIBCXX_ASSERTIONS" \
+    --with-cc-opt="-ftrivial-auto-var-init=zero" \
+    --with-cc-opt="-fcf-protection=full" \
     --with-cc-opt="-DTCP_FASTOPEN=23" \
     --with-cc-opt="-fPIE" \
     --with-cc-opt="-fno-semantic-interposition" \
@@ -90,7 +94,7 @@ RUN set -ex \
     --with-cc-opt="-ffunction-sections" \
     --with-ld-opt="-s" \
     --with-ld-opt="-lrt" \
-    --with-ld-opt="-ltalloc" \
+    --with-ld-opt="-ljemalloc" \
     --with-ld-opt="-lpcre" \
     --with-ld-opt="-Wl,-z,relro" \
     --with-ld-opt="-Wl,-z,now" \
