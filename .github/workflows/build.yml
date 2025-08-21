@@ -35,7 +35,7 @@ jobs:
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.11.1
         with:
-          version: v0.26.1
+          version: v0.27.0
           driver-opts: image=moby/buildkit:v0.23.2-rootless
 
       - name: Log into GHCR🔑
@@ -137,7 +137,7 @@ jobs:
           fail-build: false
           severity-cutoff: critical
           output-format: sarif
-          grype-version: v0.97.2
+          grype-version: v0.98.0
           output-file: "${{ github.workspace }}/grype.report.json"
 
       - name: Upload Grype report📊
