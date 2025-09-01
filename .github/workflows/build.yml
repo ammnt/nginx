@@ -128,7 +128,7 @@ jobs:
           path: "${{ github.workspace }}/scout.report.json"
 
       - name: Analyze image with Trivy💊
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@0.33.0
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           scan-type: image
