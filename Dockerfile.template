@@ -1,11 +1,11 @@
-ARG BASE_VERSION=3.22.0
-ARG BASE_HASH=8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715
+ARG BASE_VERSION
+ARG BASE_HASH
 FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
-ARG OPENSSL_VERSION=openssl-3.5.2
-ARG APP_VERSION=release-1.29.1
-ARG NJS_VERSION=0.9.1
-ARG PCRE_VERSION=pcre2-10.45
-ARG ZLIB_VERSION=2.2.5
+ARG OPENSSL_VERSION
+ARG APP_VERSION
+ARG NJS_VERSION
+ARG PCRE_VERSION
+ARG ZLIB_VERSION
 
 RUN set -ex \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
@@ -23,7 +23,7 @@ RUN set -ex \
     ca-certificates \
     linux-headers \
 && update-ca-certificates && cd /tmp \
-&& git clone --depth 1 --recursive --single-branch -b "${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
+&& git clone --depth 1 --recursive --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -32,11 +32,11 @@ RUN set -ex \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& git clone --recursive --depth 1 --single-branch -b ${OPENSSL_VERSION} https://github.com/openssl/openssl \
+&& git clone --recursive --depth 1 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
 && git clone --recursive --depth 1 --shallow-submodules https://github.com/google/ngx_brotli \
-&& git clone --recursive --depth 1 --shallow-submodules --single-branch -b ${NJS_VERSION} https://github.com/nginx/njs \
+&& git clone --recursive --depth 1 --shallow-submodules --single-branch -b "${NJS_VERSION}" https://github.com/nginx/njs \
 && cd /tmp/njs && ./configure && make -j $(nproc) && make clean \
-&& cd /tmp && git clone --depth 1 --recursive --single-branch -b "${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+&& cd /tmp && git clone --depth 1 --recursive --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
 && git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
 && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd zlib-ng && ./configure --zlib-compat \
 && make && make install && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \

@@ -1,7 +1,7 @@
 # Distroless NGINX with HTTP/3 and QUIC support🚀
 
 [![Build and push image📦](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
-![version](https://img.shields.io/badge/version-1.29.1-blue)
+![version)](https://img.shields.io/github/v/release/ammnt/nginx)
 [![GitHub issues open](https://img.shields.io/github/issues/ammnt/nginx.svg)](https://github.com/ammnt/nginx/issues)
 ![GitHub Maintained](https://img.shields.io/badge/open%20source-yes-orange)
 ![GitHub Maintained](https://img.shields.io/badge/maintained-yes-yellow)
@@ -67,7 +67,7 @@ https://github.com/openssl/openssl
 - Image efficiency score 100% according to Dive utility;
 - Scanned by vulnerability scanners: GitHub CodeQL, Docker Scout, Snyk, Grype, Dockle and Syft;
 - Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
-https://github.com/ammnt/nginx/blob/main/Dockerfile
+https://github.com/ammnt/nginx/blob/main/Dockerfile.template
 
 # Note:
 

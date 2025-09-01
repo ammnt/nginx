@@ -10,7 +10,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  APP_VERSION: 1.29.1
 
 jobs:
   build:
@@ -26,6 +25,13 @@ jobs:
     steps:
       - name: Checkout repository🧱
         uses: actions/checkout@v5.0.0
+
+      - name: Load .env variables☁️
+        run: |
+          set -x
+          ls -lash
+          export $(cat ./.env | xargs)
+          printenv | sort -n
 
       - name: Install cosign🔒
         uses: sigstore/cosign-installer@v3.9.2
@@ -74,12 +80,21 @@ jobs:
         with:
           provenance: false
           context: .
+          file: ./Dockerfile.template
           platforms: linux/amd64
           load: ${{ github.event_name != 'pull_request' }}
           tags: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BASE_VERSION=${{ env.BASE_VERSION }}
+            BASE_HASH=${{ env.BASE_HASH }}
+            OPENSSL_VERSION=${{ env.OPENSSL_VERSION }}
+            APP_VERSION=${{ env.APP_VERSION }}
+            NJS_VERSION=${{ env.NJS_VERSION }}
+            PCRE_VERSION=${{ env.PCRE_VERSION }}
+            ZLIB_VERSION=${{ env.ZLIB_VERSION }}
 
       - name: Slim the Docker image🚀
         id: slim
@@ -137,7 +152,7 @@ jobs:
           fail-build: false
           severity-cutoff: critical
           output-format: sarif
-          grype-version: v0.98.0
+          grype-version: v0.99.1
           output-file: "${{ github.workspace }}/grype.report.json"
 
       - name: Upload Grype report📊
@@ -153,7 +168,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          args: --file=Dockerfile
+          args: --file=Dockerfile.template
 
       - name: Upload Snyk report📊
         uses: actions/upload-artifact@v4.6.2
@@ -195,14 +210,13 @@ jobs:
 
       - name: Test the Docker image🧪
         run: |
-          docker images | grep nginx
           docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           curl -v http://127.0.0.1:8080 || exit 1
 
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.4
         with:
-          syft-version: v1.31.0
+          syft-version: v1.32.0
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: spdx-json
           output-file: syft.report.json
@@ -219,6 +233,7 @@ jobs:
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ghcr.io/ammnt/nginx:latest
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
+          docker images | grep nginx
           docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} | sed -e "s|ghcr.io/ammnt/nginx@||g" | sed -e "s|ammnt/nginx@||g")
@@ -251,13 +266,3 @@ jobs:
           docker pull ammnt/nginx:${{ env.APP_VERSION }}
           cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
-
-      # - name: Add reports to final commit✅
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   run: |
-      #     git config --global user.name "ammnt"
-      #     git config --global user.email "admin@msftcnsi.com"
-      #     cd ${{ github.workspace }}
-      #     git add scout.report.json trivy.report.json grype.report.json dockle.report.json slim.report.json snyk.sarif syft.report.json
-      #     git commit -m "added: build reports to the final commit"
-      #     git push
