@@ -15,12 +15,12 @@
 The Docker image is ready to use:<br>
 <code>ghcr.io/ammnt/nginx:latest</code><br>
 or<br>
-<code>docker.io/ammnt/nginx:latest</code><br>
+<code>ammnt/nginx:latest</code><br>
 or with Docker Compose deploy:
 ```
 services:
   nginx:
-    image: docker.io/ammnt/nginx:latest
+    image: ammnt/nginx:latest
     user: "101:101"
     read_only: true
     privileged: false
@@ -30,9 +30,9 @@ services:
      - all
     container_name: nginx
     security_opt:
-      - no-new-privileges:true
-      - apparmor:docker-nginx
-      - seccomp:./nginx-seccomp.json
+      - no-new-privileges=true
+      - apparmor=docker-nginx
+      - seccomp=./nginx-seccomp.json
     volumes:
       - "./conf:/etc/nginx:ro"
       - "/etc/timezone:/etc/timezone:ro"
@@ -66,8 +66,7 @@ https://github.com/openssl/openssl
 - Slimmed version by Docker Slim tool;
 - Image efficiency score 100% according to Dive utility;
 - Scanned by vulnerability scanners: GitHub CodeQL, Docker Scout, Snyk, Grype, Dockle and Syft;
-- Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner"):<br>
-https://github.com/ammnt/nginx/blob/main/Dockerfile.template
+- Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner").
 
 # Note:
 

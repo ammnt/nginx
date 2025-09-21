@@ -1,0 +1,18 @@
+# Format
+*.conf linguist-language=Nginx linguist-detectable
+*.json linguist-language=JSON linguist-detectable
+*.md linguist-language=Markdown linguist-detectable
+*.pub linguist-language=Text linguist-detectable
+*.toml linguist-language=TOML linguist-detectable
+
+# Specific files
+Dockerfile.template linguist-language=Dockerfile linguist-detectable
+nginx.conf linguist-language=Nginx linguist-detectable
+nginx_http3.conf linguist-language=Nginx linguist-detectable
+nginx-seccomp.json linguist-language=JSON linguist-detectable
+nginx.toml linguist-language=TOML linguist-detectable
+cosign.pub linguist-language=Text linguist-detectable
+default.conf linguist-language=Nginx linguist-detectable
+
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf

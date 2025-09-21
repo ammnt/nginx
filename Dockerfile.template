@@ -1,6 +1,6 @@
 ARG BASE_VERSION
 ARG BASE_HASH
-FROM docker.io/library/alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
+FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION
 ARG APP_VERSION
 ARG NJS_VERSION
@@ -13,7 +13,7 @@ RUN set -ex \
     gcc \
     make \
     git \
-    jemalloc-dev \
+    mimalloc2-dev \
     pcre-dev \
     libxslt-dev \
     tini \
@@ -39,7 +39,8 @@ RUN set -ex \
 && cd /tmp && git clone --depth 1 --recursive --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
 && git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
 && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd zlib-ng && ./configure --zlib-compat \
-&& make && make install && mkdir /var/cache/nginx && cd /tmp/nginx && ./auto/configure \
+&& make && make install && mkdir /var/cache/nginx && cd /tmp/nginx \
+&& ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
@@ -67,8 +68,7 @@ RUN set -ex \
     --with-cc-opt="-static -static-libgcc" \
     --with-ld-opt="-static" \
     --with-cc-opt="-O2" \
-    --with-cc-opt="-m64" \
-    --with-cc-opt="-march=x86-64" \
+    --with-cc-opt="-march=native" \
     --with-cc-opt="-falign-functions=32" \
     --with-cc-opt="-flto" \
     --with-cc-opt="-fstack-protector-strong" \
@@ -94,7 +94,7 @@ RUN set -ex \
     --with-cc-opt="-ffunction-sections" \
     --with-ld-opt="-s" \
     --with-ld-opt="-lrt" \
-    --with-ld-opt="-ljemalloc" \
+    --with-ld-opt="-lmimalloc" \
     --with-ld-opt="-lpcre" \
     --with-ld-opt="-Wl,-z,relro" \
     --with-ld-opt="-Wl,-z,now" \
