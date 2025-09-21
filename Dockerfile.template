@@ -6,6 +6,7 @@ ARG APP_VERSION
 ARG NJS_VERSION
 ARG PCRE_VERSION
 ARG ZLIB_VERSION
+ARG BUILD_DATE
 
 RUN set -ex \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
