@@ -161,7 +161,12 @@ LABEL description="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       org.opencontainers.image.description="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       org.opencontainers.image.authors="ammnt, admin@msftcnsi.com" \
       org.opencontainers.image.title="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
-      org.opencontainers.image.source="https://github.com/ammnt/nginx/"
+      org.opencontainers.image.source="https://github.com/ammnt/nginx/" \
+      org.opencontainers.image.created=${BUILD_DATE} \
+      org.opencontainers.image.documentation="https://github.com/ammnt/nginx/blob/main/README.md" \
+      org.opencontainers.image.licenses="GPL-3.0" \
+      org.opencontainers.image.url="https://msftcnsi.com" \
+      org.opencontainers.image.version=${APP_VERSION}
 
 STOPSIGNAL SIGQUIT
 USER nginx
