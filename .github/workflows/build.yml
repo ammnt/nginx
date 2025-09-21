@@ -113,7 +113,7 @@ jobs:
           summary: false
 
       - name: Analyze image with Trivy💊
-        uses: aquasecurity/trivy-action@0.33.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           scan-type: image
