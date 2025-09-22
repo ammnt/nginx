@@ -18,14 +18,13 @@
 
 ## 🎯 Why Choose This Image?
 
-| Feature | This Image | Standard image | Official image |
-|---------|------------|----------------------|----------------|
-| **Base Image** | `scratch` (zero-bloat) | Alpine (~25MB) | Debian (~80MB+) |
-| **Attack Surface** | **Minimal** (no shell, no package manager) | Reduced | Full OS environment |
-| **Binary** | **Statically linked**, hardened with 30+ GCC security flags | Dynamically linked | Dynamically linked |
-| **Security Scanning** | 7+ tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive) | Limited or none | Basic |
-| **HTTP/3 + QUIC** | ✅ Native OpenSSL 3.x support | ❌ Patches only | ❌ Experimental |
-| **Supply Chain Security** | ✅ Cosign signatures + SLSA attestation | ❌ | ❌ |
+### **Architecture Advantages**
+- **Distroless base** - Built from `scratch` with zero bloat
+- **Static compilation** - Fully static binary with 30+ GCC hardening flags
+- **Minimal attack surface** - No shell, no package manager
+- **Native HTTP/3 support** - OpenSSL 3.x with QUIC without patches or experimental implementations
+- **Supply chain security** - Cosign signatures + SLSA attestation
+- **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 
 ## 🌐 Image Variants
 
