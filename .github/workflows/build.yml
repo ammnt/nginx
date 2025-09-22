@@ -1,4 +1,4 @@
-name: Build the image📦
+name: Build image📦
 
 on:
   workflow_dispatch:
