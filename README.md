@@ -1,23 +1,57 @@
-# Distroless NGINX with HTTP/3 and QUIC support🚀
+# 🚀 Distroless NGINX: Hardened & Optimized image
 
-[![Build and push image📦](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
-![version)](https://img.shields.io/github/v/release/ammnt/nginx)
+[![Build and Push](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
+![Version](https://img.shields.io/github/v/release/ammnt/nginx)
+![Security](https://img.shields.io/badge/security-hardened-brightgreen)
+![Size](https://img.shields.io/badge/size-ultra--lightweight-blue)
 [![GitHub issues open](https://img.shields.io/github/issues/ammnt/nginx.svg)](https://github.com/ammnt/nginx/issues)
 ![GitHub Maintained](https://img.shields.io/badge/open%20source-yes-orange)
 ![GitHub Maintained](https://img.shields.io/badge/maintained-yes-yellow)
 
+> **Production-ready, security-focused NGINX container with HTTP/3, QUIC and PQC support.**
+
 > [!IMPORTANT]
-> QuicTLS is now deprecated. I made a choice in favor of OpenSSL, since this library natively supports OCSP, PQC and QUIC⚠️
+> QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC and QUIC⚠️
 
 > [!TIP]
 > You can find an example configuration file in the repository for successfully configuring HTTP3 and PQC💡
 
-The Docker image is ready to use:<br>
-<code>ghcr.io/ammnt/nginx:latest</code><br>
-or<br>
-<code>ammnt/nginx:latest</code><br>
-or with Docker Compose deploy:
+## 🎯 Why Choose This Image?
+
+| Feature | This Image | Standard image | Official image |
+|---------|------------|----------------------|----------------|
+| **Base Image** | `scratch` (zero-bloat) | Alpine (~25MB) | Debian (~80MB+) |
+| **Attack Surface** | **Minimal** (no shell, no package manager) | Reduced | Full OS environment |
+| **Binary** | **Statically linked**, hardened with 30+ GCC security flags | Dynamically linked | Dynamically linked |
+| **Security Scanning** | 7+ tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive) | Limited or none | Basic |
+| **HTTP/3 + QUIC** | ✅ Native OpenSSL 3.x support | ❌ Patches only | ❌ Experimental |
+| **Supply Chain Security** | ✅ Cosign signatures + SLSA attestation | ❌ | ❌ |
+
+## 🌐 Image Variants
+
+| Registry | Tags | Description |
+|----------|------|-------------|
+| **Docker Hub** | `ammnt/nginx:latest` | Primary registry with latest stable |
+| **GitHub Container Registry** | `ghcr.io/ammnt/nginx:latest` | GitHub registry with latest stable |
+| **Both** | `:latest` | Always points to current stable |
+
+All images are **signed with Cosign** and include **provenance attestation**.
+
+## 📦 Quick Start
+
+### Docker Run
+```bash
+docker run -d \
+  --name nginx \
+  -p 80:8080 \
+  -p 443:8443 \
+  ammnt/nginx:latest
 ```
+
+## 🔧 Advanced Configuration
+
+### Docker Compose (Recommended)
+```yaml
 services:
   nginx:
     image: ammnt/nginx:latest
@@ -37,37 +71,54 @@ services:
       - "./conf:/etc/nginx:ro"
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
-...
 ```
 
-# Description:
+## 🔥 Unique Security Features
 
-- Base image: Alpine Linux (only ~5 MB);
-- Hardened image (secure, minimal and production-ready) - recommended to use in Rootless mode:<br>
-https://docs.docker.com/engine/security/rootless/
-- Runtime on scratch image - with zero bloat;
-- Multi-stage building with statically linked binary;
-- Support for hybrid post-quantum key exchange algorithms in elliptic curves (PQC);
-- OpenSSL with HTTP/3 and QUIC support:<br>
-https://github.com/openssl/openssl
-- HTTP/2 with ALPN support;
-- TLS 1.3 and 0-RTT support;
-- TLS 1.2 and TCP Fast Open (TFO) support;
-- Built using hardening GCC flags;
-- NJS and Brotli support;
-- PCRE with JIT compilation;
-- zlib-ng library latest version;
-- Rootless master process (unprivileged container);
-- Async I/O threads module;
-- "Distroless" image - reduced attack surface (removed SHELL, UNIX tools, package manager etc);
-- Removed unnecessary modules;
-- Added OCI labels and annotations;
-- No excess ENTRYPOINT in the image;
-- Slimmed version by Docker Slim tool;
-- Image efficiency score 100% according to Dive utility;
-- Scanned by vulnerability scanners: GitHub CodeQL, Docker Scout, Snyk, Grype, Dockle and Syft;
-- Prioritize ChaCha cipher patch and anonymous signature - removed "Server" header ("banner").
+### **Compilation Hardening**
+- **30+ GCC security flags** including:
+  - `-D_FORTIFY_SOURCE=3`, `-fhardened`, `-fstack-protector-strong`
+  - `-fstack-clash-protection`, `-fPIE`, `-pie`
+  - `-ftrivial-auto-var-init=zero` (prevents data leaks)
+  - `-fcf-protection=full` (Control-Flow Integrity)
+- **Read-Only Relocations** (`-Wl,-z,relro,-z,now`)
+- **Stack execution protection** and **buffer overflow guards**
 
-# Note:
+### **Runtime Security**
+- **Rootless by design** (`USER nginx`)
+- **Distroless base** - no shell, no package manager, zero bloat
+- **Minimal module surface** - 15+ unnecessary modules removed
+- **Server header removal** - security through obscurity
+- **TLS 1.3 with 0-RTT** and **post-quantum hybrid key exchange**
 
-Feel free to <a href="https://github.com/ammnt/nginx/issues/new">contact me</a> with more improvements🙋
+### **Supply Chain Integrity**
+- **Cosign-signed images** with key rotation support
+- **SLSA provenance attestation**
+- **Multi-scanner validation** (Docker Scout, Trivy, Snyk, Grype)
+- **SBOM generation** with Syft
+
+## 🚀 Ultimate Optimization
+
+### **Size Optimization**
+- **Multi-stage build** with Alpine builder + scratch final image
+- **Static compilation** - zero runtime dependencies
+- **Docker Slim integration** - automatic dead code elimination
+- **Binary stripping** and **LTO optimization**
+
+### **Performance Features**
+- **zlib-ng** with modern compression algorithms
+- **PCRE2 with JIT** compilation for regex performance
+- **Thread pool support** for async I/O operations
+- **TCP Fast Open** and **SSL session resumption**
+
+## 🤝 Contributing & Support
+
+Found an issue or have an improvement?
+- [Open an Issue](https://github.com/ammnt/nginx/issues/new?template=bug_report.md)
+- [Feature Request](https://github.com/ammnt/nginx/issues/new?template=feature_request.md)
+
+> **Note:** This image is designed for security-conscious production environments. For development purposes, consider using the official NGINX image with full debugging capabilities.
+
+## 📄 License
+
+This project is open source and maintained with ❤️ by [ammnt](https://github.com/ammnt).
