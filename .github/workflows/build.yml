@@ -27,7 +27,13 @@ jobs:
         uses: actions/checkout@v5.0.0
 
       - name: Load .env variables☁️
-        run: export $(cat ./.env | xargs)
+        run: |
+          while IFS= read -r line; do
+            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
+              echo "$line" >> $GITHUB_ENV
+            fi
+          done < .env
+          echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
       - name: Install cosign🔒
         uses: sigstore/cosign-installer@v3.10.0
@@ -65,6 +71,7 @@ jobs:
             org.opencontainers.image.authors="ammnt, admin@msftcnsi.com"
             org.opencontainers.image.title="Distroless NGINX built with QUIC and HTTP/3 support🚀"
             org.opencontainers.image.source="https://github.com/ammnt/nginx/"
+            org.opencontainers.image.created=${{ env.BUILD_DATE }}
             org.opencontainers.image.documentation="https://github.com/ammnt/nginx/blob/main/README.md"
             org.opencontainers.image.licenses="BSD-2-Clause License"
             org.opencontainers.image.url="https://msftcnsi.com"
@@ -113,7 +120,7 @@ jobs:
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          sarif-file: scout.report.json
+          sarif-file: ${{ github.workspace }}/scout.report.json
           summary: false
 
       - name: Analyze image with Trivy💊
@@ -121,8 +128,8 @@ jobs:
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           scan-type: image
-          format: "sarif"
-          output: "trivy.report.json"
+          format: "json"
+          output: "${{ github.workspace }}/trivy.report.json"
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
           github-pat: ${{ secrets.GH_TOKEN }}
@@ -134,9 +141,9 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           fail-build: false
           severity-cutoff: critical
-          output-format: sarif
+          output-format: json
           grype-version: v0.100.0
-          output-file: grype.report.json
+          output-file: ${{ github.workspace }}/grype.report.json
 
       - name: Analyze image with Snyk💊
         continue-on-error: true
@@ -145,13 +152,14 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          args: --file=Dockerfile.template
+          sarif: false
+          json: true
 
       - name: Analyze image with Dockle💊
         uses: goodwithtech/dockle-action@main
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          format: "sarif"
+          format: "json"
           output: "dockle.report.json"
           exit-code: "1"
           exit-level: "warn"
@@ -163,7 +171,7 @@ jobs:
           syft-version: v1.33.0
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: spdx-json
-          output-file: syft.report.json
+          output-file: ${{ github.workspace }}/syft.report.json
           upload-artifact: false
 
       - name: Explore the Docker image and test with Dive🔍
@@ -182,13 +190,8 @@ jobs:
         with:
           name: security-reports
           path: |
-            "${{ github.workspace }}/syft.report.json"
-            "${{ github.workspace }}/scout.report.json"
-            "${{ github.workspace }}/trivy.report.json"
-            "${{ github.workspace }}/grype.report.json"
-            "${{ github.workspace }}/dockle.report.json"
-            "${{ github.workspace }}/slim.report.json"
-            "${{ github.workspace }}/snyk.sarif"
+            ${{ github.workspace }}/*.report.json
+            ${{ github.workspace }}/snyk.json
 
       - name: Push the Docker images to registries💾
         run: |
