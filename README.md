@@ -16,16 +16,6 @@
 > [!TIP]
 > You can find an example configuration file in the repository for successfully configuring HTTP3 and PQC💡
 
-## 🎯 Why Choose This Image?
-
-### **Architecture Advantages**
-- **Distroless base** - Built from `scratch` with zero bloat
-- **Static compilation** - Fully static binary with 30+ GCC hardening flags
-- **Minimal attack surface** - No shell, no package manager
-- **Native HTTP/3 support** - OpenSSL 3.x with QUIC without patches or experimental implementations
-- **Supply chain security** - Cosign signatures + SLSA attestation
-- **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
-
 ## 🌐 Image Variants
 
 Docker Hub:<br>
@@ -71,8 +61,7 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
 ```
-
-## 🔥 Unique Security Features
+## 🔥 Why Choose This Image?
 
 ### **Compilation Hardening**
 - **30+ GCC security flags** including:
@@ -82,16 +71,18 @@ services:
   - `-fcf-protection=full` (Control-Flow Integrity)
 - **Read-Only Relocations** (`-Wl,-z,relro,-z,now`)
 - **Stack execution protection** and **buffer overflow guards**
+- **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 
 ### **Runtime Security**
 - **Rootless by design** (`USER nginx`)
-- **Distroless base** - no shell, no package manager, zero bloat
-- **Minimal module surface** - 15+ unnecessary modules removed
+- **Distroless base** - built from `scratch` with zero bloat
+- **Minimal attack surface** - no shell, no package manager and 15+ unnecessary modules removed
 - **Server header removal** - security through obscurity
+- **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
 - **TLS 1.3 with 0-RTT** and **post-quantum hybrid key exchange**
 
 ### **Supply Chain Integrity**
-- **Cosign-signed images** with key rotation support
+- **Cosign-signed images** signatures and SLSA attestation
 - **SLSA provenance attestation**
 - **Multi-scanner validation** (Docker Scout, Trivy, Snyk, Grype)
 - **SBOM generation** with Syft
@@ -100,7 +91,7 @@ services:
 
 ### **Size Optimization**
 - **Multi-stage build** with Alpine builder + scratch final image
-- **Static compilation** - zero runtime dependencies
+- **Static compilation** - static binary with 30+ GCC hardening flags and minimal dependencies
 - **Docker Slim integration** - automatic dead code elimination
 - **Binary stripping** and **LTO optimization**
 
