@@ -6,7 +6,6 @@ ARG APP_VERSION
 ARG NJS_VERSION
 ARG PCRE_VERSION
 ARG ZLIB_VERSION
-ARG BUILD_DATE
 
 RUN set -ex \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
@@ -163,7 +162,6 @@ LABEL description="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       org.opencontainers.image.authors="ammnt, admin@msftcnsi.com" \
       org.opencontainers.image.title="Distroless NGINX built with QUIC and HTTP/3 support🚀" \
       org.opencontainers.image.source="https://github.com/ammnt/nginx/" \
-      org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.documentation="https://github.com/ammnt/nginx/blob/main/README.md" \
       org.opencontainers.image.licenses="BSD-2-Clause License" \
       org.opencontainers.image.url="https://msftcnsi.com" \
