@@ -71,7 +71,6 @@ services:
   - `-fcf-protection=full` (Control-Flow Integrity)
 - **Read-Only Relocations** (`-Wl,-z,relro,-z,now`)
 - **Stack execution protection** and **buffer overflow guards**
-- **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 
 ### **Runtime Security**
 - **Rootless by design** (`USER nginx`)
@@ -79,12 +78,13 @@ services:
 - **Minimal attack surface** - no shell, no package manager and 15+ unnecessary modules removed
 - **Server header removal** - security through obscurity
 - **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
+- **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves
 - **TLS 1.3 with 0-RTT** and **post-quantum hybrid key exchange**
 
 ### **Supply Chain Integrity**
 - **Cosign-signed images** signatures and SLSA attestation
 - **SLSA provenance attestation**
-- **Multi-scanner validation** (Docker Scout, Trivy, Snyk, Grype)
+- **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 - **SBOM generation** with Syft
 
 ## 🚀 Ultimate Optimization
@@ -100,6 +100,16 @@ services:
 - **PCRE2 with JIT** compilation for regex performance
 - **Thread pool support** for async I/O operations
 - **TCP Fast Open** and **SSL session resumption**
+
+### **Quality Metrics**
+- **ChaCha20 prioritization** - Custom patch for modern cipher preference
+- **Anonymous signature** - stripped version information from binaries
+- **Image efficiency** - perfect score in Dive analysis (100%)
+- **Comprehensive OCI labels** - standardized metadata and annotations
+- **No excess ENTRYPOINT** - no unnecessary wrapper scripts or bloat
+
+## 🎯 Recommended to use in Rootless mode:<br>
+https://docs.docker.com/engine/security/rootless/
 
 ## 🤝 Contributing & Support
 
