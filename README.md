@@ -14,7 +14,7 @@
 > QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC and QUIC⚠️
 
 > [!TIP]
-> You can find an example configuration file in the repository for successfully configuring HTTP3 and PQC💡
+> You can find an example configuration file in the repository for successfully configuring HTTP/3 and PQC💡
 
 ## 🌐 Image Variants
 
@@ -60,6 +60,7 @@ services:
       - "./conf:/etc/nginx:ro"
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
+...
 ```
 ## 🔥 Why Choose This Image?
 
