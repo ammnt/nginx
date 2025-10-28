@@ -10,9 +10,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  DOCKER_CONTENT_TRUST: 1
-  DOCKER_BUILD_RECORD_UPLOAD: false
-  DOCKER_BUILDKIT: 1
 
 jobs:
   build:
@@ -83,6 +80,10 @@ jobs:
       - name: Build the Docker image⛓️
         id: build
         uses: docker/build-push-action@v6.18.0
+        env:
+          DOCKER_CONTENT_TRUST: 1
+          DOCKER_BUILD_RECORD_UPLOAD: false
+          DOCKER_BUILDKIT: 1
         with:
           provenance: false
           context: .
@@ -159,6 +160,16 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           sarif: false
           json: true
+
+      - name: Analyze image with Dockle💊
+        uses: goodwithtech/dockle-action@v0.4.15
+        with:
+          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          format: "json"
+          output: "dockle.report.json"
+          exit-code: "1"
+          exit-level: "warn"
+          ignore: "CIS-DI-0010"
 
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.9
