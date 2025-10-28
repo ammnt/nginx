@@ -161,7 +161,7 @@ jobs:
           json: true
 
       - name: Analyze image with Dockle💊
-        uses: goodwithtech/dockle-action@main
+        uses: goodwithtech/dockle-action@v0.4.15
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: "json"
