@@ -111,7 +111,7 @@ jobs:
           target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           overwrite: true
-          version: 1.41.7
+          version: 1.40.11
           args: >-
             --preserve-path /usr/bin/nc
             --include-path /usr/bin/nc
