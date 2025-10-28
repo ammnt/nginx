@@ -1,4 +1,4 @@
-name: Build image📦
+name: Build the image📦
 
 on:
   workflow_dispatch:
@@ -10,6 +10,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DOCKER_CONTENT_TRUST: 1
+  DOCKER_BUILD_RECORD_UPLOAD: false
+  DOCKER_BUILDKIT: 1
 
 jobs:
   build:
@@ -38,13 +41,13 @@ jobs:
       - name: Install cosign🔒
         uses: sigstore/cosign-installer@v3.10.0
         with:
-          cosign-release: "v2.6.1"
+          cosign-release: "v3.0.2"
 
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.11.1
         with:
           version: v0.29.1
-          driver-opts: image=moby/buildkit:v0.25.0-rootless
+          driver-opts: image=moby/buildkit:v0.25.1-rootless
 
       - name: Log into GHCR🔑
         uses: docker/login-action@v3.6.0
@@ -80,10 +83,6 @@ jobs:
       - name: Build the Docker image⛓️
         id: build
         uses: docker/build-push-action@v6.18.0
-        env:
-          DOCKER_CONTENT_TRUST: 1
-          DOCKER_BUILD_RECORD_UPLOAD: false
-          DOCKER_BUILDKIT: 1
         with:
           provenance: false
           context: .
@@ -112,8 +111,14 @@ jobs:
           target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           overwrite: true
-          version: 1.40.11
-          args: --report slim.report.json
+          version: 1.41.7
+          args: >-
+            --preserve-path /usr/bin/nc
+            --include-path /usr/bin/nc
+            --preserve-path /usr/lib/libmd.so.0
+            --include-path /usr/lib/libmd.so.0
+            --preserve-path /usr/lib/libbsd.so.0
+            --include-path /usr/lib/libbsd.so.0
 
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.18.2
@@ -142,7 +147,7 @@ jobs:
           fail-build: false
           severity-cutoff: critical
           output-format: json
-          grype-version: v0.100.0
+          grype-version: v0.102.0
           output-file: ${{ github.workspace }}/grype.report.json
 
       - name: Analyze image with Snyk💊
@@ -168,7 +173,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.6
         with:
-          syft-version: v1.33.0
+          syft-version: v1.36.0
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: spdx-json
           output-file: ${{ github.workspace }}/syft.report.json
@@ -184,6 +189,7 @@ jobs:
           dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           curl -v http://127.0.0.1:8080 || exit 1
+          pwd ; ls -la
 
       - name: Upload all reports📊
         uses: actions/upload-artifact@v4.6.2
@@ -225,5 +231,4 @@ jobs:
           docker pull ammnt/nginx:${{ env.APP_VERSION }}
           cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
-          docker system prune -f
-          rm -rf ${{ github.workspace }}/*
+          docker system prune -f ; rm -rf ${{ github.workspace }}/*
