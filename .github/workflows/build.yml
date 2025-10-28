@@ -160,16 +160,6 @@ jobs:
           sarif: false
           json: true
 
-      - name: Analyze image with Dockle💊
-        uses: goodwithtech/dockle-action@v0.4.15
-        with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          format: "json"
-          output: "dockle.report.json"
-          exit-code: "1"
-          exit-level: "warn"
-          ignore: "CIS-DI-0010"
-
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.9
         with:
