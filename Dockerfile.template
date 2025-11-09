@@ -15,14 +15,12 @@ RUN set -ex \
     git \
     mimalloc2-dev \
     tini \
-    brotli-libs \
     build-base \
     ca-certificates \
     linux-headers \
     tzdata \
     upx \
     perl \
-    brotli-dev \
     cmake \
 && update-ca-certificates && cd /tmp \
 && git clone --depth 1 --recursive --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
@@ -140,6 +138,7 @@ RUN set -ex \
 && make -j $(nproc) && make install && make clean && strip --strip-all /usr/sbin/nginx \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
+&& ldd /usr/sbin/nginx || true \
 && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* && touch /tmp/error.log
 
 FROM scratch
