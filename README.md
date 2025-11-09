@@ -64,8 +64,6 @@ services:
       - seccomp=./nginx-seccomp.json
     volumes:
       - "./conf:/etc/nginx:ro"
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
 ...
 ```
 ## 🔥 Why Choose This Image?
