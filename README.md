@@ -99,7 +99,7 @@ services:
 ### **Size Optimization**
 - **Multi-stage build** with Alpine builder + scratch final image
 - **Static compilation** - static binary with 30+ GCC hardening flags and minimal dependencies
-- **Docker Slim integration** - automatic dead code elimination
+- **Mint tool integration** - slimmed version of the image
 - **UPX runtime efficiency** - minimal memory overhead with fast decompression
 - **Binary stripping** and **LTO optimization**
 

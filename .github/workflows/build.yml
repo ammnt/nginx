@@ -102,16 +102,26 @@ jobs:
             PCRE_VERSION=${{ env.PCRE_VERSION }}
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
 
+      # - name: Slim the Docker image🚀
+      #   id: slim
+      #   uses: kitabisa/docker-slim-action@v1.2.0
+      #   env:
+      #     DSLIM_HTTP_PROBE: false
+      #   with:
+      #     target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+      #     tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+      #     overwrite: true
+      #     version: 1.40.11
+
       - name: Slim the Docker image🚀
-        id: slim
-        uses: kitabisa/docker-slim-action@v1.2.0
-        env:
-          DSLIM_HTTP_PROBE: false
-        with:
-          target: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          tag: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          overwrite: true
-          version: 1.40.11
+        run: |
+          curl -L -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/1.41.7/dist_linux.tar.gz
+          tar -xvf ds.tar.gz
+          ./dist_linux/mint --verbose --debug build \
+            --target ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
+            --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
+            --http-probe=false \
+            --continue-after=5
 
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.18.2
