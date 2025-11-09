@@ -23,6 +23,7 @@ RUN set -ex \
     upx \
     perl \
     brotli-dev \
+    cmake \
 && update-ca-certificates && cd /tmp \
 && git clone --depth 1 --recursive --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
@@ -34,7 +35,13 @@ RUN set -ex \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
 && git clone --recursive --depth 1 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
-&& git clone --recursive --depth 1 --shallow-submodules https://github.com/google/ngx_brotli \
+&& git clone --recursive --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
+&& cd ngx_brotli/deps/brotli && mkdir out && cd out \
+&& cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+-DCMAKE_C_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+-DCMAKE_CXX_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+-DCMAKE_INSTALL_PREFIX=./installed .. \
+&& cmake --build . --config Release --target brotlienc && cd /tmp \
 && git clone --depth 1 --recursive --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
 && git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
 && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd zlib-ng && ./configure --zlib-compat \
@@ -61,8 +68,8 @@ RUN set -ex \
     --with-openssl-opt=no-tls-deprecated-ec \
     --with-openssl-opt=enable-quic \
     --with-openssl-opt=enable-ktls \
-    --with-pcre=/tmp/pcre2 \
-    --with-zlib=/tmp/zlib-ng \
+    --with-pcre="/tmp/pcre2" \
+    --with-zlib="/tmp/zlib-ng" \
     --with-cpu-opt="generic" \
     --with-cc-opt="-static -static-libgcc" \
     --with-ld-opt="-static" \
@@ -146,11 +153,6 @@ COPY --from=builder --chown=nginx:nginx /var/cache/nginx /var/cache/nginx
 COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
-COPY --from=builder /usr/lib/libbrotlienc.so.1 \
-                    /usr/lib/libxml2.so.2 \
-                    /usr/lib/libbrotlicommon.so.1 \
-                    /usr/lib/liblzma.so.5 /usr/lib/
-COPY --from=builder /usr/local/lib/libz.so.1 /usr/local/lib/libz.so.1
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 
