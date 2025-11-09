@@ -80,7 +80,7 @@ services:
 - **Stack execution protection** and **buffer overflow guards**
 
 ### **Runtime Security**
-- **Rootless by design** (`USER angie`)
+- **Rootless by design** (`USER nginx`)
 - **Distroless base** - built from `scratch` with zero bloat
 - **Minimal attack surface** - no shell, no package manager and 15+ unnecessary modules removed
 - **Server header removal** - security through obscurity
