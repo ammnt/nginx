@@ -13,6 +13,9 @@
 > [!IMPORTANT]
 > QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC and QUIC⚠️
 
+> [!IMPORTANT]
+> NJS module has been removed due to security vulnerabilities in libxml2/libxslt dependencies⚠️
+
 > [!TIP]
 > You can find an example configuration file in the repository for successfully configuring HTTP/3 and PQC💡
 
@@ -77,13 +80,13 @@ services:
 - **Stack execution protection** and **buffer overflow guards**
 
 ### **Runtime Security**
-- **Rootless by design** (`USER nginx`)
+- **Rootless by design** (`USER angie`)
 - **Distroless base** - built from `scratch` with zero bloat
 - **Minimal attack surface** - no shell, no package manager and 15+ unnecessary modules removed
 - **Server header removal** - security through obscurity
 - **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
 - **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves
-- **TLS 1.3 with 0-RTT** and **post-quantum hybrid key exchange**
+- **Native TLS 1.3 with 0-RTT**
 
 ### **Supply Chain Integrity**
 - **Cosign-signed images** signatures and SLSA attestation
@@ -97,6 +100,7 @@ services:
 - **Multi-stage build** with Alpine builder + scratch final image
 - **Static compilation** - static binary with 30+ GCC hardening flags and minimal dependencies
 - **Docker Slim integration** - automatic dead code elimination
+- **UPX runtime efficiency** - minimal memory overhead with fast decompression
 - **Binary stripping** and **LTO optimization**
 
 ### **Performance Features**
@@ -105,6 +109,7 @@ services:
 - **Thread pool support** for async I/O operations
 - **TCP Fast Open** and **SSL session resumption**
 - **Graceful shutdown** - SIGQUIT handling for proper connection draining
+- **Brotli compression** support
 
 ### **Quality Metrics**
 - **ChaCha20 prioritization** - custom patch for modern cipher preference

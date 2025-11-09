@@ -3,7 +3,6 @@ ARG BASE_HASH
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION
 ARG APP_VERSION
-ARG NJS_VERSION
 ARG PCRE_VERSION
 ARG ZLIB_VERSION
 ARG BUILD_DATE
@@ -15,15 +14,15 @@ RUN set -ex \
     make \
     git \
     mimalloc2-dev \
-    pcre-dev \
-    libxslt-dev \
     tini \
-    gd-dev \
     brotli-libs \
     build-base \
     ca-certificates \
     linux-headers \
-    netcat-openbsd \
+    tzdata \
+    upx \
+    perl \
+    brotli-dev \
 && update-ca-certificates && cd /tmp \
 && git clone --depth 1 --recursive --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
@@ -36,9 +35,7 @@ RUN set -ex \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
 && git clone --recursive --depth 1 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
 && git clone --recursive --depth 1 --shallow-submodules https://github.com/google/ngx_brotli \
-&& git clone --recursive --depth 1 --shallow-submodules --single-branch -b "${NJS_VERSION}" https://github.com/nginx/njs \
-&& cd /tmp/njs && ./configure && make -j $(nproc) && make clean \
-&& cd /tmp && git clone --depth 1 --recursive --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+&& git clone --depth 1 --recursive --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
 && git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
 && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd zlib-ng && ./configure --zlib-compat \
 && make && make install && mkdir /var/cache/nginx && cd /tmp/nginx \
@@ -132,17 +129,16 @@ RUN set -ex \
     --without-mail_pop3_module \
     --without-mail_imap_module \
     --without-mail_smtp_module \
-    --add-module=/tmp/njs/nginx \
     --add-module=/tmp/ngx_brotli \
-&& make -j $(nproc) && make install && make clean && strip /usr/sbin/nginx \
+&& make -j $(nproc) && make install && make clean && strip --strip-all /usr/sbin/nginx \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
-&& chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx && rm -rf /tmp/* && touch /tmp/error.log
+&& chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
+&& upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* && touch /tmp/error.log
 
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /sbin/tini /sbin/tini
-COPY --from=builder /usr/bin/nc /usr/bin/nc
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
 COPY --from=builder --chown=nginx:nginx /tmp/error.log /tmp/error.log
@@ -153,8 +149,6 @@ COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
 COPY --from=builder /usr/lib/libbrotlienc.so.1 \
                     /usr/lib/libxml2.so.2 \
                     /usr/lib/libbrotlicommon.so.1 \
-                    /usr/lib/libmd.so.0 \
-                    /usr/lib/libbsd.so.0 \
                     /usr/lib/liblzma.so.5 /usr/lib/
 COPY --from=builder /usr/local/lib/libz.so.1 /usr/local/lib/libz.so.1
 
@@ -173,8 +167,8 @@ LABEL description="Distroless NGINX with HTTP/3, QUIC and PQC support🚀" \
       org.opencontainers.image.url="https://msftcnsi.com" \
       org.opencontainers.image.version=${APP_VERSION}
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=2 \
-  CMD ["/usr/bin/nc", "-z", "-w", "1", "127.0.0.1", "8080"]
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=2 \
+  CMD ["/usr/sbin/nginx", "-qt"]
 
 STOPSIGNAL SIGQUIT
 USER nginx
