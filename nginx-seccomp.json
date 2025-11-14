@@ -20,8 +20,6 @@
         "mount",
         "umount2",
         "pivot_root",
-        "iopl",
-        "ioperm",
         "ioprio_set",
         "kcmp",
         "kexec_file_load",
@@ -50,18 +48,6 @@
         "_sysctl"
       ],
       "action": "SCMP_ACT_ERRNO"
-    },
-    {
-      "names": ["ptrace"],
-      "action": "SCMP_ACT_ALLOW",
-      "args": [
-        {
-          "index": 0,
-          "op": "SCMP_CMP_EQ",
-          "value": 0,
-          "valueTwo": 0
-        }
-      ]
     }
   ]
 }

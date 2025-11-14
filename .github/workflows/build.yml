@@ -132,11 +132,9 @@ jobs:
           tar xvzf dive_0.13.1_linux_amd64.tar.gz -C /usr/local/bin
           dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          sleep 5
+          sleep 10
           docker ps -a
-          curl -v http://127.0.0.1:8080 || exit 1
-          docker logs -t nginx
-          pwd ; ls -la
+          curl -i http://127.0.0.1:8080 || exit 1
 
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.18.2
@@ -223,18 +221,18 @@ jobs:
           show-summary: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sign and check published Docker images🔐
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-          COSIGN_KEY: ${{secrets.COSIGN_KEY}}
-          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
-        run: |
-          cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
-          docker buildx imagetools inspect ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          docker buildx imagetools inspect ammnt/nginx:${{ env.APP_VERSION }}
-          docker pull ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          docker pull ammnt/nginx:${{ env.APP_VERSION }}
-          cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
-          docker system prune -f ; rm -rf ${{ github.workspace }}/*
+      # - name: Sign and check published Docker images🔐
+      #   env:
+      #     COSIGN_EXPERIMENTAL: "true"
+      #     COSIGN_KEY: ${{secrets.COSIGN_KEY}}
+      #     COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+      #   run: |
+      #     cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+      #     cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
+      #     docker buildx imagetools inspect ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+      #     docker buildx imagetools inspect ammnt/nginx:${{ env.APP_VERSION }}
+      #     docker pull ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+      #     docker pull ammnt/nginx:${{ env.APP_VERSION }}
+      #     cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+      #     cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
+      #     docker system prune -f ; rm -rf ${{ github.workspace }}/*

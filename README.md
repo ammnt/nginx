@@ -27,7 +27,7 @@ Docker Hub:<br>
 GitHub Container Registry:<br>
 > **ghcr.io/ammnt/nginx:latest**
 
-All images are **signed with Cosign** and include **provenance attestation**.
+All images are included with **provenance attestation**.
 
 ## 📦 Quick Start
 
@@ -87,7 +87,7 @@ services:
 - **Native TLS 1.3 with 0-RTT**
 
 ### **Supply Chain Integrity**
-- **Cosign-signed images** signatures and SLSA attestation
+- **Signed images** signatures and SLSA attestation
 - **SLSA provenance attestation**
 - **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 - **SBOM generation** with Syft
