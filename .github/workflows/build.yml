@@ -123,6 +123,19 @@ jobs:
             --http-probe=false \
             --continue-after=5
 
+      - name: Explore the Docker image and test with Dive🔍
+        timeout-minutes: 2
+        env:
+          CI: true
+        run: |
+          wget -q https://github.com/wagoodman/dive/releases/download/v0.13.1/dive_0.13.1_linux_amd64.tar.gz
+          tar xvzf dive_0.13.1_linux_amd64.tar.gz -C /usr/local/bin
+          dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          docker logs -t nginx
+          curl -v http://127.0.0.1:8080 || exit 1
+          pwd ; ls -la
+
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.18.2
         with:
@@ -181,18 +194,6 @@ jobs:
           format: spdx-json
           output-file: ${{ github.workspace }}/syft.report.json
           upload-artifact: false
-
-      - name: Explore the Docker image and test with Dive🔍
-        timeout-minutes: 2
-        env:
-          CI: true
-        run: |
-          wget -q https://github.com/wagoodman/dive/releases/download/v0.13.1/dive_0.13.1_linux_amd64.tar.gz
-          tar xvzf dive_0.13.1_linux_amd64.tar.gz -C /usr/local/bin
-          dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          curl -v http://127.0.0.1:8080 || exit 1
-          pwd ; ls -la
 
       - name: Upload all reports📊
         uses: actions/upload-artifact@v5.0.0
