@@ -49,8 +49,8 @@ RUN set -ex \
     --sbin-path=/usr/sbin/nginx \
     --user=nginx \
     --group=nginx \
-    --http-log-path=/tmp/access.log \
-    --error-log-path=/tmp/error.log \
+    --http-log-path=/dev/stdout \
+    --error-log-path=/dev/stderr \
     --conf-path=/etc/nginx/nginx.conf \
     --pid-path=/tmp/nginx.pid \
     --lock-path=/tmp/nginx.lock \
@@ -139,15 +139,15 @@ RUN set -ex \
 && chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
 && ldd /usr/sbin/nginx || true \
-&& upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* && touch /tmp/error.log
+&& upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/*
 
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /sbin/tini /sbin/tini
+COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
-COPY --from=builder --chown=nginx:nginx /tmp/error.log /tmp/error.log
 COPY --from=builder --chown=nginx:nginx /var/cache/nginx /var/cache/nginx
 COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
