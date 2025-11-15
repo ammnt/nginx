@@ -117,7 +117,7 @@ jobs:
         run: |
           curl -L -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/1.41.7/dist_linux.tar.gz
           tar -xvf ds.tar.gz
-          ./dist_linux/mint --verbose --debug build \
+          ./dist_linux/mint \
             --target ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --http-probe=false \

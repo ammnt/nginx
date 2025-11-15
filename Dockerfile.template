@@ -7,7 +7,7 @@ ARG PCRE_VERSION
 ARG ZLIB_VERSION
 ARG BUILD_DATE
 
-RUN set -ex \
+RUN set -e \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
 && apk -U upgrade && apk add --no-cache \
     gcc \
@@ -23,7 +23,11 @@ RUN set -ex \
     perl \
     cmake \
 && update-ca-certificates && cd /tmp \
-&& git clone --depth 1 --recursive --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
+&& git clone --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
+&& git clone --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
+&& git clone --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+&& git clone --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
+&& git clone --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
 && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -32,18 +36,14 @@ RUN set -ex \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
 && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& git clone --recursive --depth 1 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
-&& git clone --recursive --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
-&& cd ngx_brotli/deps/brotli && mkdir out && cd out \
+&& cd /tmp/ngx_brotli/deps/brotli && mkdir out && cd out \
 && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
 -DCMAKE_C_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 -DCMAKE_CXX_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 -DCMAKE_INSTALL_PREFIX=./installed .. \
-&& cmake --build . --config Release --target brotlienc && cd /tmp \
-&& git clone --depth 1 --recursive --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
-&& git clone --depth 1 --recursive --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
-&& sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd zlib-ng && ./configure --zlib-compat \
-&& make && make install && mkdir /var/cache/nginx && cd /tmp/nginx \
+&& cmake --build . --config Release --target brotlienc \
+&& sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd /tmp/zlib-ng && ./configure --zlib-compat \
+&& make && make install && cd /tmp/nginx \
 && ./auto/configure \
     --prefix=/etc/nginx \
     --sbin-path=/usr/sbin/nginx \
@@ -54,9 +54,9 @@ RUN set -ex \
     --conf-path=/etc/nginx/nginx.conf \
     --pid-path=/tmp/nginx.pid \
     --lock-path=/tmp/nginx.lock \
-    --http-client-body-temp-path=/var/cache/nginx/client_temp \
-    --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-    --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+    --http-client-body-temp-path=/tmp/client_temp \
+    --http-proxy-temp-path=/tmp/proxy_temp \
+    --http-fastcgi-temp-path=/tmp/fastcgi_temp \
     --with-openssl="/tmp/openssl" \
     --with-openssl-opt=enable-ec_nistp_64_gcc_128 \
     --with-openssl-opt=no-ssl2 \
@@ -136,9 +136,7 @@ RUN set -ex \
     --without-mail_smtp_module \
     --add-module=/tmp/ngx_brotli \
 && make -j $(nproc) && make install && make clean && strip --strip-all /usr/sbin/nginx \
-&& chown -R nginx:nginx /var/cache/nginx && chmod -R g+w /var/cache/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
-&& ldd /usr/sbin/nginx || true \
 && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/*
 
 FROM scratch
@@ -148,7 +146,6 @@ COPY --from=builder /sbin/tini /sbin/tini
 COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
-COPY --from=builder --chown=nginx:nginx /var/cache/nginx /var/cache/nginx
 COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/
