@@ -1,4 +1,4 @@
-name: Build the image📦
+name: Build📦
 
 on:
   workflow_dispatch:
@@ -35,10 +35,10 @@ jobs:
           done < .env
           echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
-      - name: Install cosign🔒
-        uses: sigstore/cosign-installer@v4.0.0
-        with:
-          cosign-release: "v3.0.2"
+      # - name: Install cosign🔒
+      #   uses: sigstore/cosign-installer@v4.0.0
+      #   with:
+      #     cosign-release: "v3.0.2"
 
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.11.1
