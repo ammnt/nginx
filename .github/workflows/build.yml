@@ -210,7 +210,9 @@ jobs:
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
           docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:${{ env.APP_VERSION }} | sed -e "s|ammnt/nginx@||g")
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} | \
+            sed -e "s|ghcr.io/ammnt/nginx@||g" | \
+            sed -e "s|ammnt/nginx@||g")
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attestation the Docker image📍
