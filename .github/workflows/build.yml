@@ -35,16 +35,16 @@ jobs:
           done < .env
           echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
-      # - name: Install cosign🔒
-      #   uses: sigstore/cosign-installer@v4.0.0
-      #   with:
-      #     cosign-release: "v3.0.2"
+      - name: Install cosign🔒
+        uses: sigstore/cosign-installer@v4.0.0
+        with:
+          cosign-release: "v3.0.2"
 
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.11.1
         with:
-          version: v0.30.0
-          driver-opts: image=moby/buildkit:v0.26.0-rootless
+          version: v0.30.1
+          driver-opts: image=moby/buildkit:v0.26.1-rootless
 
       - name: Log into GHCR🔑
         uses: docker/login-action@v3.6.0
@@ -189,7 +189,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.9
         with:
-          syft-version: v1.37.0
+          syft-version: v1.38.0
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: spdx-json
           output-file: ${{ github.workspace }}/syft.report.json
@@ -210,7 +210,8 @@ jobs:
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
           docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
-          echo "DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:${{ env.APP_VERSION }} | sed -e "s|ammnt/nginx@||g")" >> $GITHUB_ENV
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ammnt/nginx:${{ env.APP_VERSION }} | sed -e "s|ammnt/nginx@||g")
+          echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attestation the Docker image📍
         uses: actions/attest-build-provenance@v3.0.0
@@ -221,18 +222,14 @@ jobs:
           show-summary: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Sign and check published Docker images🔐
-      #   env:
-      #     COSIGN_EXPERIMENTAL: "true"
-      #     COSIGN_KEY: ${{secrets.COSIGN_KEY}}
-      #     COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
-      #   run: |
-      #     cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-      #     cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
-      #     docker buildx imagetools inspect ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker buildx imagetools inspect ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker pull ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker pull ammnt/nginx:${{ env.APP_VERSION }}
-      #     cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-      #     cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
-      #     docker system prune -f ; rm -rf ${{ github.workspace }}/*
+      - name: Sign and check published Docker images🔐
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
+          cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+          cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
+          docker system prune -f ; rm -rf ${{ github.workspace }}/*
