@@ -69,7 +69,7 @@ services:
 ## 🔥 Why Choose This Image?
 
 ### **Compilation Hardening**
-- **30+ GCC security flags** including:
+- **GCC security flags** including:
   - `-D_FORTIFY_SOURCE=3`, `-fhardened`, `-fstack-protector-strong`
   - `-fstack-clash-protection`, `-fPIE`, `-pie`
   - `-ftrivial-auto-var-init=zero` (prevents data leaks)
