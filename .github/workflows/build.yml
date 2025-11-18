@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository🧱
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
 
       - name: Load .env variables☁️
         run: |
