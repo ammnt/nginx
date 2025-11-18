@@ -10,6 +10,13 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  COSIGN_VERSION: "3.0.2"
+  BUILDX_VERSION: "0.30.1"
+  BUILDKIT_VERSION: "0.26.1"
+  MINT_VERSION: "1.41.7"
+  DIVE_VERSION: "0.13.1"
+  GRYPE_VERSION: "0.103.0"
+  SYFT_VERSION: "1.38.0"
 
 jobs:
   build:
@@ -38,13 +45,13 @@ jobs:
       - name: Install cosign🔒
         uses: sigstore/cosign-installer@v4.0.0
         with:
-          cosign-release: "v3.0.2"
+          cosign-release: v${{ env.COSIGN_VERSION }}
 
       - name: Setup Docker buildx🛠️
         uses: docker/setup-buildx-action@v3.11.1
         with:
-          version: v0.30.1
-          driver-opts: image=moby/buildkit:v0.26.1-rootless
+          version: v${{ env.BUILDX_VERSION }}
+          driver-opts: image=moby/buildkit:v${{ env.BUILDKIT_VERSION }}-rootless
 
       - name: Log into GHCR🔑
         uses: docker/login-action@v3.6.0
@@ -61,7 +68,7 @@ jobs:
 
       - name: Extract Docker metadata🔬
         id: meta
-        uses: docker/metadata-action@v5.8.0
+        uses: docker/metadata-action@v5.9.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: |
@@ -115,9 +122,9 @@ jobs:
 
       - name: Slim the Docker image🚀
         run: |
-          curl -L -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/1.41.7/dist_linux.tar.gz
+          curl -L -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz
           tar -xvf ds.tar.gz
-          ./dist_linux/mint \
+          ./dist_linux/mint build \
             --target ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --http-probe=false \
@@ -128,8 +135,8 @@ jobs:
         env:
           CI: true
         run: |
-          wget -q https://github.com/wagoodman/dive/releases/download/v0.13.1/dive_0.13.1_linux_amd64.tar.gz
-          tar xvzf dive_0.13.1_linux_amd64.tar.gz -C /usr/local/bin
+          wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
+          tar xvzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
           dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           docker run -d --name nginx --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           sleep 10
@@ -163,7 +170,7 @@ jobs:
           fail-build: false
           severity-cutoff: critical
           output-format: json
-          grype-version: v0.103.0
+          grype-version: v${{ env.GRYPE_VERSION }}
           output-file: ${{ github.workspace }}/grype.report.json
 
       - name: Analyze image with Snyk💊
@@ -177,7 +184,7 @@ jobs:
           json: true
 
       - name: Analyze image with Dockle💊
-        uses: goodwithtech/dockle-action@v0.4.15
+        uses: goodwithtech/dockle-action@main
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: "json"
@@ -189,7 +196,7 @@ jobs:
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.9
         with:
-          syft-version: v1.38.0
+          syft-version: v${{ env.SYFT_VERSION }}
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: spdx-json
           output-file: ${{ github.workspace }}/syft.report.json
