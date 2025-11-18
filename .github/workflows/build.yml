@@ -180,8 +180,7 @@ jobs:
           docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
           DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} | \
-            sed -e "s|ghcr.io/ammnt/nginx@||g" | \
-            sed -e "s|ammnt/nginx@||g")
+            | cut -d'@' -f2)
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attestation the Docker image📍
@@ -202,7 +201,9 @@ jobs:
           cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
           cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
           cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.APP_VERSION }}
-          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.APP_VERSION }}
+          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx:${{ env.APP_VERSION }}
           # cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
           # cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
+          # cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          # cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
