@@ -194,7 +194,7 @@ jobs:
           ignore: "CIS-DI-0010"
 
       - name: Analyze image with Syft💊
-        uses: anchore/sbom-action@v0.20.9
+        uses: anchore/sbom-action@v0.20.10
         with:
           syft-version: v${{ env.SYFT_VERSION }}
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
