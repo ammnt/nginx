@@ -136,7 +136,6 @@ jobs:
           output-file: ${{ github.workspace }}/grype.report.json
 
       - name: Analyze image with Snyk💊
-        continue-on-error: true
         uses: snyk/actions/docker@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
