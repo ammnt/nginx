@@ -201,6 +201,8 @@ jobs:
         run: |
           cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
           cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
-          cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-          cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.APP_VERSION }}
+          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.APP_VERSION }}
+          # cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+          # cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
           docker system prune -f ; rm -rf ${{ github.workspace }}/*

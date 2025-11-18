@@ -27,8 +27,6 @@ Docker Hub:<br>
 GitHub Container Registry:<br>
 > **ghcr.io/ammnt/nginx:latest**
 
-All images are included with **provenance attestation**.
-
 ## 📦 Quick Start
 
 ### Docker Run
@@ -87,8 +85,7 @@ services:
 - **Native TLS 1.3 with 0-RTT**
 
 ### **Supply Chain Integrity**
-- **Signed images** signatures and SLSA attestation
-- **SLSA provenance attestation**
+- **Signed images** - signatures and SLSA **provenance attestation**.
 - **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 - **SBOM generation** with Syft
 
