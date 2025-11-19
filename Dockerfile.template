@@ -119,11 +119,13 @@ RUN set -e \
     --add-module="/tmp/ngx_brotli" \
 && make -j $(nproc) && make install && make clean && strip --strip-all /usr/sbin/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
-&& upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/*
+&& upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
+&& echo "nginx:!:65534:0:99999:7:::" > /tmp/shadow
 
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
+COPY --from=builder /tmp/shadow /etc/shadow
 COPY --from=builder /sbin/tini-static /sbin/tini
 COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
