@@ -114,6 +114,13 @@ jobs:
           tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
           dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
 
+      - name: Analyze image with Dockle💊
+        uses: goodwithtech/dockle-action@main
+        with:
+          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          exit-code: "1"
+          exit-level: "warn"
+
       - name: Analyze image with Docker Scout💊
         uses: docker/scout-action@v1.18.2
         with:
