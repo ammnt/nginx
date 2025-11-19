@@ -69,11 +69,13 @@ jobs:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain
           DOCKER_BUILD_RECORD_UPLOAD: false
+          DOCKER_BUILD_CHECKS_ANNOTATIONS: false
         with:
           provenance: false
           context: .
           file: ./Dockerfile.template
           platforms: ${{ env.ARCH_PLATFORMS }}
+          load: ${{ github.event_name != 'pull_request' }}
           tags: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -89,7 +91,7 @@ jobs:
         run: |
           curl -sSL -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz
           tar -xf ds.tar.gz
-          ./dist_linux/mint build \
+          ./dist_linux/mint --quiet build \
             --target ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --http-probe=false \
@@ -97,6 +99,12 @@ jobs:
           docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           sleep 10 && docker ps -a
           curl -sSI http://127.0.0.1:8080 || exit 1
+
+      - name: Upload the Slim report📊
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: MintToolkit Mint (Slim) report
+          path: slim.report.json
 
       - name: Explore the Docker image with Dive🔍
         env:
@@ -116,6 +124,11 @@ jobs:
           summary: true
           github-token: ${{ secrets.GH_TOKEN }}
 
+      - name: Upload Docker Scout report📊
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: scout.sarif
+
       - name: Analyze image with Trivy💊
         uses: aquasecurity/trivy-action@0.33.1
         with:
@@ -127,6 +140,11 @@ jobs:
           scanners: "vuln"
           github-pat: ${{ secrets.GH_TOKEN }}
 
+      - name: Upload Trivy report📊
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy.sarif
+
       - name: Analyze image with Grype💊
         uses: anchore/scan-action@v7.2.0
         with:
@@ -137,6 +155,11 @@ jobs:
           grype-version: v${{ env.GRYPE_VERSION }}
           output-file: ${{ github.workspace }}/grype.sarif
 
+      - name: Upload Grype report📊
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: grype.sarif
+
       - name: Analyze image with Snyk💊
         uses: snyk/actions/docker@master
         continue-on-error: true
@@ -146,17 +169,12 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           sarif: true
           json: false
-          args: --sarif-file-output=${{ github.workspace }}/snyk.sarif
+          args: --sarif-file-output=snyk.sarif
 
-      - name: Analyze image with Dockle💊
-        uses: goodwithtech/dockle-action@main
+      - name: Upload Snyk report📊
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          format: "sarif"
-          output: "dockle.sarif"
-          exit-code: "1"
-          exit-level: "warn"
-          ignore: "CIS-DI-0010"
+          sarif_file: snyk.sarif
 
       - name: Analyze image with Syft💊
         uses: anchore/sbom-action@v0.20.10
@@ -166,23 +184,12 @@ jobs:
           format: cyclonedx-json
           upload-artifact: true
 
-      - name: Upload all reports📊
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: |
-            ${{ github.workspace }}/scout.sarif
-            ${{ github.workspace }}/trivy.sarif
-            ${{ github.workspace }}/grype.sarif
-            ${{ github.workspace }}/snyk.sarif
-            ${{ github.workspace }}/dockle.sarif
-          category: container-security-scan
-
       - name: Push the Docker images to registries💾
         run: |
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ghcr.io/ammnt/nginx:latest
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
           docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
-          docker push ghcr.io/ammnt/angnginxie --all-tags
+          docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
           DIGEST=$(docker inspect -f='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             | cut -d'@' -f2)
