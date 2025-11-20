@@ -126,6 +126,7 @@ RUN set -e \
 
 FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
 COPY --from=builder /sbin/tini-static /sbin/tini
 COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
