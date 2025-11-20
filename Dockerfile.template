@@ -86,6 +86,7 @@ RUN set -e \
     --with-cc-opt="-fcode-hoisting" \
     --with-cc-opt="-Wno-deprecated-declarations" \
     --with-cc-opt="-DTCP_FASTOPEN=23" \
+    --with-cc-opt="-flto" \
     --with-compat \
     --with-pcre-jit \
     --with-threads \
@@ -117,8 +118,10 @@ RUN set -e \
     --without-mail_imap_module \
     --without-mail_smtp_module \
     --add-module="/tmp/ngx_brotli" \
-&& make -j $(nproc) && make install && make clean && strip --strip-all /usr/sbin/nginx \
+&& make -s -j $(nproc) && make -s install && make -s clean \
+&& strip --strip-all /usr/sbin/nginx \
 && chown -R nginx:nginx /etc/nginx && chmod -R g+w /etc/nginx \
+&& file /usr/sbin/nginx && ldd /usr/sbin/nginx || true \
 && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/*
 
 FROM scratch

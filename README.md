@@ -69,8 +69,7 @@ services:
 ### **Compilation Hardening**
 - **GCC security flags** including:
   - `-D_FORTIFY_SOURCE=3`, `-fhardened`, `-fstack-protector-strong`
-  - `-fstack-clash-protection`, `-fPIE`, `-pie`
-  - `-ftrivial-auto-var-init=zero` (prevents data leaks)
+  - `-fstack-clash-protection`, `-ftrivial-auto-var-init=zero` (prevents data leaks)
   - `-fcf-protection=full` (Control-Flow Integrity)
 - **Read-Only Relocations** (`-Wl,-z,relro,-z,now`)
 - **Stack execution protection** and **buffer overflow guards**
@@ -78,22 +77,22 @@ services:
 ### **Runtime Security**
 - **Rootless by design** (`USER nginx`)
 - **Distroless base** - built from `scratch` with zero bloat
-- **Minimal attack surface** - no shell, no package manager and 15+ unnecessary modules removed
-- **Server header removal** - security through obscurity
+- **Minimal attack surface** - no shell, no package manager and no unnecessary modules
+- **Server header removal** - anonymous signature ("security through obscurity")
 - **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
 - **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves
 - **Native TLS 1.3 with 0-RTT**
 
 ### **Supply Chain Integrity**
 - **Signed images** - signatures and SLSA **provenance attestation**.
-- **Comprehensive scanning** - 7+ security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
+- **Comprehensive scanning** - by security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Syft, Dive)
 - **SBOM generation** with Syft
 
 ## 🚀 Ultimate Optimization
 
 ### **Size Optimization**
 - **Multi-stage build** with Alpine builder + scratch final image
-- **Static compilation** - static binary with 30+ GCC hardening flags and minimal dependencies
+- **Static compilation** - static binary with minimal dependencies
 - **Mint tool integration** - slimmed version of the image
 - **UPX runtime efficiency** - minimal memory overhead with fast decompression
 - **Binary stripping** and **LTO optimization**
@@ -108,11 +107,10 @@ services:
 
 ### **Quality Metrics**
 - **ChaCha20 prioritization** - custom patch for modern cipher preference
-- **Anonymous signature** - stripped version information from binaries
 - **Image efficiency** - perfect score in Dive analysis (100%)
 - **Comprehensive OCI labels** - standardized metadata and annotations
 - **No excess ENTRYPOINT** - no unnecessary wrapper scripts or bloat
-- **Readiness Probes** - configurable via Docker HEALTHCHECK parameters
+- **HEALTHCHECK** - added in the Dockerfile
 
 ## 🤝 Contributing & Support
 
