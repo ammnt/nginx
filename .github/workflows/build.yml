@@ -190,6 +190,8 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           format: cyclonedx-json
           upload-artifact: true
+          dependency-snapshot: true
+          github-token: ${{ secrets.SNYK_TOKEN }}
 
       - name: Push the Docker images to registries💾
         run: |
