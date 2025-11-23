@@ -9,7 +9,6 @@ ARG ZLIB_VERSION
 ARG BUILD_DATE
 
 WORKDIR /tmp
-
 # System setup and dependency installation
 RUN set -e \
     # Create non-root user for security (nginx:nginx)
