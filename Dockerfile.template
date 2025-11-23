@@ -7,6 +7,7 @@ ARG PCRE_VERSION
 ARG ZLIB_VERSION
 ARG BUILD_DATE
 
+WORKDIR /tmp
 RUN set -e \
 && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
 && apk -U upgrade && apk add --no-cache \
@@ -22,7 +23,7 @@ RUN set -e \
     upx \
     perl \
     cmake \
-&& update-ca-certificates && cd /tmp \
+&& update-ca-certificates \
 && git clone --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
 && git clone --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
 && git clone --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
@@ -35,15 +36,21 @@ RUN set -e \
 && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/v3/ngx_http_v3_filter_module.c \
 && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
 && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
-&& sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c \
-&& cd /tmp/ngx_brotli/deps/brotli && mkdir out && cd out \
+&& sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c
+
+WORKDIR /tmp/zlib-ng
+RUN set -e \
+&& mkdir -p /tmp/ngx_brotli/deps/brotli/out \
 && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
--DCMAKE_C_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
--DCMAKE_CXX_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
--DCMAKE_INSTALL_PREFIX=./installed .. \
-&& cmake --build . --config Release --target brotlienc \
-&& sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && cd /tmp/zlib-ng && ./configure --zlib-compat \
-&& make && make install && cd /tmp/nginx \
+    -DCMAKE_C_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+    -DCMAKE_CXX_FLAGS="-Ofast -m64 -march=native -mtune=native -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+    -DCMAKE_INSTALL_PREFIX=./installed -B /tmp/ngx_brotli/deps/brotli/out -S /tmp/ngx_brotli/deps/brotli \
+&& cmake --build /tmp/ngx_brotli/deps/brotli/out --config Release --target brotlienc \
+&& sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && ./configure --zlib-compat \
+&& make -s -j "$(nproc)" && make -s install && make -s clean
+
+WORKDIR /tmp/nginx
+RUN set -e \
 && ./auto/configure \
     --prefix="/etc/nginx" \
     --sbin-path="/usr/sbin/nginx" \
