@@ -13,7 +13,6 @@ env:
   DIVE_VERSION: "0.13.1"
   GRYPE_VERSION: "0.103.0"
   SYFT_VERSION: "1.38.0"
-  ARCH_PLATFORMS: linux/amd64
 
 jobs:
   build:
@@ -63,6 +62,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Analyze the Dockerfile with Hadolint💊
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: Dockerfile.template
+          format: sarif
+          output-file: hadolint.sarif
+          failure-threshold: warning
+
+      - name: Upload Hadolint report📊
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: hadolint.sarif
+
       - name: Build the Docker image⛓️
         uses: docker/build-push-action@v6.18.0
         env:
@@ -74,7 +86,7 @@ jobs:
           provenance: false
           context: .
           file: ./Dockerfile.template
-          platforms: ${{ env.ARCH_PLATFORMS }}
+          platforms: linux/amd64
           load: ${{ github.event_name != 'pull_request' }}
           tags: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           cache-from: type=gha

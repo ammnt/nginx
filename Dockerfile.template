@@ -71,7 +71,7 @@ RUN set -e \
     --with-cc-opt="-static -static-libgcc" \
     --with-ld-opt="-static" \
     --with-cc-opt="-O2" \
-    --with-cc-opt="-march=native" \
+    --with-cc-opt="-march=x86-64" \
     --with-cc-opt="-fhardened" \
     --with-cc-opt="-D_FORTIFY_SOURCE=3" \
     --with-cc-opt="-D_GLIBCXX_ASSERTIONS" \

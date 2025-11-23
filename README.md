@@ -85,7 +85,7 @@ services:
 
 ### **Supply Chain Integrity**
 - **Signed images** - signatures and SLSA **provenance attestation**.
-- **Comprehensive scanning** - by security tools (Docker Scout, Trivy, Snyk, Grype, Dockle)
+- **Comprehensive scanning** - by security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Hadolint)
 - **SBOM generation** with Syft
 
 ## 🚀 Ultimate Optimization
