@@ -68,7 +68,8 @@ jobs:
           dockerfile: Dockerfile.template
           format: sarif
           output-file: hadolint.sarif
-          failure-threshold: warning
+          failure-threshold: error
+          no-fail: true
 
       - name: Upload Hadolint report📊
         uses: github/codeql-action/upload-sarif@v4
