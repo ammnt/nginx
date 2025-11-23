@@ -122,7 +122,6 @@ RUN set -e \
         --with-cc-opt="-fcode-hoisting" \
         --with-cc-opt="-Wno-deprecated-declarations" \
         --with-cc-opt="-DTCP_FASTOPEN=23" \
-        --with-cc-opt="-flto" \
         # Core features
         --with-compat \
         --with-pcre-jit \
