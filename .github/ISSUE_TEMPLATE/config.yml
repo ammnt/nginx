@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Open an Issue
-    url: https://github.com/ammnt/nginx/issues/new?template=bug_report.md
-    about: Found an issue? Open an Issue!
-  - name: Feature Request
-    url: https://github.com/ammnt/nginx/issues/new?template=feature_request.md
-    about: Have an improvement? Open a Feature Request!
+  - name: More about me🏆
+    url: https://msftcnsi.com/
+    about: If you want something else!
