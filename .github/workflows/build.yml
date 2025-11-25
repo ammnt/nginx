@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout repository🧱
-        uses: actions/checkout@v6.0.0
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
 
       - name: Load .env variables☁️
         run: |
@@ -39,31 +39,31 @@ jobs:
           echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
       - name: Install cosign🔒
-        uses: sigstore/cosign-installer@v4.0.0
+        uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
         with:
           cosign-release: v${{ env.COSIGN_VERSION }}
 
       - name: Setup Docker buildx🛠️
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
         with:
           version: v${{ env.BUILDX_VERSION }}
           driver-opts: image=moby/buildkit:v${{ env.BUILDKIT_VERSION }}-rootless
 
       - name: Log into GHCR🔑
-        uses: docker/login-action@v3.6.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Log into Docker Hub🔑
-        uses: docker/login-action@v3.6.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Analyze the Dockerfile with Hadolint💊
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5
         with:
           dockerfile: Dockerfile.template
           format: sarif
@@ -71,12 +71,12 @@ jobs:
           failure-threshold: error
 
       - name: Upload Hadolint report📊
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2
         with:
           sarif_file: hadolint.sarif
 
       - name: Build the Docker image⛓️
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
         env:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain
@@ -113,7 +113,7 @@ jobs:
           curl -sSI http://127.0.0.1:8080 || exit 1
 
       - name: Upload the Slim report📊
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: MintToolkit Mint (Slim) report
           path: slim.report.json
@@ -127,14 +127,14 @@ jobs:
           dive --ci-config "${{ github.workspace }}/.dive-ci/" ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
 
       - name: Analyze image with Dockle💊
-        uses: goodwithtech/dockle-action@main
+        uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           exit-code: "1"
           exit-level: "warn"
 
       - name: Analyze image with Docker Scout💊
-        uses: docker/scout-action@v1.18.2
+        uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
@@ -144,12 +144,12 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Docker Scout report📊
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2
         with:
           sarif_file: scout.sarif
 
       - name: Analyze image with Trivy💊
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           scan-type: image
@@ -160,12 +160,12 @@ jobs:
           github-pat: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Trivy report📊
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2
         with:
           sarif_file: trivy.sarif
 
       - name: Analyze image with Grype💊
-        uses: anchore/scan-action@v7.2.1
+        uses: anchore/scan-action@40a61b52209e9d50e87917c5b901783d546b12d0
         with:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           fail-build: false
@@ -175,12 +175,12 @@ jobs:
           output-file: ${{ github.workspace }}/grype.sarif
 
       - name: Upload Grype report📊
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2
         with:
           sarif_file: grype.sarif
 
       - name: Analyze image with Snyk💊
-        uses: snyk/actions/docker@master
+        uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -191,12 +191,12 @@ jobs:
           args: --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk report📊
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2
         with:
           sarif_file: snyk.sarif
 
       - name: Analyze image with Syft💊
-        uses: anchore/sbom-action@v0.20.10
+        uses: anchore/sbom-action@fbfd9c6c189226748411491745178e0c2017392d
         with:
           syft-version: v${{ env.SYFT_VERSION }}
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
@@ -217,7 +217,7 @@ jobs:
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attestation the Docker image📍
-        uses: actions/attest-build-provenance@v3.0.0
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ env.DIGEST }}
