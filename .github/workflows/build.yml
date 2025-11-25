@@ -82,12 +82,13 @@ jobs:
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_CHECKS_ANNOTATIONS: false
+          DOCKER_CONTENT_TRUST: 1
         with:
           provenance: false
           context: .
           file: ./Dockerfile.template
           platforms: linux/amd64
-          load: ${{ github.event_name != 'pull_request' }}
+          load: true
           tags: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
