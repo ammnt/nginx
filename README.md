@@ -1,6 +1,6 @@
 # 🚀 Distroless NGINX: Hardened & Optimized image
 
-[![Build and Push](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
+[![CI/CD](https://github.com/ammnt/nginx/actions/workflows/build.yml/badge.svg)](https://github.com/ammnt/nginx/actions/workflows/build.yml)
 ![Version](https://img.shields.io/github/v/release/ammnt/nginx)
 [![GitHub stars](https://img.shields.io/github/stars/ammnt/nginx.svg)](https://github.com/ammnt/nginx/stargazers)
 ![Feature](https://img.shields.io/badge/feature-distroless-blue)
