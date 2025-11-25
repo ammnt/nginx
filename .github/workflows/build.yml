@@ -113,7 +113,7 @@ jobs:
           curl -sSI http://127.0.0.1:8080 || exit 1
 
       - name: Upload the Slim report📊
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: MintToolkit Mint (Slim) report
           path: slim.report.json
