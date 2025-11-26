@@ -167,18 +167,19 @@ RUN set -e \
     # Verify binary and dependencies
     && file /usr/sbin/nginx && ldd /usr/sbin/nginx || true \
     # Compress binary with UPX (minimal memory overhead)
-    && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
+    && upx --best --lzma /usr/sbin/nginx \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
-    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
+    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow \
+    && rm -rf /tmp/*
 
 # Final distroless image
 FROM scratch
 
 # Copy minimal runtime dependencies from builder
+WORKDIR /tmp
 COPY --from=builder /tmp/passwd /tmp/group /tmp/shadow /etc/
 COPY --from=builder /sbin/tini-static /sbin/tini
-COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
 # Copy configuration files
