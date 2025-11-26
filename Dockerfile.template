@@ -40,18 +40,19 @@ RUN set -e \
     # Clone Brotli compression module
     && git clone --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
     # Security hardening: Remove server headers and version information
-    && sed -i -e 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
-    && sed -i -e 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
+    && sed -ie 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
+    && sed -ie 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
     # Remove Server header from HTTP responses (HTTP/1.1, HTTP/2, HTTP/3)
-    && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/ngx_http_header_filter_module.c \
-    && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/v2/ngx_http_v2_filter_module.c \
-    && sed -i -e 's@r->headers_out.server == NULL@0@g' /tmp/nginx/src/http/v3/ngx_http_v3_filter_module.c \
+    && sed -ie 's@r->headers_out.server == NULL@0@g' \
+        /tmp/nginx/src/http/ngx_http_header_filter_module.c \
+        /tmp/nginx/src/http/v2/ngx_http_v2_filter_module.c \
+        /tmp/nginx/src/http/v3/ngx_http_v3_filter_module.c \
     # Remove default footer from error pages
-    && sed -i -e 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
+    && sed -ie 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
     # Anonymize version strings in source code
-    && sed -i -e 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
+    && sed -ie 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
     # Prioritize ChaCha20 cipher for better performance on mobile devices
-    && sed -i -e 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c
+    && sed -ie 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c
 
 # Build Brotli compression library with optimizations
 WORKDIR /tmp/zlib-ng
@@ -167,22 +168,19 @@ RUN set -e \
     && file /usr/sbin/nginx && ldd /usr/sbin/nginx || true \
     # Compress binary with UPX (minimal memory overhead)
     && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
-    && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd.minimal \
-    && grep -E "(root|nginx)" /etc/group > /tmp/group.minimal \
-    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow.minimal
+    && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
+    && grep -E "(root|nginx)" /etc/group > /tmp/group \
+    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
 
 # Final distroless image
 FROM scratch
 
 # Copy minimal runtime dependencies from builder
-COPY --from=builder /tmp/passwd.minimal /etc/passwd
-COPY --from=builder /tmp/group.minimal /etc/group
-COPY --from=builder /tmp/shadow.minimal /etc/shadow
+COPY --from=builder /tmp/passwd /tmp/group /tmp/shadow /etc/
 COPY --from=builder /sbin/tini-static /sbin/tini
 COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=nginx:nginx /etc/nginx /etc/nginx
-
 # Copy configuration files
 COPY --chown=nginx:nginx ./nginx.conf /etc/nginx/nginx.conf
 COPY --chown=nginx:nginx ./default.conf /etc/nginx/conf.d/default.conf
