@@ -107,11 +107,10 @@ jobs:
           ./dist_linux/mint --quiet build \
             --target ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
-            --http-probe=false \
-            --continue-after=5
+            --http-probe=false --continue-after=5 \
+            --include-path=/etc/shadow --include-path=/etc/group
           docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          sleep 10 && docker ps -a
-          curl -sSI http://127.0.0.1:8080 || exit 1
+          sleep 5 ; curl -sSI http://127.0.0.1:8080 || exit 1
 
       - name: Upload Mint report📁
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
@@ -142,7 +141,7 @@ jobs:
           sarif-file: ${{ github.workspace }}/scout.sarif
           write-comment: true
           summary: true
-          exit-code: "2"
+          exit-code: true
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Docker Scout report📁

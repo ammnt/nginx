@@ -15,18 +15,18 @@ RUN set -e \
     && addgroup --system --gid 101 nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid 101 --no-create-home nginx \
     # Update system and install build dependencies
     && apk -U upgrade && apk add --no-cache \
-        gcc \
-        make \
-        git \
-        mimalloc2-dev \
-        tini-static \
-        build-base \
-        ca-certificates \
-        linux-headers \
-        tzdata \
-        upx \
-        perl \
-        cmake \
+        gcc=14.2.0-r6 \
+        make=4.4.1-r3 \
+        git=2.49.1-r0 \
+        mimalloc2-dev=2.2.3-r2 \
+        tini-static=0.19.0-r3 \
+        build-base=0.5-r3 \
+        ca-certificates=20250911-r0 \
+        linux-headers=6.14.2-r0 \
+        tzdata=2025b-r0 \
+        upx=5.0.2-r0 \
+        perl=5.40.3-r0 \
+        cmake=3.31.7-r1 \
     # Update CA certificates for SSL verification
     && update-ca-certificates \
     # Clone NGINX webserver and remove documentation
@@ -166,14 +166,18 @@ RUN set -e \
     # Verify binary and dependencies
     && file /usr/sbin/nginx && ldd /usr/sbin/nginx || true \
     # Compress binary with UPX (minimal memory overhead)
-    && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/*
+    && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
+    && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd.minimal \
+    && grep -E "(root|nginx)" /etc/group > /tmp/group.minimal \
+    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow.minimal
 
 # Final distroless image
 FROM scratch
 
 # Copy minimal runtime dependencies from builder
-COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /etc/group /etc/group
+COPY --from=builder /tmp/passwd.minimal /etc/passwd
+COPY --from=builder /tmp/group.minimal /etc/group
+COPY --from=builder /tmp/shadow.minimal /etc/shadow
 COPY --from=builder /sbin/tini-static /sbin/tini
 COPY --from=builder /tmp /tmp
 COPY --from=builder --chown=nginx:nginx /usr/sbin/nginx /usr/sbin/nginx
