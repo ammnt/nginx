@@ -167,11 +167,10 @@ RUN set -e \
     # Verify binary and dependencies
     && file /usr/sbin/nginx && ldd /usr/sbin/nginx || true \
     # Compress binary with UPX (minimal memory overhead)
-    && upx --best --lzma /usr/sbin/nginx \
+    && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
-    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow \
-    && rm -rf /tmp/*
+    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
 
 # Final distroless image
 FROM scratch
