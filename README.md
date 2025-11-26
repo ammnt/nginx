@@ -79,6 +79,7 @@ services:
 - **Distroless base** - built from `scratch` with zero bloat
 - **Minimal attack surface** - no shell, no package manager and no unnecessary modules
 - **Server header removal** - anonymous signature ("security through obscurity")
+- **Best practices compliance** - follows Docker security standards
 - **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
 - **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves
 - **Native TLS 1.3 with 0-RTT**
