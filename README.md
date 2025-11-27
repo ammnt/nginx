@@ -138,7 +138,7 @@ spec:
 - **Image efficiency** - perfect score in Dive analysis (100%)
 - **Comprehensive OCI labels** - standardized metadata and annotations
 - **No excess ENTRYPOINT** - no unnecessary wrapper scripts or bloat
-- **HEALTHCHECK** - added in the Dockerfile
+- **Built-in HEALTHCHECK** - Configuration validation every 30s with 3s timeout
 
 ## 🤝 Contributing & Support
 
