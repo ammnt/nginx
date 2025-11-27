@@ -48,11 +48,11 @@ https://docs.docker.com/engine/security/rootless/
 services:
   nginx:
     image: ammnt/nginx:latest
-    user: "101:101"
+    user: "10001:10001"
     read_only: true
     privileged: false
     tmpfs:
-     - /tmp:mode=1700,size=1G,noexec,nosuid,nodev,uid=101,gid=101
+     - /tmp:mode=1700,size=1G,noexec,nosuid,nodev,uid=10001,gid=10001
     cap_drop:
      - all
     container_name: nginx
