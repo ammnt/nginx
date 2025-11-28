@@ -101,7 +101,7 @@ spec:
 - **Stack execution protection** and **buffer overflow guards**
 
 ### **Runtime Security**
-- **Rootless by design** (`USER nginx`)
+- **Rootless by design** - unprivileged runtime user
 - **Distroless base** - built from `scratch` with zero bloat
 - **Minimal attack surface** - no shell, no package manager and no unnecessary modules
 - **Server header removal** - anonymous signature ("security through obscurity")
@@ -138,7 +138,7 @@ spec:
 - **Image efficiency** - perfect score in Dive analysis (100%)
 - **Comprehensive OCI labels** - standardized metadata and annotations
 - **No excess ENTRYPOINT** - no unnecessary wrapper scripts or bloat
-- **Built-in HEALTHCHECK** - Configuration validation every 30s with 3s timeout
+- **Built-in HEALTHCHECK** - configuration validation every 30s with 3s timeout
 
 ## 🤝 Contributing & Support
 

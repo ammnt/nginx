@@ -4,6 +4,7 @@
 *.md linguist-language=Markdown linguist-detectable
 # *.pub linguist-language=Text linguist-detectable
 *.toml linguist-language=TOML linguist-detectable
+*.yml linguist-language=YAML linguist-detectable
 
 # Specific files
 Dockerfile.template linguist-language=Dockerfile linguist-detectable

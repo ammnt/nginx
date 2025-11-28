@@ -67,9 +67,9 @@ jobs:
         uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5
         with:
           dockerfile: Dockerfile.template
-          format: sarif
           output-file: hadolint.sarif
-          failure-threshold: warning
+          format: sarif
+          config: ./hadolint.yaml
 
       - name: Upload Hadolint report📁
         uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2
@@ -123,7 +123,7 @@ jobs:
         run: |
           wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
           tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
-          dive ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          dive ./dive-ci.yml ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
 
       - name: Security scan with Dockle🛡️
         uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
