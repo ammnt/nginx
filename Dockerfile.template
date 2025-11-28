@@ -31,6 +31,7 @@ RUN set -e \
     # Update CA certificates for SSL verification
     && update-ca-certificates \
     # Clone NGINX webserver and remove documentation
+    && git config --global advice.detachedHead false \
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
     # Clone OpenSSL with HTTP/3 and QUIC support
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \

@@ -67,8 +67,8 @@ jobs:
         uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5
         with:
           dockerfile: Dockerfile.template
-          output-file: hadolint.sarif
           format: sarif
+          output-file: hadolint.sarif
           config: ./hadolint.yaml
 
       - name: Upload Hadolint report📁
