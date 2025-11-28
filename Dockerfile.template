@@ -15,7 +15,7 @@ RUN set -e \
     # Create non-root user for security (nginx:nginx)
     && addgroup --system --gid "${GID}" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "${UID}" --no-create-home nginx \
     # Update system and install build dependencies
-    && apk -U upgrade && apk add --no-cache \
+    && apk -U -q upgrade && apk add -q --no-cache \
         gcc=14.2.0-r6 \
         make=4.4.1-r3 \
         git=2.49.1-r0 \
@@ -31,15 +31,15 @@ RUN set -e \
     # Update CA certificates for SSL verification
     && update-ca-certificates \
     # Clone NGINX webserver and remove documentation
-    && git clone --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
     # Clone OpenSSL with HTTP/3 and QUIC support
-    && git clone --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
     # Clone PCRE2 for regex with JIT support
-    && git clone --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
     # Clone zlib-ng for modern compression performance
-    && git clone --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
     # Clone Brotli compression module
-    && git clone --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
+    && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
     # Security hardening: Remove server headers and version information
     && sed -ie 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
     && sed -ie 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
