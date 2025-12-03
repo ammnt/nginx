@@ -37,7 +37,8 @@ jobs:
               echo "$line" >> $GITHUB_ENV
             fi
           done < .env
-          echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+          echo "COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -98,6 +99,7 @@ jobs:
             APP_VERSION=${{ env.APP_VERSION }}
             PCRE_VERSION=${{ env.PCRE_VERSION }}
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
+            COMMIT_HASH=${{ env.COMMIT_HASH }}
 
       - name: Slim image with Mint🔧
         run: |
