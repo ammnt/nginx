@@ -9,7 +9,7 @@ env:
   COSIGN_VERSION: "3.0.3"
   BUILDX_VERSION: "0.30.1"
   BUILDKIT_VERSION: "0.26.2"
-  MINT_VERSION: "1.41.7"
+  MINT_VERSION: "1.41.8"
   DIVE_VERSION: "0.13.1"
   GRYPE_VERSION: "0.104.2"
   SYFT_VERSION: "1.38.2"
@@ -38,7 +38,7 @@ jobs:
             fi
           done < .env
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
-          echo "COMMIT_HASH=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -99,7 +99,7 @@ jobs:
             APP_VERSION=${{ env.APP_VERSION }}
             PCRE_VERSION=${{ env.PCRE_VERSION }}
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
-            COMMIT_HASH=${{ env.COMMIT_HASH }}
+            VCS_REF=${{ env.VCS_REF }}
 
       - name: Slim image with Mint🔧
         run: |

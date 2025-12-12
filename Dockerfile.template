@@ -180,7 +180,7 @@ ARG APP_VERSION
 ARG BUILD_DATE
 ARG UID
 ARG GID
-ARG COMMIT_HASH
+ARG VCS_REF
 
 # Copy minimal runtime dependencies from builder
 WORKDIR /tmp
@@ -210,7 +210,7 @@ LABEL description="Distroless NGINX with HTTP/3, QUIC and PQC support🚀" \
       org.opencontainers.image.licenses="BSD-2-Clause License" \
       org.opencontainers.image.url="https://msftcnsi.com" \
       org.opencontainers.image.version=${APP_VERSION} \
-      org.opencontainers.image.revision=${COMMIT_HASH}
+      org.opencontainers.image.revision=${VCS_REF}
 
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=2 \
