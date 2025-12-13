@@ -115,8 +115,8 @@ spec:
 - **Native TLS 1.3 with 0-RTT**
 
 ### **Supply Chain Integrity**
-- **Signed images** - signatures and SLSA **provenance attestation**.
-- **Comprehensive scanning** - by security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Hadolint)
+- **Signed images** - signatures and SLSA **provenance attestation**
+- **Comprehensive scanning** - by security tools (Scout, Trivy, Snyk, Grype, Dockle, Hadolint)
 - **SBOM generation** with Syft
 
 ## 🚀 Ultimate Optimization
