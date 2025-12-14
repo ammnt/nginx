@@ -113,6 +113,7 @@ spec:
 - **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
 - **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves
 - **Native TLS 1.3 with 0-RTT**
+- **Native support for the Encrypted Client Hello (ECH)** - extension of the TLS 1.3 protocol
 
 ### **Supply Chain Integrity**
 - **Signed images** - signatures and SLSA **provenance attestation**
