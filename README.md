@@ -135,6 +135,7 @@ spec:
 - **TCP Fast Open** and **SSL session resumption**
 - **Graceful shutdown** - SIGQUIT handling for proper connection draining
 - **Brotli compression** support
+- **ZSTD compression** support
 
 ### **Quality Metrics**
 - **ChaCha20 prioritization** - custom patch for modern cipher preference

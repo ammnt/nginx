@@ -6,6 +6,7 @@ ARG OPENSSL_VERSION
 ARG APP_VERSION
 ARG PCRE_VERSION
 ARG ZLIB_VERSION
+ARG ZSTD_VERSION
 ARG UID
 ARG GID
 
@@ -41,6 +42,8 @@ RUN set -e \
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
     # Clone Brotli compression module
     && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
+    # Clone ZSTD compression module
+    && git clone -q --depth 1 --recurse -j8 --single-branch -b "${ZSTD_VERSION}" https://github.com/tokers/zstd-nginx-module \
     # Security hardening: Remove server headers and version information
     && sed -ie 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
     && sed -ie 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
@@ -160,6 +163,7 @@ RUN set -e \
         --without-mail_smtp_module \
         # Third-party modules
         --add-module="/tmp/ngx_brotli" \
+        --add-module="/tmp/zstd-nginx-module" \
     # Build and install NGINX
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
