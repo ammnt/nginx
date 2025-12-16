@@ -38,7 +38,7 @@ RUN set -e \
     # Clone PCRE2 for regex with JIT support
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
     # Clone zlib-ng for modern compression performance
-    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng.git \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng \
     # Clone Brotli compression module
     && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
     # Security hardening: Remove server headers and version information
