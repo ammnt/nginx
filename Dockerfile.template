@@ -37,7 +37,7 @@ RUN set -e \
     && git config --global advice.detachedHead false \
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
     # Clone OpenSSL with HTTP/3 and QUIC support
-    && git clone -q --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "feature/ech" https://github.com/openssl/openssl \
     # Clone PCRE2 for regex with JIT support
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
     # Clone zlib-ng for modern compression performance
