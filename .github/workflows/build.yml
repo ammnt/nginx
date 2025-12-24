@@ -26,7 +26,6 @@ jobs:
       id-token: write
       security-events: write
       attestations: write
-      artifact-metadata: write
 
     steps:
       - name: Checkout repository📥
