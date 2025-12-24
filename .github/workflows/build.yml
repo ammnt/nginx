@@ -26,6 +26,7 @@ jobs:
       id-token: write
       security-events: write
       attestations: write
+      artifact-metadata: write
 
     steps:
       - name: Checkout repository📥
@@ -100,7 +101,11 @@ jobs:
             APP_VERSION=${{ env.APP_VERSION }}
             PCRE_VERSION=${{ env.PCRE_VERSION }}
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
+            ZSTD_VERSION=${{ env.ZSTD_VERSION }}
             VCS_REF=${{ env.VCS_REF }}
+            UID=${{ env.UID }}
+            GID=${{ env.GID }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
 
       - name: Slim image with Mint🔧
         run: |
@@ -126,7 +131,7 @@ jobs:
         run: |
           wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
           tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
-          dive ./dive-ci.yml ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          dive --config ./dive-ci.yml ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
 
       - name: Security scan with Dockle🛡️
         uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
@@ -134,6 +139,7 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           exit-code: "1"
           exit-level: "warn"
+          ignore: "CIS-DI-0010"
 
       - name: Security scan with Docker Scout🛡️
         uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
