@@ -19,6 +19,9 @@
 > [!TIP]
 > You can find an example configuration file in the repository for successfully configuring HTTP/3 and PQC💡
 
+> [!IMPORTANT]
+> UID/GID changed to 10001 - it's [recommended](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Kubernetes and prevents conflicts with system users⚠️
+
 ## 🌐 Image Variants
 
 Docker Hub:<br>
@@ -48,11 +51,11 @@ https://docs.docker.com/engine/security/rootless/
 services:
   nginx:
     image: ammnt/nginx:latest
-    user: "101:101"
+    user: "10001:10001"
     read_only: true
     privileged: false
     tmpfs:
-     - /tmp:mode=1700,size=1G,noexec,nosuid,nodev,uid=101,gid=101
+     - /tmp:mode=1700,size=1G,noexec,nosuid,nodev,uid=10001,gid=10001
     cap_drop:
      - all
     container_name: nginx
@@ -64,6 +67,32 @@ services:
       - "./conf:/etc/nginx:ro"
 ...
 ```
+
+### Example Deployment (PSS Restricted Level Compliant)
+```yaml
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: nginx-pss-restricted
+spec:
+  containers:
+  - name: nginx
+    image: ammnt/nginx:latest
+    securityContext:
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      runAsUser: 10001
+      runAsGroup: 10001
+      seccompProfile:
+        type: RuntimeDefault
+      runAsNonRoot: true
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+...
+```
+
 ## 🔥 Why Choose This Image?
 
 ### **Compilation Hardening**
@@ -75,18 +104,19 @@ services:
 - **Stack execution protection** and **buffer overflow guards**
 
 ### **Runtime Security**
-- **Rootless by design** (`USER nginx`)
+- **Rootless by design** - unprivileged runtime user
 - **Distroless base** - built from `scratch` with zero bloat
 - **Minimal attack surface** - no shell, no package manager and no unnecessary modules
 - **Server header removal** - anonymous signature ("security through obscurity")
-- **Best practices compliance** - follows Docker security standards
+- **Kubernetes PSS compliant** - fully conforms to Pod Security Standards (Baseline & Restricted)
+- **Docker security standards** - follows CIS Docker Benchmarks and best practices
 - **Native HTTP/3 support** - OpenSSL and QUIC without patches or experimental implementations
 - **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves
 - **Native TLS 1.3 with 0-RTT**
 
 ### **Supply Chain Integrity**
-- **Signed images** - signatures and SLSA **provenance attestation**.
-- **Comprehensive scanning** - by security tools (Docker Scout, Trivy, Snyk, Grype, Dockle, Hadolint)
+- **Signed images** - signatures and SLSA **provenance attestation**
+- **Comprehensive scanning** - by security tools (Scout, Trivy, Snyk, Grype, Dockle, Hadolint)
 - **SBOM generation** with Syft
 
 ## 🚀 Ultimate Optimization
@@ -105,13 +135,14 @@ services:
 - **TCP Fast Open** and **SSL session resumption**
 - **Graceful shutdown** - SIGQUIT handling for proper connection draining
 - **Brotli compression** support
+- **ZSTD compression** support
 
 ### **Quality Metrics**
 - **ChaCha20 prioritization** - custom patch for modern cipher preference
 - **Image efficiency** - perfect score in Dive analysis (100%)
 - **Comprehensive OCI labels** - standardized metadata and annotations
 - **No excess ENTRYPOINT** - no unnecessary wrapper scripts or bloat
-- **HEALTHCHECK** - added in the Dockerfile
+- **Built-in HEALTHCHECK** - configuration validation every 30s with 3s timeout
 
 ## 🤝 Contributing & Support
 

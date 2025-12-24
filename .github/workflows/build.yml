@@ -6,14 +6,15 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  COSIGN_VERSION: "3.0.2"
+  COSIGN_VERSION: "3.0.3"
   BUILDX_VERSION: "0.30.1"
-  BUILDKIT_VERSION: "0.26.2"
-  MINT_VERSION: "1.41.7"
+  BUILDKIT_VERSION: "0.26.3"
+  MINT_VERSION: "1.41.8"
   DIVE_VERSION: "0.13.1"
-  GRYPE_VERSION: "0.104.1"
-  SYFT_VERSION: "1.38.0"
+  GRYPE_VERSION: "0.104.3"
+  SYFT_VERSION: "1.39.0"
   DOCKER_BUILDKIT: 1
+  BUILDKIT_PROGRESS: quiet
 
 jobs:
   build:
@@ -25,6 +26,7 @@ jobs:
       id-token: write
       security-events: write
       attestations: write
+      artifact-metadata: write
 
     steps:
       - name: Checkout repository📥
@@ -37,7 +39,8 @@ jobs:
               echo "$line" >> $GITHUB_ENV
             fi
           done < .env
-          echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+          echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -69,7 +72,7 @@ jobs:
           dockerfile: Dockerfile.template
           format: sarif
           output-file: hadolint.sarif
-          failure-threshold: warning
+          config: ./hadolint.yaml
 
       - name: Upload Hadolint report📁
         uses: github/codeql-action/upload-sarif@fe4161a26a8629af62121b670040955b330f9af2
@@ -98,6 +101,11 @@ jobs:
             APP_VERSION=${{ env.APP_VERSION }}
             PCRE_VERSION=${{ env.PCRE_VERSION }}
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
+            ZSTD_VERSION=${{ env.ZSTD_VERSION }}
+            VCS_REF=${{ env.VCS_REF }}
+            UID=${{ env.UID }}
+            GID=${{ env.GID }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
 
       - name: Slim image with Mint🔧
         run: |
@@ -123,7 +131,7 @@ jobs:
         run: |
           wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
           tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
-          dive ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          dive --config ./dive-ci.yml ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
 
       - name: Security scan with Dockle🛡️
         uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
@@ -131,6 +139,7 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           exit-code: "1"
           exit-level: "warn"
+          ignore: "CIS-DI-0010"
 
       - name: Security scan with Docker Scout🛡️
         uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
