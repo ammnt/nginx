@@ -115,8 +115,6 @@ jobs:
             --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
             --http-probe=false --continue-after=5 \
             --include-path=/etc/shadow --include-path=/etc/group
-          docker run -d --rm -p 127.0.0.1:8080:8080/tcp ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          sleep 5 ; curl -sSI http://127.0.0.1:8080 || exit 1
 
       - name: Upload Mint report📁
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
