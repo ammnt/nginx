@@ -75,7 +75,7 @@ jobs:
           config: ./hadolint.yaml
 
       - name: Upload Hadolint report📁
-        uses: github/codeql-action/upload-sarif@fe4161a26a8629af62121b670040955b330f9af2
+        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7
         with:
           sarif_file: hadolint.sarif
 
@@ -153,7 +153,7 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Docker Scout report📁
-        uses: github/codeql-action/upload-sarif@fe4161a26a8629af62121b670040955b330f9af2
+        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7
         with:
           sarif_file: scout.sarif
 
@@ -170,7 +170,7 @@ jobs:
           github-pat: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Trivy report📁
-        uses: github/codeql-action/upload-sarif@fe4161a26a8629af62121b670040955b330f9af2
+        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7
         with:
           sarif_file: trivy.sarif
 
@@ -185,7 +185,7 @@ jobs:
           output-file: ${{ github.workspace }}/grype.sarif
 
       - name: Upload Grype report📁
-        uses: github/codeql-action/upload-sarif@fe4161a26a8629af62121b670040955b330f9af2
+        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7
         with:
           sarif_file: grype.sarif
 
@@ -201,7 +201,7 @@ jobs:
           args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
 
       - name: Upload Snyk report📁
-        uses: github/codeql-action/upload-sarif@fe4161a26a8629af62121b670040955b330f9af2
+        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7
         with:
           sarif_file: snyk.sarif
 
