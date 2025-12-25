@@ -247,3 +247,15 @@ jobs:
           # cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           # cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
+
+      - name: Deploy to production server🌐
+        uses: appleboy/ssh-action@823bd89e131d8d508129f9443cad5855e9ba96f0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd /home/${{ secrets.SERVER_USERNAME }}/agh
+            /usr/bin/docker compose pull web dns
+            /usr/bin/docker compose up -d web dns
