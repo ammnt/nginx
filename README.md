@@ -134,8 +134,7 @@ spec:
 - **Thread pool support** for async I/O operations
 - **TCP Fast Open** and **SSL session resumption**
 - **Graceful shutdown** - SIGQUIT handling for proper connection draining
-- **Brotli compression** support
-- **ZSTD compression** support
+- **Brotli** and **ZSTD** compression mechanisms support
 
 ### **Quality Metrics**
 - **ChaCha20 prioritization** - custom patch for modern cipher preference
