@@ -45,21 +45,14 @@ RUN set -e \
     # Clone Brotli compression module
     && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
     # Clone ZSTD compression module
-    && git clone -q --depth 1 --recurse -j8 --single-branch -b "${ZSTD_VERSION}" https://github.com/tokers/zstd-nginx-module \
-    # Security hardening: Remove server headers and version information
-    && sed -ie 's@"nginx/"@" "@g' /tmp/nginx/src/core/nginx.h \
-    && sed -ie 's@"nginx version: "@" "@g' /tmp/nginx/src/core/nginx.c \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZSTD_VERSION}" https://github.com/tokers/zstd-nginx-module \
     # Remove Server header from HTTP responses (HTTP/1.1, HTTP/2, HTTP/3)
     && sed -ie 's@r->headers_out.server == NULL@0@g' \
         /tmp/nginx/src/http/ngx_http_header_filter_module.c \
         /tmp/nginx/src/http/v2/ngx_http_v2_filter_module.c \
         /tmp/nginx/src/http/v3/ngx_http_v3_filter_module.c \
     # Remove default footer from error pages
-    && sed -ie 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c \
-    # Anonymize version strings in source code
-    && sed -ie 's@NGINX_VERSION      ".*"@NGINX_VERSION      " "@g' /tmp/nginx/src/core/nginx.h \
-    # Prioritize ChaCha20 cipher for better performance on mobile devices
-    && sed -ie 's/SSL_OP_CIPHER_SERVER_PREFERENCE);/SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_PRIORITIZE_CHACHA);/g' /tmp/nginx/src/event/ngx_event_openssl.c
+    && sed -ie 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c
 
 # Build Brotli compression library with optimizations
 WORKDIR /tmp/zlib-ng
@@ -97,7 +90,6 @@ RUN set -e \
         # SSL/TLS configuration with modern protocols
         --with-openssl="/tmp/openssl" \
         --with-openssl-opt="enable-ec_nistp_64_gcc_128" \
-        --with-openssl-opt="no-ssl2" \
         --with-openssl-opt="no-ssl3" \
         --with-openssl-opt="no-shared" \
         --with-openssl-opt="no-weak-ssl-ciphers" \
@@ -172,10 +164,8 @@ RUN set -e \
     && strip --strip-all /usr/sbin/nginx \
     # Set proper permissions
     && chown -R "${UID}:${GID}" /etc/nginx && chmod -R g+w /etc/nginx \
-    # Verify binary and dependencies
-    && file /usr/sbin/nginx && ldd /usr/sbin/nginx || true \
     # Compress binary with UPX (minimal memory overhead)
-    && upx --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
+    && upx -q --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
     && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
