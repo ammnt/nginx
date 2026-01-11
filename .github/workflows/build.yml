@@ -239,8 +239,8 @@ jobs:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign -y --upload=true --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-          cosign sign -y --upload=true --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --new-bundle-format=false --use-signing-config=false --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --new-bundle-format=false --use-signing-config=false --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
           # cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
           # cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
