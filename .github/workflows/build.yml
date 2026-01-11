@@ -6,13 +6,13 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  COSIGN_VERSION: "3.0.3"
+  COSIGN_VERSION: "3.0.4"
   BUILDX_VERSION: "0.30.1"
   BUILDKIT_VERSION: "0.26.3"
   MINT_VERSION: "1.41.8"
   DIVE_VERSION: "0.13.1"
-  GRYPE_VERSION: "0.104.3"
-  SYFT_VERSION: "1.39.0"
+  GRYPE_VERSION: "0.104.4"
+  SYFT_VERSION: "1.40.0"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: quiet
 
@@ -239,14 +239,10 @@ jobs:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
-          cosign sign -y --recursive --key env://COSIGN_KEY ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          cosign sign -y --recursive --key env://COSIGN_KEY ammnt/nginx:${{ env.APP_VERSION }}
+          cosign sign -y --upload=true --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --upload=true --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
           # cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
           # cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
-          # cosign verify --key cosign.pub ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
-          # cosign verify --key cosign.pub ammnt/nginx:${{ env.APP_VERSION }}
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
 
       - name: Deploy to production server🌐
