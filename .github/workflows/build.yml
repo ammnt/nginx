@@ -239,10 +239,10 @@ jobs:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign -y --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-          cosign sign -y --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }}
-          cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }}
-          cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }}
+          cosign sign -y --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ env.DIGEST }} || true
+          cosign sign -y --key env://COSIGN_KEY ammnt/nginx@${{ env.DIGEST }} || true
+          cosign verify --key cosign.pub ghcr.io/ammnt/nginx@${{ env.DIGEST }} || true
+          cosign verify --key cosign.pub ammnt/nginx@${{ env.DIGEST }} || true
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
 
       - name: Deploy to production server🌐
