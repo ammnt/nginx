@@ -74,6 +74,7 @@ RUN set -e \
 WORKDIR /tmp/nginx
 RUN set -e \
     && ./auto/configure \
+        --with-debug \
         # Installation paths
         --prefix="/etc/nginx" \
         --sbin-path="/usr/sbin/nginx" \
@@ -89,38 +90,37 @@ RUN set -e \
         --http-fastcgi-temp-path="/tmp/fastcgi_temp" \
         # SSL/TLS configuration with modern protocols
         --with-openssl="/tmp/openssl" \
-        --with-openssl-opt="enable-ec_nistp_64_gcc_128" \
-        --with-openssl-opt="no-ssl3" \
-        --with-openssl-opt="no-shared" \
-        --with-openssl-opt="no-weak-ssl-ciphers" \
-        --with-openssl-opt="no-tls-deprecated-ec" \
-        --with-openssl-opt="enable-quic" \
-        --with-openssl-opt="enable-ktls" \
+        --with-openssl-opt="\
+            enable-ec_nistp_64_gcc_128 \
+            no-ssl3 \
+            no-shared \
+            no-weak-ssl-ciphers \
+            no-tls-deprecated-ec \
+            enable-quic \
+            enable-ktls" \
         # External libraries
         --with-pcre="/tmp/pcre2" \
         --with-zlib="/tmp/zlib-ng" \
-        # Static compilation flags
-        --with-cc-opt="-static -static-libgcc" \
+        # Сompilation flags
+        --with-cc-opt="\
+            -static \
+            -static-libgcc \
+            -O2 \
+            -march=x86-64 \
+            -flto \
+            -fhardened \
+            -ftrivial-auto-var-init=zero \
+            -Wl,-z,relro,-z,now \
+            -fstack-protector-strong \
+            -fstack-clash-protection \
+            -fcf-protection=full \
+            -Wformat \
+            -Wformat-security \
+            -Werror=format-security \
+            -fcode-hoisting \
+            -Wno-deprecated-declarations \
+            -DTCP_FASTOPEN=23" \
         --with-ld-opt="-static" \
-        # Performance optimizations
-        --with-cc-opt="-O2" \
-        --with-cc-opt="-march=x86-64" \
-        --with-cc-opt="-flto" \
-        # Security hardening flags
-        --with-cc-opt="-fhardened" \
-        --with-cc-opt="-D_FORTIFY_SOURCE=3" \
-        --with-cc-opt="-D_GLIBCXX_ASSERTIONS" \
-        --with-cc-opt="-ftrivial-auto-var-init=zero" \
-        --with-cc-opt="-Wl,-z,relro,-z,now" \
-        --with-cc-opt="-fstack-protector-strong" \
-        --with-cc-opt="-fstack-clash-protection" \
-        --with-cc-opt="-fcf-protection=full" \
-        --with-cc-opt="-Wformat" \
-        --with-cc-opt="-Wformat-security" \
-        --with-cc-opt="-Werror=format-security" \
-        --with-cc-opt="-fcode-hoisting" \
-        --with-cc-opt="-Wno-deprecated-declarations" \
-        --with-cc-opt="-DTCP_FASTOPEN=23" \
         # Core features
         --with-compat \
         --with-pcre-jit \
