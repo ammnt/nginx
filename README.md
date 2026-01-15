@@ -95,13 +95,14 @@ spec:
 
 ## 🔥 Why Choose This Image?
 
-### **Compilation Hardening**
-- **GCC security flags** including:
-  - `-D_FORTIFY_SOURCE=3`, `-fhardened`, `-fstack-protector-strong`
-  - `-fstack-clash-protection`, `-ftrivial-auto-var-init=zero` (prevents data leaks)
-  - `-fcf-protection=full` (Control-Flow Integrity)
-- **Read-Only Relocations** (`-Wl,-z,relro,-z,now`)
-- **Stack execution protection** and **buffer overflow guards**
+### **GCC hardened compilation suite (-fhardened) providing comprehensive security:**
+- **Memory protection** - stack smashing protection, stack clash protection
+- **Control Flow Integrity** - full CFI protection against ROP/JOP attacks
+- **Initialization hardening** - automatic zero-initialization to prevent data leaks
+- **Binary hardening** - position Independent Executables (PIE) for ASLR
+- **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection
+- **C++ assertions** - enhanced standard library security checks
+- **Linker hardening** - read-only relocations and immediate binding
 
 ### **Runtime Security**
 - **Rootless by design** - unprivileged runtime user
