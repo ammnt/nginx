@@ -11,8 +11,8 @@ env:
   BUILDKIT_VERSION: "0.26.3"
   MINT_VERSION: "1.41.8"
   DIVE_VERSION: "0.13.1"
-  GRYPE_VERSION: "0.104.4"
-  SYFT_VERSION: "1.40.0"
+  GRYPE_VERSION: "0.105.0"
+  SYFT_VERSION: "1.40.1"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: quiet
 
@@ -26,7 +26,7 @@ jobs:
       id-token: write
       security-events: write
       attestations: write
-      artifact-metadata: write
+      # artifact-metadata: write
 
     steps:
       - name: Checkout repository📥
@@ -146,7 +146,7 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
           sarif-file: ${{ github.workspace }}/scout.sarif
           write-comment: true
-          summary: true
+          summary: false
           exit-code: true
           github-token: ${{ secrets.GH_TOKEN }}
 
@@ -229,8 +229,8 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ env.DIGEST }}
-          push-to-registry: true
-          show-summary: true
+          push-to-registry: false
+          show-summary: false
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Sign container images✍️
