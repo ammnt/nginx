@@ -225,6 +225,7 @@ jobs:
           echo "DIGEST=$DIGEST" >> $GITHUB_ENV
 
       - name: Attest image provenance📜
+        continue-on-error: true
         uses: actions/attest-build-provenance@00014ed6ed5efc5b1ab7f7f34a39eb55d41aa4f8
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -234,6 +235,7 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Sign container images✍️
+        continue-on-error: true
         env:
           COSIGN_EXPERIMENTAL: "true"
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
@@ -244,6 +246,7 @@ jobs:
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
 
       # - name: Deploy to production server🌐
+      #   continue-on-error: true
       #   uses: appleboy/ssh-action@823bd89e131d8d508129f9443cad5855e9ba96f0
       #   with:
       #     host: ${{ secrets.SERVER_HOST }}
