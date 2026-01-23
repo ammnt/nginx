@@ -30,6 +30,8 @@ RUN set -e \
         cmake=4.1.3-r0 \
         zstd-dev=1.5.7-r2 \
         zstd-static=1.5.7-r2 \
+        brotli-dev=1.2.0-r0  \
+        brotli-static=1.2.0-r0 \
     # Update CA certificates for SSL verification
     && update-ca-certificates \
     # Clone NGINX webserver and remove documentation
@@ -90,9 +92,9 @@ RUN set -e \
         # SSL/TLS configuration with modern protocols
         --with-openssl="/tmp/openssl" \
         --with-openssl-opt="\
+            enable-ec_nistp_64_gcc_128 \
             no-tls1 \
             no-tls1_1 \
-            enable-ec_nistp_64_gcc_128 \
             no-shared \
             no-weak-ssl-ciphers \
             no-tls-deprecated-ec \
