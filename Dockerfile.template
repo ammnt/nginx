@@ -59,8 +59,8 @@ RUN set -e \
     && mkdir -p /tmp/ngx_brotli/deps/brotli/out \
     # Configure Brotli with performance optimizations
     && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-Ofast -m64 -march=x86-64 -mtune=generic -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
-        -DCMAKE_CXX_FLAGS="-Ofast -m64 -march=x86-64 -mtune=generic -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+        -DCMAKE_C_FLAGS="-m64 -march=x86-64 -mtune=generic -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+        -DCMAKE_CXX_FLAGS="-m64 -march=x86-64 -mtune=generic -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
         -DCMAKE_INSTALL_PREFIX=./installed -B /tmp/ngx_brotli/deps/brotli/out -S /tmp/ngx_brotli/deps/brotli \
     # Build Brotli encoder
     && cmake --build /tmp/ngx_brotli/deps/brotli/out --config Release --target brotlienc \
