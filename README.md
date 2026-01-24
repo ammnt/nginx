@@ -136,6 +136,7 @@ spec:
 - **TCP Fast Open** and **SSL session resumption**
 - **Graceful shutdown** - SIGQUIT handling for proper connection draining
 - **Brotli** and **ZSTD** compression mechanisms support
+- **Native TLS compression** - support for certificate compression
 
 ### **Quality Metrics**
 - **Image efficiency** - perfect score in Dive analysis (100%)

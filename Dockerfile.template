@@ -55,7 +55,7 @@ RUN set -e \
     # Remove default footer from error pages
     && sed -ie 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c
 
-# Build Brotli compression library with optimizations
+# Build zlib-ng and Brotli compression libraries with optimizations
 WORKDIR /tmp/zlib-ng
 RUN set -e \
     && mkdir -p /tmp/ngx_brotli/deps/brotli/out \
@@ -74,6 +74,10 @@ RUN set -e \
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
 RUN set -e \
+    && C_INCLUDE_PATH="/usr/local/include:$C_INCLUDE_PATH" \
+    && LIBRARY_PATH="/usr/local/lib:$LIBRARY_PATH" \
+    && LDFLAGS="-L/usr/local/lib -lz -static" \
+    && CFLAGS="-I/usr/local/include -static" \
     && ./auto/configure \
         --with-debug \
         # Installation paths
@@ -99,7 +103,8 @@ RUN set -e \
             no-weak-ssl-ciphers \
             no-tls-deprecated-ec \
             enable-quic \
-            enable-ktls" \
+            enable-ktls \
+            zlib" \
         # External libraries
         --with-pcre="/tmp/pcre2" \
         --with-zlib="/tmp/zlib-ng" \
