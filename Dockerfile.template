@@ -76,8 +76,6 @@ WORKDIR /tmp/nginx
 RUN set -e \
     && C_INCLUDE_PATH="/usr/local/include:$C_INCLUDE_PATH" \
     && LIBRARY_PATH="/usr/local/lib:$LIBRARY_PATH" \
-    && LDFLAGS="-L/usr/local/lib -lz -static" \
-    && CFLAGS="-I/usr/local/include -static" \
     && ./auto/configure \
         --with-debug \
         # Installation paths
@@ -110,6 +108,7 @@ RUN set -e \
         --with-zlib="/tmp/zlib-ng" \
         # Сompilation flags
         --with-cc-opt="\
+            -I/usr/local/include \
             -static \
             -static-libgcc \
             -O2 \
@@ -122,7 +121,10 @@ RUN set -e \
             -fcode-hoisting \
             -Wno-deprecated-declarations \
             -DTCP_FASTOPEN=23" \
-        --with-ld-opt="-static" \
+        --with-ld-opt="\
+            -L/usr/local/lib \
+            -lz \
+            -static" \
         # Core features
         --with-compat \
         --with-pcre-jit \
@@ -164,6 +166,10 @@ RUN set -e \
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && strip --strip-all /usr/sbin/nginx \
+    # Verify binary and dependencies
+    && ldd /usr/sbin/nginx || true \
+    && strings /usr/sbin/nginx | grep "zlib-ng" \
+    && file /usr/sbin/nginx | grep "static"\
     # Set proper permissions
     && chown -R "${UID}:${GID}" /etc/nginx && chmod -R g+w /etc/nginx \
     # Compress binary with UPX (minimal memory overhead)
