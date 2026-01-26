@@ -166,14 +166,14 @@ RUN set -e \
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && strip --strip-all /usr/sbin/nginx \
+    && upx -q --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
+    # Set proper permissions
+    && chown -R "${UID}:${GID}" /etc/nginx && chmod -R g+w /etc/nginx \
     # Verify binary and dependencies
     && ldd /usr/sbin/nginx || true \
     && strings /usr/sbin/nginx | grep "zlib-ng" \
-    && file /usr/sbin/nginx | grep "static"\
-    # Set proper permissions
-    && chown -R "${UID}:${GID}" /etc/nginx && chmod -R g+w /etc/nginx \
-    # Compress binary with UPX (minimal memory overhead)
-    && upx -q --best --lzma /usr/sbin/nginx && rm -rf /tmp/* \
+    && file /usr/sbin/nginx | grep "statically" \
+    && ls -lash /usr/sbin/nginx \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
     && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow

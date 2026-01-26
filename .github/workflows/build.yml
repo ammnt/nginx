@@ -14,7 +14,8 @@ env:
   GRYPE_VERSION: "0.105.0"
   SYFT_VERSION: "1.40.1"
   DOCKER_BUILDKIT: 1
-  BUILDKIT_PROGRESS: quiet
+  # BUILDKIT_PROGRESS: quiet
+  BUILDKIT_PROGRESS: plain
 
 jobs:
   build:
