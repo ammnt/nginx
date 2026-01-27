@@ -173,7 +173,7 @@ RUN set -e \
     && ldd /usr/sbin/nginx || true \
     && strings /usr/sbin/nginx | grep "zlib-ng" \
     && file /usr/sbin/nginx | grep "statically" \
-    && ls -lash /usr/sbin/nginx && rm -rf /tmp/* \
+    && ls -lh /usr/sbin/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
     && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
