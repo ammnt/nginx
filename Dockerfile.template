@@ -74,7 +74,6 @@ RUN set -e \
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
 RUN set -e \
-    && LIBRARY_PATH="/usr/local/lib:$LIBRARY_PATH" \
     && ./auto/configure \
         --with-debug \
         # Installation paths
