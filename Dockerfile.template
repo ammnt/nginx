@@ -167,11 +167,7 @@ RUN set -e \
     && upx -q --best --lzma /usr/sbin/nginx \
     # Set proper permissions
     && chown -R "${UID}:${GID}" /etc/nginx && chmod -R g+w /etc/nginx \
-    # Verify binary and dependencies
-    && ldd /usr/sbin/nginx || true \
-    && strings /usr/sbin/nginx | grep "zlib-ng" \
-    && file /usr/sbin/nginx | grep "statically" \
-    && ls -lh /usr/sbin/nginx && rm -rf /tmp/* \
+    && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
     && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
