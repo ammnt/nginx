@@ -74,7 +74,6 @@ RUN set -e \
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
 RUN set -e \
-    && C_INCLUDE_PATH="/usr/local/include:$C_INCLUDE_PATH" \
     && LIBRARY_PATH="/usr/local/lib:$LIBRARY_PATH" \
     && ./auto/configure \
         --with-debug \
@@ -108,7 +107,6 @@ RUN set -e \
         --with-zlib="/tmp/zlib-ng" \
         # Сompilation flags
         --with-cc-opt="\
-            -I/usr/local/include \
             -static \
             -static-libgcc \
             -O2 \
