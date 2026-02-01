@@ -55,14 +55,14 @@ jobs:
           driver-opts: image=moby/buildkit:v${{ env.BUILDKIT_VERSION }}-rootless
 
       - name: Login to GHCR🔑
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Login to Docker Hub🔑
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
