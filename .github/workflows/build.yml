@@ -205,7 +205,7 @@ jobs:
           sarif_file: snyk.sarif
 
       - name: Generate SBOM with Syft📋
-        uses: anchore/sbom-action@62ad5284b8ced813296287a0b63906cb364b73ee
+        uses: anchore/sbom-action@deef08a0db64bfad603422135db61477b16cef56
         with:
           syft-version: v${{ env.SYFT_VERSION }}
           image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
