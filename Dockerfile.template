@@ -165,11 +165,14 @@ RUN set -e \
     && strip --strip-all /usr/sbin/nginx \
     && upx -q --best --lzma /usr/sbin/nginx \
     # Set proper permissions
-    && chown -R "${UID}:${GID}" /etc/nginx && chmod -R g+w /etc/nginx \
-    && rm -rf /tmp/* \
+    && chown -R "${UID}:${GID}" /etc/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
-    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow
+    && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow \
+    && find /etc/nginx -type d -exec chmod 550 {} \; \
+    && find /etc/nginx -type f -name "*.conf" -exec chmod 440 {} \; \
+    && find /etc/nginx -type f -name "*.types" -exec chmod 440 {} \; \
+    && chmod 644 /tmp/passwd /tmp/group && chmod 640 /tmp/shadow
 
 # Final distroless image
 FROM scratch
@@ -181,8 +184,8 @@ ARG VCS_REF
 
 # Copy minimal runtime dependencies from builder
 WORKDIR /tmp
-COPY --from=builder /tmp/passwd /tmp/group /tmp/shadow /etc/
-COPY --from=builder --chown="${UID}:${GID}" /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder --chown="0:0" /tmp/passwd /tmp/group /tmp/shadow /etc/
+COPY --from=builder --chown="${UID}:${GID}" --chmod="550" /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown="${UID}:${GID}" /etc/nginx /etc/nginx
 # Copy configuration files
 COPY --chown="${UID}:${GID}" ./nginx.conf /etc/nginx/nginx.conf
