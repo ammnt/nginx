@@ -81,7 +81,7 @@ jobs:
           sarif_file: hadolint.sarif
 
       - name: Build Docker image🐳
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_CHECKS_ANNOTATIONS: false
