@@ -3,6 +3,12 @@ name: CI/CD📦
 on:
   workflow_dispatch:
 
+# Глобальные permissions по умолчанию
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -22,12 +28,10 @@ jobs:
     if: github.actor == 'ammnt'
     runs-on: ubuntu-24.04
     permissions:
-      contents: write
+      contents: read
       packages: write
       id-token: write
-      security-events: write
       attestations: write
-      artifact-metadata: write
     outputs:
       digest: ${{ steps.digest.outputs.digest }}
 
@@ -104,6 +108,9 @@ jobs:
   security-scans:
     needs: build
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write
     strategy:
       matrix:
         scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
@@ -207,6 +214,11 @@ jobs:
   finalize:
     needs: [build, security-scans]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
     steps:
       - name: Login to GHCR🔑
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
