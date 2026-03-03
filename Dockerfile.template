@@ -12,7 +12,7 @@ ARG GID
 
 WORKDIR /tmp
 # System setup and dependency installation
-RUN set -e \
+RUN set -eu \
     # Create non-root user for security (nginx:nginx)
     && addgroup --system --gid "${GID}" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "${UID}" --no-create-home nginx \
     # Update system and install build dependencies
@@ -57,7 +57,7 @@ RUN set -e \
 
 # Build zlib-ng and Brotli compression libraries with optimizations
 WORKDIR /tmp/zlib-ng
-RUN set -e \
+RUN set -eu \
     && mkdir -p /tmp/ngx_brotli/deps/brotli/out \
     # Configure Brotli with performance optimizations
     && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
@@ -73,7 +73,7 @@ RUN set -e \
 
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
-RUN set -e \
+RUN set -eu \
     && ./auto/configure \
         --with-debug \
         # Installation paths
