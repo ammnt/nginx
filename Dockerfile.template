@@ -12,7 +12,7 @@ ARG GID
 
 WORKDIR /tmp
 # System setup and dependency installation
-RUN set -eur \
+RUN set -eu \
     # Create non-root user for security (nginx:nginx)
     && addgroup --system --gid "${GID}" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "${UID}" --no-create-home nginx \
     # Update system and install build dependencies
@@ -24,7 +24,7 @@ RUN set -eur \
         build-base=0.5-r3 \
         ca-certificates=20251003-r0 \
         linux-headers=6.16.12-r0 \
-        tzdata=2025c-r0 \
+        tzdata=2026a-r0 \
         upx=5.0.2-r0 \
         perl=5.42.0-r0 \
         cmake=4.1.3-r0 \
@@ -57,7 +57,7 @@ RUN set -eur \
 
 # Build zlib-ng and Brotli compression libraries with optimizations
 WORKDIR /tmp/zlib-ng
-RUN set -eur \
+RUN set -eu \
     && mkdir -p /tmp/ngx_brotli/deps/brotli/out \
     # Configure Brotli with performance optimizations
     && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
@@ -67,9 +67,9 @@ RUN set -eur \
     # Build Brotli encoder
     && cmake --build /tmp/ngx_brotli/deps/brotli/out --config Release --target brotlienc \
     # Configure zlib-ng for compatibility mode
-    && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && /tmp/zlib-ng/configure --zlib-compat \
+    && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && ./configure --zlib-compat \
     # Build and install zlib-ng
-    && make -s -j "$(nproc)" -C /tmp/zlib-ng && make -s -C /tmp/zlib-ng install && make -s -C /tmp/zlib-ng clean
+    && make -s -j "$(nproc)" && make -s install && make -s clean
 
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
