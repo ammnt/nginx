@@ -210,6 +210,13 @@ jobs:
             *.spdx
             *.cyclonedx
 
+      - name: Upload SARIF to Code Scanning🔬
+        if: hashFiles('*.sarif') != ''
+        uses: github/codeql-action/upload-sarif@0c0c5dc2f136b98cb0537075ccfa21f94cd9a63e
+        with:
+          sarif_file: .
+          category: ${{ matrix.scanner }}
+
   finalize:
     needs: [build, security-scans]
     runs-on: ubuntu-24.04

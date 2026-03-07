@@ -97,14 +97,13 @@ RUN set -eu \
             no-tls1_1 \
             no-shared \
             no-weak-ssl-ciphers \
-            no-tls-deprecated-ec \
             enable-quic \
             enable-ktls \
             zlib" \
         # External libraries
         --with-pcre="/tmp/pcre2" \
         --with-zlib="/tmp/zlib-ng" \
-        # Сompilation flags
+        # Compilation flags
         --with-cc-opt="\
             -static \
             -static-libgcc \
