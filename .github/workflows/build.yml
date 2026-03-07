@@ -3,7 +3,6 @@ name: CI/CD📦
 on:
   workflow_dispatch:
 
-# Глобальные permissions по умолчанию
 permissions:
   contents: read
   security-events: write
@@ -13,7 +12,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   COSIGN_VERSION: "3.0.5"
-  BUILDX_VERSION: "0.32.0"
+  BUILDX_VERSION: "0.32.1"
   BUILDKIT_VERSION: "0.28.0"
   MINT_VERSION: "1.41.8"
   DIVE_VERSION: "0.13.1"
