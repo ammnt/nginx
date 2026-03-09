@@ -8,16 +8,16 @@
 ![GitHub Maintained](https://img.shields.io/badge/open%20source-yes-orange)
 ![GitHub Maintained](https://img.shields.io/badge/maintained-yes-yellow)
 
-> **Production-ready, security-focused NGINX image with HTTP/3, QUIC and PQC support.**
+> **Production-ready, security-focused NGINX image with HTTP/3, QUIC, ECH and PQC support.**
 
 > [!IMPORTANT]
-> QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC and QUIC⚠️
+> QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC, ECH and QUIC⚠️
 
 > [!IMPORTANT]
 > NJS module has been removed due to security vulnerabilities in libxml2/libxslt dependencies⚠️
 
 > [!TIP]
-> You can find an example [configuration file](example.conf) in the repository for successfully configuring HTTP/3 and PQC💡
+> You can find an example [configuration file](example.conf) in the repository for successfully configuring HTTP/3, ECH and PQC💡
 
 > [!IMPORTANT]
 > UID/GID changed to 10001 - it's [recommended](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Kubernetes and prevents conflicts with system users⚠️
