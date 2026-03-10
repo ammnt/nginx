@@ -194,11 +194,11 @@ COPY --chown="${UID}:${GID}" ./default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080/tcp 8443/tcp 8443/udp
 
 # OCI labels for image metadata
-LABEL description="Distroless NGINX with HTTP/3, QUIC and PQC support🚀" \
+LABEL description="Distroless NGINX with HTTP/3, QUIC, ECH and PQC support🚀" \
       maintainer="ammnt <admin@msftcnsi.com>" \
-      org.opencontainers.image.description="Distroless NGINX with HTTP/3, QUIC and PQC support🚀" \
+      org.opencontainers.image.description="Distroless NGINX with HTTP/3, QUIC, ECH and PQC support🚀" \
       org.opencontainers.image.authors="ammnt, admin@msftcnsi.com" \
-      org.opencontainers.image.title="Distroless NGINX with HTTP/3, QUIC and PQC support🚀" \
+      org.opencontainers.image.title="Distroless NGINX with HTTP/3, QUIC, ECH and PQC support🚀" \
       org.opencontainers.image.source="https://github.com/ammnt/nginx/" \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.documentation="https://github.com/ammnt/nginx/blob/main/README.md" \
