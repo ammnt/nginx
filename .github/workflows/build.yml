@@ -20,6 +20,7 @@ env:
   SYFT_VERSION: "1.42.3"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: quiet
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   # BUILDKIT_PROGRESS: plain
 
 jobs:
@@ -180,7 +181,6 @@ jobs:
           write-comment: true
           summary: false
           exit-code: true
-          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Trivy scan🛡️
         if: matrix.scanner == 'trivy'
@@ -193,7 +193,7 @@ jobs:
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln,secret"
           exit-code: "1"
-          github-pat: ${{ secrets.GH_TOKEN }}
+          github-pat: ${{ GITHUB_TOKEN }}
 
       - name: Grype scan🛡️
         if: matrix.scanner == 'grype'
