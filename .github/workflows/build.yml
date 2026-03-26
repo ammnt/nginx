@@ -46,6 +46,7 @@ jobs:
           env >> $GITHUB_ENV
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
           echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          printenv | sort -n
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -83,8 +84,8 @@ jobs:
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
             ZSTD_VERSION=${{ env.ZSTD_VERSION }}
             VCS_REF=${{ env.VCS_REF }}
-            UID=${{ env.UID }}
-            GID=${{ env.GID }}
+            NGINX_UID=${{ env.NGINX_UID }}
+            NGINX_UID=${{ env.NGINX_UID }}
             BUILD_DATE=${{ env.BUILD_DATE }}
 
       - name: Slim image with Mint🔧
