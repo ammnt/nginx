@@ -33,20 +33,37 @@ jobs:
       attestations: write
     outputs:
       digest: ${{ steps.digest.outputs.digest }}
+      app_version: ${{ steps.load_env.outputs.APP_VERSION }}
+      base_version: ${{ steps.load_env.outputs.BASE_VERSION }}
+      base_hash: ${{ steps.load_env.outputs.BASE_HASH }}
+      openssl_version: ${{ steps.load_env.outputs.OPENSSL_VERSION }}
+      pcre_version: ${{ steps.load_env.outputs.PCRE_VERSION }}
+      zlib_version: ${{ steps.load_env.outputs.ZLIB_VERSION }}
+      zstd_version: ${{ steps.load_env.outputs.ZSTD_VERSION }}
+      uid: ${{ steps.load_env.outputs.UID }}
+      gid: ${{ steps.load_env.outputs.GID }}
+      build_date: ${{ steps.load_env.outputs.BUILD_DATE }}
+      vcs_ref: ${{ steps.load_env.outputs.VCS_REF }}
 
     steps:
       - name: Checkout repository📥
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Load .env variables☁️
+        id: load_env
         run: |
           while IFS= read -r line; do
             if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
-              echo "$line" >> $GITHUB_ENV
+              key="${line%%=*}"
+              value="${line#*=}"
+              echo "$key=$value" >> $GITHUB_OUTPUT
             fi
           done < .env
-          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
-          echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')
+          VCS_REF=$(git rev-parse HEAD)
+          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_OUTPUT
+          echo "VCS_REF=$VCS_REF" >> $GITHUB_OUTPUT
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -72,36 +89,36 @@ jobs:
           file: ./Dockerfile.template
           platforms: linux/amd64
           load: true
-          tags: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          tags: ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            BASE_VERSION=${{ env.BASE_VERSION }}
-            BASE_HASH=${{ env.BASE_HASH }}
-            OPENSSL_VERSION=${{ env.OPENSSL_VERSION }}
-            APP_VERSION=${{ env.APP_VERSION }}
-            PCRE_VERSION=${{ env.PCRE_VERSION }}
-            ZLIB_VERSION=${{ env.ZLIB_VERSION }}
-            ZSTD_VERSION=${{ env.ZSTD_VERSION }}
-            VCS_REF=${{ env.VCS_REF }}
-            UID=${{ env.UID }}
-            GID=${{ env.GID }}
-            BUILD_DATE=${{ env.BUILD_DATE }}
+            BASE_VERSION=${{ steps.load_env.outputs.BASE_VERSION }}
+            BASE_HASH=${{ steps.load_env.outputs.BASE_HASH }}
+            OPENSSL_VERSION=${{ steps.load_env.outputs.OPENSSL_VERSION }}
+            APP_VERSION=${{ steps.load_env.outputs.APP_VERSION }}
+            PCRE_VERSION=${{ steps.load_env.outputs.PCRE_VERSION }}
+            ZLIB_VERSION=${{ steps.load_env.outputs.ZLIB_VERSION }}
+            ZSTD_VERSION=${{ steps.load_env.outputs.ZSTD_VERSION }}
+            VCS_REF=${{ steps.load_env.outputs.VCS_REF }}
+            UID=${{ steps.load_env.outputs.UID }}
+            GID=${{ steps.load_env.outputs.GID }}
+            BUILD_DATE=${{ steps.load_env.outputs.BUILD_DATE }}
 
       - name: Slim image with Mint🔧
         run: |
           curl -sSL -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz
           tar -xf ds.tar.gz
           ./dist_linux/mint --quiet build \
-            --target ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
-            --tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} \
+            --target ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
+            --tag ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
             --http-probe=false --continue-after=5 \
             --include-path=/etc/shadow --include-path=/etc/group
 
       - name: Get image digest🔢
         id: digest
         run: |
-          DIGEST=$(docker inspect -f='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} | cut -d'@' -f2)
+          DIGEST=$(docker inspect -f='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} | cut -d'@' -f2)
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
   security-scans:
@@ -115,6 +132,9 @@ jobs:
         scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
       fail-fast: false
     steps:
+      - name: Checkout repository📥
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
       - name: Lint Dockerfile with Hadolint🔍
         if: matrix.scanner == 'hadolint'
         uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5
@@ -131,13 +151,13 @@ jobs:
         run: |
           wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
           tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
-          dive --config ./dive-ci.yml ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          dive --config ./dive-ci.yml ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
 
       - name: Dockle scan🛡️
         if: matrix.scanner == 'dockle'
         uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
         with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           exit-code: "1"
           exit-level: "warn"
           ignore: "CIS-DI-0010"
@@ -147,7 +167,7 @@ jobs:
         uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
         with:
           command: cves,sbom
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           sarif-file: scout.sarif
           write-comment: true
           summary: false
@@ -158,7 +178,7 @@ jobs:
         if: matrix.scanner == 'trivy'
         uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         with:
-          image-ref: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           scan-type: image
           format: sarif
           output: trivy.sarif
@@ -171,7 +191,7 @@ jobs:
         if: matrix.scanner == 'grype'
         uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c
         with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           fail-build: false
           severity-cutoff: critical
           output-format: sarif
@@ -185,7 +205,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           sarif: true
           args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
 
@@ -194,7 +214,7 @@ jobs:
         uses: anchore/sbom-action@17ae1740179002c89186b61233e0f892c3118b11
         with:
           syft-version: v${{ env.SYFT_VERSION }}
-          image: ghcr.io/ammnt/nginx:${{ env.APP_VERSION }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           format: cyclonedx-json
           upload-artifact: true
           dependency-snapshot: true
@@ -241,9 +261,9 @@ jobs:
 
       - name: Push images to registries🚚
         run: |
-          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ghcr.io/ammnt/nginx:latest
-          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:${{ env.APP_VERSION }}
-          docker tag ghcr.io/ammnt/nginx:${{ env.APP_VERSION }} ammnt/nginx:latest
+          docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ghcr.io/ammnt/nginx:latest
+          docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ammnt/nginx:${{ needs.build.outputs.app_version }}
+          docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ammnt/nginx:latest
           docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
 
