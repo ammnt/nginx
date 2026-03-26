@@ -131,12 +131,10 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     permissions:
-      contents: write
+      contents: read
+      security-events: write
       packages: write
       id-token: write
-      security-events: write
-      attestations: write
-      artifact-metadata: write
     strategy:
       matrix:
         scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
@@ -179,24 +177,24 @@ jobs:
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          sarif-file: scout.sarif
+          sarif-file: ${{ github.workspace }}/scout.sarif
           write-comment: true
           summary: false
           exit-code: true
-          github-token: ${{ secrets.GH_TOKEN2 }}
+          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Trivy scan🛡️
         if: matrix.scanner == 'trivy'
-        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           scan-type: image
-          format: sarif
-          output: trivy.sarif
+          format: "sarif"
+          output: "${{ github.workspace }}/trivy.sarif"
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln,secret"
           exit-code: "1"
-          github-pat: ${{ secrets.GH_TOKEN2 }}
+          github-pat: ${{ secrets.GH_TOKEN }}
 
       - name: Grype scan🛡️
         if: matrix.scanner == 'grype'
