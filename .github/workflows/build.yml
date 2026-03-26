@@ -131,10 +131,12 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     permissions:
-      contents: read
-      security-events: write
+      contents: write
       packages: write
       id-token: write
+      security-events: write
+      attestations: write
+      artifact-metadata: write
     strategy:
       matrix:
         scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
