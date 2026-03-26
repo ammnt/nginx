@@ -133,7 +133,8 @@ jobs:
     permissions:
       contents: read
       security-events: write
-      packages: read
+      packages: write
+      id-token: write
     strategy:
       matrix:
         scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
