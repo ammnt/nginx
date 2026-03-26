@@ -7,14 +7,14 @@ ARG APP_VERSION
 ARG PCRE_VERSION
 ARG ZLIB_VERSION
 ARG ZSTD_VERSION
-ARG UID
-ARG GID
+ARG NGINX_UID
+ARG NGINX_GID
 
 WORKDIR /tmp
 # System setup and dependency installation
 RUN set -eu \
     # Create non-root user for security (nginx:nginx)
-    && addgroup --system --gid "${GID}" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "${UID}" --no-create-home nginx \
+    && addgroup --system --gid "${NGINX_GID}" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "${NGINX_UID}" --no-create-home nginx \
     # Update system and install build dependencies
     && apk -U -q upgrade && apk add -q --no-cache \
         gcc=15.2.0-r2 \
@@ -164,7 +164,7 @@ RUN set -eu \
     && strip --strip-all /usr/sbin/nginx \
     && upx -q --best --lzma /usr/sbin/nginx \
     # Set proper permissions
-    && chown -R "${UID}:${GID}" /etc/nginx && rm -rf /tmp/* \
+    && chown -R "${NGINX_UID}:${NGINX_GID}" /etc/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
     && grep -E "(root|nginx)" /etc/group > /tmp/group \
     && grep -E "(root|nginx)" /etc/shadow > /tmp/shadow \
@@ -177,18 +177,18 @@ RUN set -eu \
 FROM scratch
 ARG APP_VERSION
 ARG BUILD_DATE
-ARG UID
-ARG GID
+ARG NGINX_UID
+ARG NGINX_GID
 ARG VCS_REF
 
 # Copy minimal runtime dependencies from builder
 WORKDIR /tmp
 COPY --from=builder --chown="0:0" /tmp/passwd /tmp/group /tmp/shadow /etc/
-COPY --from=builder --chown="${UID}:${GID}" --chmod="550" /usr/sbin/nginx /usr/sbin/nginx
-COPY --from=builder --chown="${UID}:${GID}" /etc/nginx /etc/nginx
+COPY --from=builder --chown="${NGINX_UID}:${NGINX_GID}" --chmod="550" /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder --chown="${NGINX_UID}:${NGINX_GID}" /etc/nginx /etc/nginx
 # Copy configuration files
-COPY --chown="${UID}:${GID}" ./nginx.conf /etc/nginx/nginx.conf
-COPY --chown="${UID}:${GID}" ./default.conf /etc/nginx/conf.d/default.conf
+COPY --chown="${NGINX_UID}:${NGINX_GID}" ./nginx.conf /etc/nginx/nginx.conf
+COPY --chown="${NGINX_UID}:${NGINX_GID}" ./default.conf /etc/nginx/conf.d/default.conf
 
 # Expose HTTP, HTTPS, and QUIC ports
 EXPOSE 8080/tcp 8443/tcp 8443/udp
@@ -215,7 +215,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=2 \
 STOPSIGNAL SIGQUIT
 
 # Run as non-root user for security
-USER "${UID}:${GID}"
+USER "${NGINX_UID}:${NGINX_GID}"
 
 # Start NGINX in foreground mode
 ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
