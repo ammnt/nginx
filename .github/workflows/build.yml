@@ -20,7 +20,6 @@ env:
   SYFT_VERSION: "1.42.3"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: quiet
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   # BUILDKIT_PROGRESS: plain
 
 jobs:
@@ -181,7 +180,6 @@ jobs:
           write-comment: true
           summary: false
           exit-code: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trivy scan🛡️
         if: matrix.scanner == 'trivy'
