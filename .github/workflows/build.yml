@@ -177,7 +177,7 @@ jobs:
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          sarif-file: ${{ github.workspace }}/scout.sarif
+          sarif-file: scout.sarif
           write-comment: true
           summary: false
           exit-code: true
@@ -185,12 +185,12 @@ jobs:
 
       - name: Trivy scan🛡️
         if: matrix.scanner == 'trivy'
-        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
+        uses: aquasecurity/trivy-action@e368e328979b113139d6f9068e03accaed98a518
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           scan-type: image
-          format: "sarif"
-          output: "${{ github.workspace }}/trivy.sarif"
+          format: sarif
+          output: trivy.sarif
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln,secret"
           exit-code: "1"
