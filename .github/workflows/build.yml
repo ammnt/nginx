@@ -59,11 +59,15 @@ jobs:
               echo "$key=$value" >> $GITHUB_OUTPUT
             fi
           done < .env
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
+          echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')
-          VCS_REF=$(git rev-parse HEAD)
-          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_OUTPUT
-          echo "VCS_REF=$VCS_REF" >> $GITHUB_OUTPUT
+      - name: Login to GHCR🔑
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -105,15 +109,17 @@ jobs:
             GID=${{ steps.load_env.outputs.GID }}
             BUILD_DATE=${{ steps.load_env.outputs.BUILD_DATE }}
 
-      - name: Slim image with Mint🔧
+      - name: Slim and push image with Mint🔧
         run: |
           curl -sSL -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz
           tar -xf ds.tar.gz
           ./dist_linux/mint --quiet build \
             --target ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
+            --tag ghcr.io/ammnt/nginx:latest \
             --http-probe=false --continue-after=5 \
             --include-path=/etc/shadow --include-path=/etc/group
+          docker push ghcr.io/ammnt/nginx --all-tags
 
       - name: Get image digest🔢
         id: digest
@@ -127,6 +133,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      packages: read
     strategy:
       matrix:
         scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
@@ -149,6 +156,7 @@ jobs:
         env:
           CI: true
         run: |
+          docker pull ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
           tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
           dive --config ./dive-ci.yml ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
@@ -259,12 +267,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push images to registries🚚
+      - name: Push images to Docker Hub🚚
         run: |
-          docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ghcr.io/ammnt/nginx:latest
+          docker pull ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ammnt/nginx:${{ needs.build.outputs.app_version }}
           docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ammnt/nginx:latest
-          docker push ghcr.io/ammnt/nginx --all-tags
           docker push ammnt/nginx --all-tags
 
       - name: Attest image provenance📜
