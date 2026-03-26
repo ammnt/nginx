@@ -111,8 +111,8 @@ jobs:
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
             ZSTD_VERSION=${{ env.ZSTD_VERSION }}
             VCS_REF=${{ env.VCS_REF }}
-            UID=${{ env.NGINX_UID }}
-            GID=${{ env.NGINX_GID }}
+            NGINX_GID=${{ env.NGINX_UID }}
+            NGINX_GID=${{ env.NGINX_GID }}
             BUILD_DATE=${{ env.BUILD_DATE }}
 
       - name: Slim image with Mint🔧
