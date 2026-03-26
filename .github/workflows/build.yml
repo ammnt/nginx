@@ -181,6 +181,7 @@ jobs:
           write-comment: true
           summary: false
           exit-code: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trivy scan🛡️
         if: matrix.scanner == 'trivy'
@@ -193,7 +194,6 @@ jobs:
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln,secret"
           exit-code: "1"
-          github-pat: ${{ GITHUB_TOKEN }}
 
       - name: Grype scan🛡️
         if: matrix.scanner == 'grype'
