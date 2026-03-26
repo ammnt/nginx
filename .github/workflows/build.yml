@@ -26,18 +26,6 @@ jobs:
   build:
     if: github.actor == 'ammnt'
     runs-on: ubuntu-24.04
-    env:
-      APP_VERSION: ${{ steps.load_env.outputs.APP_VERSION }}
-      BASE_VERSION: ${{ steps.load_env.outputs.BASE_VERSION }}
-      BASE_HASH: ${{ steps.load_env.outputs.BASE_HASH }}
-      OPENSSL_VERSION: ${{ steps.load_env.outputs.OPENSSL_VERSION }}
-      PCRE_VERSION: ${{ steps.load_env.outputs.PCRE_VERSION }}
-      ZLIB_VERSION: ${{ steps.load_env.outputs.ZLIB_VERSION }}
-      ZSTD_VERSION: ${{ steps.load_env.outputs.ZSTD_VERSION }}
-      NGINX_UID: ${{ steps.load_env.outputs.NGINX_UID }}
-      NGINX_GID: ${{ steps.load_env.outputs.NGINX_GID }}
-      VCS_REF: ${{ steps.load_env.outputs.VCS_REF }}
-      BUILD_DATE: ${{ steps.load_env.outputs.BUILD_DATE }}
     permissions:
       contents: read
       packages: write
@@ -51,29 +39,14 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Load .env variables☁️
-        id: load_env
         run: |
-          set -a
-          source .env
-          set +a
-
-          echo "APP_VERSION=${APP_VERSION}" >> $GITHUB_OUTPUT
-          echo "BASE_VERSION=${BASE_VERSION}" >> $GITHUB_OUTPUT
-          echo "BASE_HASH=${BASE_HASH}" >> $GITHUB_OUTPUT
-          echo "OPENSSL_VERSION=${OPENSSL_VERSION}" >> $GITHUB_OUTPUT
-          echo "PCRE_VERSION=${PCRE_VERSION}" >> $GITHUB_OUTPUT
-          echo "ZLIB_VERSION=${ZLIB_VERSION}" >> $GITHUB_OUTPUT
-          echo "ZSTD_VERSION=${ZSTD_VERSION}" >> $GITHUB_OUTPUT
-          echo "NGINX_UID=${NGINX_UID}" >> $GITHUB_OUTPUT
-          echo "NGINX_GID=${NGINX_GID}" >> $GITHUB_OUTPUT
-
-          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')
-          VCS_REF=$(git rev-parse HEAD)
-          echo "BUILD_DATE=${BUILD_DATE}" >> $GITHUB_OUTPUT
-          echo "VCS_REF=${VCS_REF}" >> $GITHUB_OUTPUT
-
-          echo "BUILD_DATE=${BUILD_DATE}" >> $GITHUB_ENV
-          echo "VCS_REF=${VCS_REF}" >> $GITHUB_ENV
+          while IFS= read -r line; do
+            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
+              echo "$line" >> $GITHUB_ENV
+            fi
+          done < .env
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+          echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Install Cosign🔐
         uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad
@@ -111,8 +84,8 @@ jobs:
             ZLIB_VERSION=${{ env.ZLIB_VERSION }}
             ZSTD_VERSION=${{ env.ZSTD_VERSION }}
             VCS_REF=${{ env.VCS_REF }}
-            NGINX_GID=${{ env.NGINX_UID }}
-            NGINX_GID=${{ env.NGINX_GID }}
+            UID=${{ env.UID }}
+            GID=${{ env.GID }}
             BUILD_DATE=${{ env.BUILD_DATE }}
 
       - name: Slim image with Mint🔧
