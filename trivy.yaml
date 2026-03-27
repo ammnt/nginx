@@ -1,0 +1,15 @@
+cache:
+  # Same as '--cache-dir'
+  dir: "/tmp/cache"
+
+# Same as '--debug'
+debug: false
+
+# Same as '--insecure'
+insecure: false
+
+# Same as '--quiet'
+quiet: true
+
+# Same as '--timeout'
+timeout: 5m0s
