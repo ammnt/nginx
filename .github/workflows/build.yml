@@ -117,6 +117,12 @@ jobs:
             --include-path=/etc/shadow --include-path=/etc/group
           docker push ghcr.io/ammnt/nginx --all-tags
 
+      - name: Upload Mint report📁
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: mint-report
+          path: slim.report.json
+
       - name: Get image digest🔢
         id: digest
         run: |
