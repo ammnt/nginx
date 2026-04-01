@@ -230,7 +230,7 @@ jobs:
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
-        uses: anchore/sbom-action@17ae1740179002c89186b61233e0f892c3118b11
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
         with:
           syft-version: v${{ env.SYFT_VERSION }}
           image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
