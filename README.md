@@ -93,6 +93,35 @@ spec:
 ...
 ```
 
+### Repository structure
+```bash
+nginx/
+├── 📋 dependabot.yml                    # Automated dependency updates
+├── 📁 ISSUE_TEMPLATE/                   # Issue creation templates
+│   ├── 🐛 bug_report.md                 # Bug report template
+│   ├── ⚙️ config.yml                    # Issue templates configuration
+│   └── 💡 feature_request.md            # Feature request template
+├── 📝 PULL_REQUEST_TEMPLATE.md          # Pull Request template
+├── 📁 workflows/                        # GitHub Actions CI/CD pipelines
+│   ├── 🔨 build.yml                     # Build and testing
+│   └── 🔒 codeql.yml                    # Static security analysis (CodeQL)
+├── 📜 CODE_OF_CONDUCT.md                # Code of Conduct for contributors
+├── 🤝 CONTRIBUTING.md                   # Contributing guidelines
+├── 🔑 cosign.pub                        # Public key for image signing (Sigstore/cosign)
+├── ⚙️ default.conf                      # Default NGINX configuration
+├── 🐳 dive-ci.yml                       # Dive configuration for Docker image analysis
+├── 🐳 Dockerfile.template               # Dockerfile template (dynamic generation)
+├── 📄 example.conf                      # Example NGINX configuration
+├── ✅ hadolint.yaml                     # Hadolint configuration (Dockerfile linter)
+├── ⚖️ LICENSE                           # License agreement
+├── 🚀 nginx.conf                        # Main NGINX configuration file
+├── 🛡️ nginx-seccomp.json                # Seccomp profile for NGINX security
+├── 📦 nginx.toml                        # Additional NGINX configuration (TOML format)
+├── 📖 README.md                         # Main project documentation
+├── 🔒 SECURITY.md                       # Security policy and vulnerability reporting
+└── 🔍 trivy.yaml                        # Trivy configuration (vulnerability scanning)
+```
+
 ## 🔥 Why Choose This Image?
 
 ### **GCC hardened compilation suite (-fhardened) providing comprehensive security:**
