@@ -111,7 +111,7 @@ nginx/
 ├── ⚙️ default.conf                      # Default NGINX configuration
 ├── 🐳 dive-ci.yml                       # Dive configuration for Docker image analysis
 ├── 🐳 Dockerfile.template               # Dockerfile template (dynamic generation)
-├── 📄 example.conf                      # Example NGINX configuration
+├── 📄 example.conf                      # Example NGINX configuration for HTTP/3
 ├── ✅ hadolint.yaml                     # Hadolint configuration (Dockerfile linter)
 ├── ⚖️ LICENSE                           # License agreement
 ├── 🚀 nginx.conf                        # Main NGINX configuration file
