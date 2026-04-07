@@ -11,7 +11,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  COSIGN_VERSION: "3.0.5"
+  COSIGN_VERSION: "3.0.6"
   BUILDX_VERSION: "0.33.0"
   BUILDKIT_VERSION: "0.29.0"
   MINT_VERSION: "1.41.8"
