@@ -1,19 +1,41 @@
-# Format
-# *.conf linguist-language=Nginx linguist-detectable
-# *.json linguist-language=JSON linguist-detectable
-*.md linguist-language=Markdown linguist-detectable
-# *.pub linguist-language=Text linguist-detectable
-*.toml linguist-language=TOML linguist-detectable
-*.yml linguist-language=YAML linguist-detectable
+* text=auto
 
-# Specific files
-Dockerfile.template linguist-language=Dockerfile linguist-detectable
-# nginx.conf linguist-language=Nginx linguist-detectable
-# example.conf linguist-language=Nginx linguist-detectable
-# nginx-seccomp.json linguist-language=JSON linguist-detectable
-# nginx.toml linguist-language=TOML linguist-detectable
-# cosign.pub linguist-language=Text linguist-detectable
-default.conf linguist-language=Nginx linguist-detectable
+*.md text eol=lf diff=markdown linguist-documentation
+CODE_OF_CONDUCT.md text eol=lf diff=markdown
+CONTRIBUTING.md text eol=lf diff=markdown
+README.md text eol=lf diff=markdown
+SECURITY.md text eol=lf diff=markdown
+PULL_REQUEST_TEMPLATE.md text eol=lf diff=markdown
 
-# Auto detect text files and perform LF normalization
-* text=auto eol=lf
+LICENSE text eol=lf
+
+*.conf text eol=lf linguist-language=nginx diff=nginx
+*.toml text eol=lf linguist-language=TOML
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+
+*.template text eol=lf linguist-language=Dockerfile
+Dockerfile.template text eol=lf
+
+.github/**/* text eol=lf
+.github/ISSUE_TEMPLATE/*.md text eol=lf diff=markdown
+.github/ISSUE_TEMPLATE/config.yml text eol=lf
+.github/workflows/*.yml text eol=lf linguist-generated=false
+.github/workflows/*.yaml text eol=lf linguist-generated=false
+
+dependabot.yml text eol=lf
+.dependabot/**/* text eol=lf
+
+trivy.yaml text eol=lf merge=union
+hadolint.yaml text eol=lf merge=union
+dive-ci.yml text eol=lf merge=union
+codeql.yml text eol=lf
+
+nginx.conf text eol=lf diff=nginx working-tree-encoding=UTF-8
+default.conf text eol=lf working-tree-encoding=UTF-8
+example.conf text eol=lf working-tree-encoding=UTF-8
+nginx-seccomp.json text eol=lf
+
+*.pub binary
+cosign.pub binary
