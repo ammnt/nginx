@@ -104,7 +104,8 @@ nginx/
 ├── 📝 PULL_REQUEST_TEMPLATE.md          # Pull Request template
 ├── 📁 workflows/                        # GitHub Actions CI/CD pipelines
 │   ├── 🔨 build.yml                     # Build and testing
-│   └── 🔒 codeql.yml                    # Static security analysis (CodeQL)
+│   ├── 🔒 codeql.yml                    # Static security analysis (CodeQL)
+│   └── 🏷️ label.yml                     # Workflow for triage PR and apply labels
 ├── 📜 CODE_OF_CONDUCT.md                # Code of Conduct for contributors
 ├── 🤝 CONTRIBUTING.md                   # Contributing guidelines
 ├── 🔑 cosign.pub                        # Public key for image signing (Sigstore/cosign)

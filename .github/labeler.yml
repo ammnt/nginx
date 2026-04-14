@@ -1,0 +1,90 @@
+# ============================================
+# GitHub Labeler Configuration for NGINX Project
+# ============================================
+
+# ---------------------------
+# 📄 1. Documentation & Community
+# ---------------------------
+"📄 area/documentation":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**"
+          - "LICENSE"
+          - "CODE_OF_CONDUCT.md"
+          - "CONTRIBUTING.md"
+          - "SECURITY.md"
+          - "PULL_REQUEST_TEMPLATE.md"
+          - "ISSUE_TEMPLATE/**"
+
+# ---------------------------
+# ⚙️ 2. Configuration (NGINX Core)
+# ---------------------------
+"⚙️ area/configuration":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.conf"
+          - "*.toml"
+          - "default.conf"
+          - "example.conf"
+          - "nginx.conf" # Специфично для NGINX
+          - "nginx.toml" # Специфично для NGINX
+
+# ---------------------------
+# 🐳 3. Docker & Container
+# ---------------------------
+"🐳 area/docker":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile*"
+          - "docker-compose*.yml"
+          - "docker-entrypoint.sh"
+          - ".dockerignore"
+          - "hadolint.yaml"
+          - "dive-ci.yml"
+
+# ---------------------------
+# 🤖 4. CI/CD & GitHub Actions
+# ---------------------------
+"🤖 area/ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/*.yml"
+          - ".github/workflows/*.yaml"
+          - ".github/labeler.yml"
+          - ".github/dependabot.yml"
+
+# ---------------------------
+# 🔒 5. Security & Hardening
+# ---------------------------
+"🔒 area/security":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "trivy.yaml"
+          - "codeql.yml"
+          - "cosign.pub"
+          - "nginx-seccomp.json" # Специфично для NGINX
+          - "SECURITY.md"
+          - ".github/workflows/codeql.yml"
+
+# ---------------------------
+# 🐛 6. Issue Templates & Meta
+# ---------------------------
+"📋 area/meta":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/ISSUE_TEMPLATE/**"
+          - ".github/PULL_REQUEST_TEMPLATE.md"
+
+# ---------------------------
+# 🔧 7. Dependencies & Bots
+# ---------------------------
+"📦 dependencies":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/dependabot.yml"
+          - "go.mod"
+          - "go.sum"
+          - "package.json"
+          - "package-lock.json"
+          - "requirements.txt"
