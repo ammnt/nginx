@@ -118,7 +118,7 @@ jobs:
           docker push ghcr.io/ammnt/nginx --all-tags
 
       - name: Upload Mint report📁
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mint-report
           path: slim.report.json
@@ -240,7 +240,7 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload ${{ matrix.scanner }} report📁
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ${{ matrix.scanner }}-report
           path: |
