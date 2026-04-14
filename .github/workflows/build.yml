@@ -181,7 +181,7 @@ jobs:
 
       - name: Docker Scout scan🛡️
         if: matrix.scanner == 'scout'
-        uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7
+        uses: docker/scout-action@bacf462e8d090c09660de30a6ccc718035f961e3
         with:
           command: cves,sbom
           image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
