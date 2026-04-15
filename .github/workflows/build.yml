@@ -117,11 +117,26 @@ jobs:
             --include-path=/etc/shadow --include-path=/etc/group
           docker push ghcr.io/ammnt/nginx --all-tags
 
+      - name: Explore with Dive🔍
+        env:
+          CI: true
+        run: |
+          docker pull ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
+          tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
+          dive --config ./dive-ci.yml -j dive.report.json ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+
       - name: Upload Mint report📁
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mint-report
           path: slim.report.json
+
+      - name: Upload Dive report📁
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: dive-report
+          path: dive.report.json
 
       - name: Get image digest🔢
         id: digest
@@ -139,7 +154,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        scanner: [hadolint, dive, dockle, scout, trivy, grype, snyk, syft]
+        scanner: [hadolint, dockle, scout, trivy, grype, snyk, syft]
       fail-fast: false
     steps:
       - name: Checkout repository📥
@@ -159,16 +174,6 @@ jobs:
           format: sarif
           output-file: hadolint.sarif
           config: ./hadolint.yaml
-
-      - name: Explore with Dive🔍
-        if: matrix.scanner == 'dive'
-        env:
-          CI: true
-        run: |
-          docker pull ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
-          tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
-          dive --config ./dive-ci.yml ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
 
       - name: Dockle scan🛡️
         if: matrix.scanner == 'dockle'
@@ -245,9 +250,6 @@ jobs:
           name: ${{ matrix.scanner }}-report
           path: |
             *.sarif
-            *.json
-            *.spdx
-            *.cyclonedx
 
       - name: Upload SARIF to Code Scanning🔬
         if: hashFiles('*.sarif') != ''
