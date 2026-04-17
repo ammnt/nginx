@@ -11,14 +11,6 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  COSIGN_VERSION: "3.0.6"
-  BUILDX_VERSION: "0.33.0"
-  BUILDKIT_VERSION: "0.29.0"
-  MINT_VERSION: "1.41.8"
-  DIVE_VERSION: "0.13.1"
-  GRYPE_VERSION: "0.111.0"
-  SYFT_VERSION: "1.42.4"
-  TRIVY_VERSION: "0.69.3"
   DOCKER_BUILDKIT: 1
   BUILDKIT_PROGRESS: quiet
   # BUILDKIT_PROGRESS: plain
@@ -60,8 +52,26 @@ jobs:
               echo "$key=$value" >> $GITHUB_OUTPUT
             fi
           done < .env
+
+          fetch_ver() {
+            curl -sSfL "https://api.github.com/repos/$1/releases/latest" | \
+            grep '"tag_name":' | \
+            sed -E 's/.*"v?([0-9][^"]+)".*/\1/'
+          }
+
+          for pair in "COSIGN_VERSION:sigstore/cosign" "BUILDX_VERSION:docker/buildx" \
+                      "BUILDKIT_VERSION:moby/buildkit" "MINT_VERSION:mintoolkit/mint" \
+                      "DIVE_VERSION:wagoodman/dive" "GRYPE_VERSION:anchore/grype" \
+                      "SYFT_VERSION:anchore/syft" "TRIVY_VERSION:aquasecurity/trivy"; do
+            IFS=':' read -r var repo <<< "$pair"
+            ver=$(fetch_ver "$repo")
+            echo "$var=$ver" >> $GITHUB_OUTPUT
+            echo "$var=$ver" >> $GITHUB_ENV
+          done
+
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
           echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          printenv | sort -n
 
       - name: Login to GHCR🔑
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
@@ -154,7 +164,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        scanner: [hadolint, dockle, scout, trivy, grype, snyk, syft]
+        scanner: [ hadolint, dockle, scout, trivy, grype, snyk, syft ]
       fail-fast: false
     steps:
       - name: Checkout repository📥
@@ -259,7 +269,7 @@ jobs:
           category: ${{ matrix.scanner }}
 
   finalize:
-    needs: [build, security-scans]
+    needs: [ build, security-scans ]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
