@@ -30,11 +30,6 @@ jobs:
       base_version: ${{ steps.load_env.outputs.BASE_VERSION }}
       base_hash: ${{ steps.load_env.outputs.BASE_HASH }}
       openssl_version: ${{ steps.load_env.outputs.OPENSSL_VERSION }}
-      pcre_version: ${{ steps.load_env.outputs.PCRE_VERSION }}
-      zlib_version: ${{ steps.load_env.outputs.ZLIB_VERSION }}
-      zstd_version: ${{ steps.load_env.outputs.ZSTD_VERSION }}
-      uid: ${{ steps.load_env.outputs.UID }}
-      gid: ${{ steps.load_env.outputs.GID }}
       build_date: ${{ steps.load_env.outputs.BUILD_DATE }}
       vcs_ref: ${{ steps.load_env.outputs.VCS_REF }}
 
@@ -107,12 +102,7 @@ jobs:
             BASE_HASH=${{ steps.load_env.outputs.BASE_HASH }}
             OPENSSL_VERSION=${{ steps.load_env.outputs.OPENSSL_VERSION }}
             APP_VERSION=${{ steps.load_env.outputs.APP_VERSION }}
-            PCRE_VERSION=${{ steps.load_env.outputs.PCRE_VERSION }}
-            ZLIB_VERSION=${{ steps.load_env.outputs.ZLIB_VERSION }}
-            ZSTD_VERSION=${{ steps.load_env.outputs.ZSTD_VERSION }}
             VCS_REF=${{ steps.load_env.outputs.VCS_REF }}
-            UID=${{ steps.load_env.outputs.UID }}
-            GID=${{ steps.load_env.outputs.GID }}
             BUILD_DATE=${{ steps.load_env.outputs.BUILD_DATE }}
 
       - name: Slim and push image with Mint🔧
