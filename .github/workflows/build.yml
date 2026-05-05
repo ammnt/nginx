@@ -107,8 +107,7 @@ jobs:
 
       - name: Slim and push image with Mint🔧
         run: |
-          curl -sSL -o ds.tar.gz https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz
-          tar -xf ds.tar.gz
+          curl -sSfL "https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz" | tar -zxf -
           ./dist_linux/mint --quiet build \
             --target ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
@@ -122,9 +121,8 @@ jobs:
           CI: true
         run: |
           docker pull ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          wget -q https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz
-          tar xzf dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz -C /usr/local/bin
-          dive --config ./dive-ci.yml -j dive.report.json ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          curl -sSfL "https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz" | tar -zxf -
+          ./dive --config ./dive-ci.yml -j dive.report.json ghcr.io/ammnt/angie:${{ needs.build.outputs.app_version }}
 
       - name: Upload Mint report📁
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
