@@ -156,7 +156,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        scanner: [ hadolint, dockle, scout, trivy, grype, snyk, syft ]
+        scanner: [hadolint, dockle, scout, trivy, grype, snyk, syft, clair]
       fail-fast: false
     steps:
       - name: Checkout repository📥
@@ -235,6 +235,15 @@ jobs:
           sarif: true
           args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
 
+      - name: Clair scan🛡️
+        if: matrix.scanner == 'clair'
+        continue-on-error: true
+        uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
+        with:
+          image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          format: sarif
+          output: clair.sarif
+
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
@@ -261,7 +270,7 @@ jobs:
           category: ${{ matrix.scanner }}
 
   finalize:
-    needs: [ build, security-scans ]
+    needs: [build, security-scans]
     runs-on: ubuntu-24.04
     permissions:
       contents: read
