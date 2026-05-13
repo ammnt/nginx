@@ -72,6 +72,9 @@ jobs:
             echo "$var=$ver" >> $GITHUB_ENV
           done
 
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
+          echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
       - name: Login to GHCR🔑
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
         with:
@@ -241,8 +244,8 @@ jobs:
         uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          format: sarif
-          output: clair.sarif
+          # format: sarif
+          # output: clair.sarif
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
