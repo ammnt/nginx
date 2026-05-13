@@ -240,12 +240,11 @@ jobs:
 
       - name: Clair scan🛡️
         if: matrix.scanner == 'clair'
-        continue-on-error: true
         uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          # format: sarif
-          # output: clair.sarif
+          format: sarif
+          output: clair.sarif
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
@@ -267,6 +266,7 @@ jobs:
 
       - name: Upload SARIF to Code Scanning🔬
         if: hashFiles('*.sarif') != ''
+        continue-on-error: true
         uses: github/codeql-action/upload-sarif@0c0c5dc2f136b98cb0537075ccfa21f94cd9a63e
         with:
           sarif_file: .
@@ -337,7 +337,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Create tagged release🏷️
-        continue-on-error: true
+        # continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
