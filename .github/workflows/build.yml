@@ -185,6 +185,7 @@ jobs:
         uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
         with:
           image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          format: sarif
           exit-code: "1"
           exit-level: "warn"
           ignore: "CIS-DI-0010"
@@ -229,7 +230,6 @@ jobs:
 
       - name: Snyk scan🛡️
         if: matrix.scanner == 'snyk'
-        continue-on-error: true
         uses: snyk/actions/docker@9adf32b1121593767fc3c057af55b55db032dc04
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -238,13 +238,14 @@ jobs:
           sarif: true
           args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
 
-      # - name: Clair scan🛡️
-      #   if: matrix.scanner == 'clair'
-      #   uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
-      #   with:
-      #     image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-      #     format: sarif
-      #     output: clair.sarif
+      - name: Clair scan🛡️
+        if: matrix.scanner == 'clair'
+        continue-on-error: true
+        uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
+        with:
+          image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          format: sarif
+          output: ./clair.sarif
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
@@ -263,6 +264,9 @@ jobs:
           name: ${{ matrix.scanner }}-report
           path: |
             *.sarif
+            *.json
+            *.spdx
+            *.cyclonedx
 
       - name: Upload SARIF to Code Scanning🔬
         if: hashFiles('*.sarif') != ''
@@ -307,7 +311,6 @@ jobs:
           docker push ammnt/nginx --all-tags
 
       - name: Attest image provenance📜
-        # continue-on-error: true
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -317,7 +320,6 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Sign container images✍️
-        # continue-on-error: true
         env:
           COSIGN_EXPERIMENTAL: "true"
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
@@ -337,7 +339,6 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Create tagged release🏷️
-        # continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
