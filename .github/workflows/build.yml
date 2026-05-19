@@ -264,7 +264,6 @@ jobs:
           name: ${{ matrix.scanner }}-report
           path: |
             *.sarif
-            *.json
             *.spdx
             *.cyclonedx
 
