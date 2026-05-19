@@ -27,7 +27,7 @@ RUN set -eu \
         zstd-static=1.5.7-r2 \
         brotli-dev=1.2.0-r0  \
         brotli-static=1.2.0-r0 \
-        curl=8.17.0-r1 \
+        curl=8.19.0-r0 \
         bash=5.3.3-r1 \
     # Update CA certificates for SSL verification
     && update-ca-certificates
