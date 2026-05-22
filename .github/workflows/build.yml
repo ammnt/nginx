@@ -171,6 +171,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Prepare Clair DB🗄️
+        id: cache
+        if: matrix.scanner == 'clair'
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: matcher.db
+          key: clair-matcher-db
+
+      - name: Update Clair DB🔄
+        if: matrix.scanner == 'clair' && steps.cache.outputs.cache-hit != 'true'
+        uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
+        with:
+          db-file: matcher.db
+          mode: update
+
       - name: Lint Dockerfile with Hadolint🔍
         if: matrix.scanner == 'hadolint'
         uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5
@@ -189,6 +204,7 @@ jobs:
           exit-code: "1"
           exit-level: "warn"
           ignore: "CIS-DI-0010"
+          output: "dockle.sarif"
 
       - name: Docker Scout scan🛡️
         if: matrix.scanner == 'scout'
@@ -246,6 +262,7 @@ jobs:
           image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           format: sarif
           output: ./clair.sarif
+          db-file: matcher.db
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
@@ -259,6 +276,7 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload ${{ matrix.scanner }} report📁
+        if: matrix.scanner != 'syft'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: ${{ matrix.scanner }}-report
