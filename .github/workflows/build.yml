@@ -241,6 +241,7 @@ jobs:
 
       - name: Prepare Clair DB🗄️
         if: matrix.scanner == 'clair'
+        continue-on-error: true
         uses: quay/clair-action@e5340cbfbf57d0ee596363fb98fd3d282aa71e17
         with:
           db-file: matcher.db
@@ -248,6 +249,7 @@ jobs:
 
       - name: Update Clair DB🔄
         if: matrix.scanner == 'clair'
+        continue-on-error: true
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: matcher.db
