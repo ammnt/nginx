@@ -188,7 +188,7 @@ jobs:
           format: sarif
           exit-code: "1"
           exit-level: "warn"
-          ignore: "CIS-DI-0010,CIS-DI-0005"
+          ignore: "CIS-DI-0005"
           output: "dockle.sarif"
 
       - name: Docker Scout scan🛡️
