@@ -96,6 +96,7 @@ spec:
 ### Repository structure
 ```bash
 nginx/
+├── 🔧 AGENTS.md                         # Dedicated file that guides AI coding agents
 ├── 📜 CODE_OF_CONDUCT.md                # Code of Conduct for contributors
 ├── 🤝 CONTRIBUTING.md                   # Contributing guidelines
 ├── 🔑 cosign.pub                        # Public key for image signing (Sigstore/cosign)
