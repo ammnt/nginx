@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout repository📥
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
 
       - name: Load .env variables☁️
         id: load_env
@@ -163,7 +163,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout repository📥
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
 
       - name: Login to Docker Hub🔑
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
@@ -354,7 +354,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout repository📥
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
 
       - name: Create tagged release🏷️
         env:
