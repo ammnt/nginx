@@ -193,4 +193,4 @@ Found an issue or have an improvement?
 
 ## 📄 License
 
-This project is open source and maintained with ❤️ by [ammnt](https://msftcnsi.com).
+This project is open source and maintained with ❤️ by [ammnt](https://ammnt.fun).

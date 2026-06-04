@@ -193,15 +193,15 @@ EXPOSE 8080/tcp 8443/tcp 8443/udp
 
 # OCI labels for image metadata
 LABEL description="Distroless NGINX with HTTP/3, QUIC, ECH and PQC support🚀" \
-      maintainer="ammnt <admin@msftcnsi.com>" \
+      maintainer="ammnt" \
       org.opencontainers.image.description="Distroless NGINX with HTTP/3, QUIC, ECH and PQC support🚀" \
-      org.opencontainers.image.authors="ammnt, admin@msftcnsi.com" \
+      org.opencontainers.image.authors="ammnt" \
       org.opencontainers.image.title="Distroless NGINX with HTTP/3, QUIC, ECH and PQC support🚀" \
       org.opencontainers.image.source="https://github.com/ammnt/nginx/" \
       org.opencontainers.image.created=${BUILD_DATE} \
       org.opencontainers.image.documentation="https://github.com/ammnt/nginx/blob/main/README.md" \
       org.opencontainers.image.licenses="BSD-2-Clause License" \
-      org.opencontainers.image.url="https://msftcnsi.com" \
+      org.opencontainers.image.url="https://ammnt.fun" \
       org.opencontainers.image.version=${APP_VERSION} \
       org.opencontainers.image.revision=${VCS_REF}
 
