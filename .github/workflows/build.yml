@@ -347,6 +347,18 @@ jobs:
           cosign sign -y --key env://COSIGN_KEY ammnt/nginx@${{ needs.build.outputs.digest }}
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
 
+      - name: Deploy to production server🌐
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd /home/${{ secrets.SERVER_USERNAME }}/agh
+            /usr/bin/docker compose pull web dns
+            /usr/bin/docker compose up -d web dns
+
   release:
     needs: [build, security-scans, finalize]
     runs-on: ubuntu-24.04
