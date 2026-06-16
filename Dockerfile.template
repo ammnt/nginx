@@ -17,7 +17,7 @@ RUN set -eu \
         git=2.54.0-r0 \
         mimalloc2-dev=2.2.7-r0 \
         build-base=0.5-r4 \
-        ca-certificates=20260413-r0 \
+        ca-certificates=20260611-r0 \
         linux-headers=7.0.0-r1 \
         tzdata=2026b-r0 \
         upx=5.2.0-r0 \
