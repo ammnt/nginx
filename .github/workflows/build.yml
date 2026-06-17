@@ -348,6 +348,7 @@ jobs:
           docker system prune -f ; rm -rf ${{ github.workspace }}/*
 
       - name: Deploy to production server🌐
+        continue-on-error: true
         uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
         with:
           host: ${{ secrets.SERVER_HOST }}
