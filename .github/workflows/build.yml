@@ -40,6 +40,7 @@ jobs:
       grype_version: ${{ steps.load_env.outputs.GRYPE_VERSION }}
       syft_version: ${{ steps.load_env.outputs.SYFT_VERSION }}
       trivy_version: ${{ steps.load_env.outputs.TRIVY_VERSION }}
+      checkov_version: ${{ steps.load_env.outputs.CHECKOV_VERSION }}
 
     steps:
       - name: Checkout repository📥
@@ -65,7 +66,8 @@ jobs:
           for pair in "COSIGN_VERSION:sigstore/cosign" "BUILDX_VERSION:docker/buildx" \
                       "BUILDKIT_VERSION:moby/buildkit" "MINT_VERSION:mintoolkit/mint" \
                       "DIVE_VERSION:wagoodman/dive" "GRYPE_VERSION:anchore/grype" \
-                      "SYFT_VERSION:anchore/syft" "TRIVY_VERSION:aquasecurity/trivy"; do
+                      "SYFT_VERSION:anchore/syft" "TRIVY_VERSION:aquasecurity/trivy" \
+                      "CHECKOV_VERSION:bridgecrewio/checkov"; do
             IFS=':' read -r var repo <<< "$pair"
             ver=$(fetch_ver "$repo")
             echo "$var=$ver" >> $GITHUB_OUTPUT
@@ -159,7 +161,8 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        scanner: [hadolint, dockle, scout, trivy, grype, snyk, syft, clair]
+        scanner:
+          [hadolint, checkov, dockle, scout, trivy, grype, snyk, syft, clair]
       fail-fast: false
     steps:
       - name: Checkout repository📥
@@ -179,6 +182,20 @@ jobs:
           format: sarif
           output-file: hadolint.sarif
           config: ./hadolint.yaml
+
+      - name: Checkov scan🔍
+        if: matrix.scanner == 'checkov'
+        run: |
+          curl -sSfL -o ./checkov_linux_X86_64.zip "https://github.com/bridgecrewio/checkov/releases/download/${{ needs.build.outputs.checkov_version }}/checkov_linux_X86_64.zip"
+          unzip -q ./checkov_linux_X86_64.zip
+          ./dist/checkov \
+            --quiet \
+            --output sarif \
+            --output-file-path results \
+            --framework dockerfile \
+            --directory . \
+            --dockerfile-path ./Dockerfile.template
+          mv results/results_sarif.sarif checkov.sarif
 
       - name: Dockle scan🛡️
         if: matrix.scanner == 'dockle'
