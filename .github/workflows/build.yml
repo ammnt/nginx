@@ -186,7 +186,7 @@ jobs:
       - name: Checkov scan🔍
         if: matrix.scanner == 'checkov'
         run: |
-          curl -sSfL -o ./checkov_linux_X86_64.zip "https://github.com/bridgecrewio/checkov/releases/download/${{ needs.build.outputs.checkov_version }}/checkov_linux_X86_64.zip"
+          curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/download/${{ needs.build.outputs.checkov_version }}/checkov_linux_X86_64.zip"
           unzip -q ./checkov_linux_X86_64.zip
           ./dist/checkov \
             --quiet \
