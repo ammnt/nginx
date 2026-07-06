@@ -50,8 +50,6 @@ RUN git config --global advice.detachedHead false \
     && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
     # Clone ZSTD compression module
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZSTD_VERSION}" https://github.com/tokers/zstd-nginx-module \
-    # Clone NGINX ACME protocol module
-    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ACME_VERSION}" https://github.com/nginx/nginx-acme \
     # Remove Server header from HTTP responses (HTTP/1.1, HTTP/2, HTTP/3)
     && sed -ie 's@r->headers_out.server == NULL@0@g' \
         /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -161,7 +159,6 @@ RUN ./auto/configure \
         # Third-party modules
         --add-module="/tmp/ngx_brotli" \
         --add-module="/tmp/zstd-nginx-module" \
-        --add-module="/tmp/nginx-acme" \
     # Build and install NGINX
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
