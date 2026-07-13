@@ -25,10 +25,10 @@
 ## 🌐 Image Variants
 
 Docker Hub:<br>
-> **ammnt/nginx:latest**
+> **ammnt/nginx**
 
 GitHub Container Registry:<br>
-> **ghcr.io/ammnt/nginx:latest**
+> **ghcr.io/ammnt/nginx**
 
 ## 📦 Quick Start
 
@@ -38,7 +38,7 @@ docker run -d \
   --name nginx \
   -p 80:8080 \
   -p 443:8443 \
-  ammnt/nginx:latest
+  ammnt/nginx
 ```
 
 ## 🔧 Advanced Configuration
