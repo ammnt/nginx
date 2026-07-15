@@ -19,7 +19,7 @@ RUN set -eu \
         build-base=0.5-r4 \
         ca-certificates=20260611-r0 \
         linux-headers=7.0.0-r1 \
-        tzdata=2026b-r0 \
+        tzdata=2026c-r0 \
         upx=5.2.0-r0 \
         perl=5.42.2-r0 \
         cmake=4.2.3-r0 \
