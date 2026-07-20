@@ -163,6 +163,9 @@ RUN ./auto/configure \
     # Security hardening: strip debug symbols and compress binary
     && strip --strip-all /usr/sbin/nginx \
     && upx -q --best --lzma /usr/sbin/nginx \
+    && ldd /usr/sbin/nginx || true \
+    && file /usr/sbin/nginx \
+    && readelf -d /usr/sbin/nginx \
     # Set proper permissions
     && chown -R "10001:10001" /etc/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
