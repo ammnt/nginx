@@ -145,7 +145,7 @@ nginx/
 ### **Runtime Security**
 - **Rootless by design** - unprivileged runtime user (Docker Bench Security, OCI Runtime Specification)
 - **Distroless base** - built from `scratch` with zero bloat (SLSA Level 3 requirements)
-- **Minimal attack surface** - no shell, no package manager and no unnecessary modules (CIS Docker Benchmark, Principle of Least Privilege)
+- **Minimal attack surface** - no shell, no package manager, and no unnecessary modules (CIS Docker Benchmark, Principle of Least Privilege)
 - **Server header removal** - anonymous signature ("security through obscurity")
 - **Kubernetes PSS compliant** - fully conforms to Pod Security Standards (baseline & restricted)
 - **Docker security standards** - follows CIS Docker Benchmarks and best practices
