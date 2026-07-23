@@ -11,7 +11,7 @@
 > **Production-ready, security-focused NGINX image with HTTP/3, QUIC, ECH and PQC support.**
 
 > [!IMPORTANT]
-> QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC, ECH and QUIC⚠️
+> The QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC, ECH and QUIC⚠️
 
 > [!IMPORTANT]
 > NJS module has been removed due to security vulnerabilities in libxml2/libxslt dependencies⚠️
@@ -137,7 +137,7 @@ nginx/
 - **Memory protection** - stack smashing protection, stack clash protection
 - **Control Flow Integrity** - full CFI protection against ROP/JOP attacks (Intel CET)
 - **Initialization hardening** - automatic zero-initialization to prevent data leaks
-- **Binary hardening** - position idependent executables (PIE) for ASLR (PaX ASLR, Linux kernel ASLR)
+- **Binary hardening** - position independent executables (PIE) for ASLR (PaX ASLR, Linux kernel ASLR)
 - **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection
 - **C++ assertions** - enhanced standard library security checks
 - **Linker hardening** - read-only relocations and immediate binding (ELF hardening, RELRO)
