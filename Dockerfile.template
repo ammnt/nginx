@@ -1,9 +1,9 @@
 # Build arguments for version pinning and reproducibility
-ARG BASE_VERSION=3.24.1
-ARG BASE_HASH=bec4ccd3817e7c824eb0388971a0b83fab111d586285511ba0266b77e8dc65a9
+ARG BASE_VERSION
+ARG BASE_HASH
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
-ARG OPENSSL_VERSION=4.0.1
-ARG APP_VERSION=1.31.3
+ARG OPENSSL_VERSION
+ARG APP_VERSION
 
 WORKDIR /tmp
 # System setup and dependency installation
@@ -187,7 +187,7 @@ RUN ./auto/configure \
 
 # Final distroless image
 FROM scratch
-ARG APP_VERSION=1.31.3
+ARG APP_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
