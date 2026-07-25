@@ -1,9 +1,9 @@
 # Build arguments for version pinning and reproducibility
-ARG BASE_VERSION
-ARG BASE_HASH
+ARG BASE_VERSION=3.24.1
+ARG BASE_HASH=bec4ccd3817e7c824eb0388971a0b83fab111d586285511ba0266b77e8dc65a9
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
-ARG OPENSSL_VERSION
-ARG APP_VERSION
+ARG OPENSSL_VERSION=4.0.1
+ARG APP_VERSION=1.31.3
 
 WORKDIR /tmp
 # System setup and dependency installation
@@ -116,11 +116,20 @@ RUN ./auto/configure \
             -Werror=format-security \
             -fcode-hoisting \
             -Wno-deprecated-declarations \
-            -DTCP_FASTOPEN=23" \
+            -DTCP_FASTOPEN=23 \
+            -fno-delete-null-pointer-checks \
+            -fno-strict-overflow \
+            -fmerge-all-constants \
+            -finline-functions-called-once \
+            -fasynchronous-unwind-tables \
+            -fomit-frame-pointer" \
         --with-ld-opt="\
             -L/usr/local/lib \
             -lz \
-            -static-pie" \
+            -static-pie \
+            -Wl,--gc-sections \
+            -Wl,-z,noexecstack \
+            -Wl,-z,separate-code" \
         # Core features
         --with-compat \
         --with-pcre-jit \
@@ -178,7 +187,7 @@ RUN ./auto/configure \
 
 # Final distroless image
 FROM scratch
-ARG APP_VERSION
+ARG APP_VERSION=1.31.3
 ARG BUILD_DATE
 ARG VCS_REF
 
