@@ -105,7 +105,7 @@ RUN ./auto/configure \
         --with-zlib="/tmp/zlib-ng" \
         # Compilation flags
         --with-cc-opt="\
-            -static \
+            -static-pie \
             -static-libgcc \
             -O2 \
             -march=x86-64 \
@@ -120,7 +120,7 @@ RUN ./auto/configure \
         --with-ld-opt="\
             -L/usr/local/lib \
             -lz \
-            -static" \
+            -static-pie" \
         # Core features
         --with-compat \
         --with-pcre-jit \
