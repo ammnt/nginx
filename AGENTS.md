@@ -70,7 +70,7 @@ BUILD_DATE      # Build timestamp
 - HEALTHCHECK interval: 30s, timeout: 3s
 
 ### Image Hardening
-- `-fhardened` Compilator flag (includes: stack-protector-strong, PIE, FORTIFY_SOURCE=3, -fstack-clash-protection, -fcf-protection=full, -ftrivial-auto-var-init=zero, -D_GLIBCXX_ASSERTIONS)
+- `-fhardened` Compiler flag (includes: stack-protector-strong, PIE, FORTIFY_SOURCE=3, -fstack-clash-protection, -fcf-protection=full, -ftrivial-auto-var-init=zero, -D_GLIBCXX_ASSERTIONS)
 - LTO (Link Time Optimization)
 - Strip DWARF debug symbols
 - Remove static libraries after build
