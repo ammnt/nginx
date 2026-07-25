@@ -4,7 +4,7 @@
 Production-ready, security-hardened NGINX image built from scratch with HTTP/3, QUIC, ECH, and PQC support.
 - **Base:** Scratch (distroless)
 - **Builder:** Alpine Linux (multi-stage)
-- **Compiler:** GCC with `-fhardened` flags
+- **Compiler:** Clang with `-fhardened` flags
 - **User:** 10001:10001 (rootless by design)
 - **Registry:** ghcr.io/ammnt/nginx, Docker Hub: ammnt/nginx
 
@@ -70,7 +70,7 @@ BUILD_DATE      # Build timestamp
 - HEALTHCHECK interval: 30s, timeout: 3s
 
 ### Image Hardening
-- `-fhardened` GCC flag (includes: stack-protector-strong, PIE, FORTIFY_SOURCE=3, -fstack-clash-protection, -fcf-protection=full, -ftrivial-auto-var-init=zero, -D_GLIBCXX_ASSERTIONS)
+- `-fhardened` Compilator flag (includes: stack-protector-strong, PIE, FORTIFY_SOURCE=3, -fstack-clash-protection, -fcf-protection=full, -ftrivial-auto-var-init=zero, -D_GLIBCXX_ASSERTIONS)
 - LTO (Link Time Optimization)
 - Strip DWARF debug symbols
 - Remove static libraries after build
@@ -156,7 +156,7 @@ listen 8080;
 - ZSTD (compression)
 
 ### Build-time only
-- GCC + musl-dev
+- Clang + musl-dev
 - Make, Perl, Linux headers
 - Git (for version detection)
 
