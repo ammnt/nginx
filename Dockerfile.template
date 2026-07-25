@@ -12,8 +12,8 @@ RUN set -eu \
     && addgroup --system --gid "10001" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "10001" --no-create-home nginx \
     # Update system and install build dependencies
     && apk -U -q upgrade && apk add -q --no-cache \
-        clang22-22.1.3-r2 \
-        lld22-22.1.3-r0 \
+        clang22=22.1.3-r2 \
+        lld22=22.1.3-r0 \
         llvm=22-r0 \
         make=4.4.1-r4 \
         git=2.54.0-r0 \
