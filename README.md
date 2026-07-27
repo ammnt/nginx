@@ -141,7 +141,7 @@ nginx/
 - **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection (`-D_FORTIFY_SOURCE=3`)
 - **C++ assertions** - enhanced standard library security checks (`-D_GLIBCXX_ASSERTIONS`)
 - **Linker hardening** - read-only relocations and immediate binding (`-Wl,-z,relro,-z,now`), no-exec stack (`-Wl,-z,noexecstack`), separate code/data segments (`-Wl,-z,separate-code`), CET enforcement (`-Wl,-z,shstk,-z,ibt`)
-- **Compiler warnings** - comprehensive warning set with errors for critical issues (`-Wall -Wextra -Wformat=2 -Wconversion -Wimplicit-fallthrough -Werror=format-security -Werror=return-type`)
+- **Compiler warnings** - comprehensive warning set with errors for critical issues (`-Wall -Wextra -Wformat=2 -Wimplicit-fallthrough -Werror=format-security -Werror=return-type`)
 
 ### **Runtime Security**
 - **Rootless by design** - unprivileged runtime user (Docker Bench Security, OCI Runtime Specification)
