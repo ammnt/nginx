@@ -133,14 +133,15 @@ nginx/
 
 ## 🔥 Why Choose This Image?
 
-### **Compiler hardened compilation suite (-fhardened) providing comprehensive security:**
-- **Memory protection** - stack smashing protection, stack clash protection
-- **Control Flow Integrity** - full CFI protection against ROP/JOP attacks (Intel CET)
-- **Initialization hardening** - automatic zero-initialization to prevent data leaks
-- **Binary hardening** - position independent executables (PIE) for ASLR (PaX ASLR, Linux kernel ASLR)
-- **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection
-- **C++ assertions** - enhanced standard library security checks
-- **Linker hardening** - read-only relocations and immediate binding (ELF hardening, RELRO)
+### **Compiler Options Hardening Guide (OpenSSF Best Practices) providing comprehensive security:**
+- **Memory protection** - stack smashing protection (`-fstack-protector-strong`), stack clash protection (`-fstack-clash-protection`)
+- **Control Flow Integrity** - full CFI protection against ROP/JOP attacks via Intel CET (`-fcf-protection=full`)
+- **Initialization hardening** - automatic variable initialization to prevent data leaks (`-ftrivial-auto-var-init=pattern`)
+- **Binary hardening** - position independent executable (`-static-pie`) for full ASLR (PaX, Linux kernel)
+- **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection (`-D_FORTIFY_SOURCE=3`)
+- **C++ assertions** - enhanced standard library security checks (`-D_GLIBCXX_ASSERTIONS`)
+- **Linker hardening** - read-only relocations and immediate binding (`-Wl,-z,relro,-z,now`), no-exec stack (`-Wl,-z,noexecstack`), separate code/data segments (`-Wl,-z,separate-code`), CET enforcement (`-Wl,-z,shstk,-z,ibt`)
+- **Compiler warnings** - comprehensive warning set with errors for critical issues (`-Wall -Wextra -Wformat=2 -Wconversion -Wimplicit-fallthrough -Werror=format-security -Werror=return-type`)
 
 ### **Runtime Security**
 - **Rootless by design** - unprivileged runtime user (Docker Bench Security, OCI Runtime Specification)
