@@ -256,7 +256,16 @@ jobs:
           sarif: true
           args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
 
-      - name: Prepare Clair DB🗄️
+      - name: Restore Clair DB from cache🗄️
+        if: matrix.scanner == 'clair'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: matcher.db
+          key: clair-db-${{ github.run_id }}
+          restore-keys: |
+            clair-db-
+
+      - name: Update Clair DB🔄
         if: matrix.scanner == 'clair'
         continue-on-error: true
         uses: quay/clair-action@d24c74d7e3eaf5c9e3d6b0d566f6c1ac7d73f682
@@ -264,13 +273,13 @@ jobs:
           db-file: matcher.db
           mode: update
 
-      - name: Update Clair DB🔄
+      - name: Save Clair DB to cache💾
         if: matrix.scanner == 'clair'
         continue-on-error: true
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: matcher.db
-          key: matcher.db
+          key: clair-db-${{ github.run_id }}
 
       - name: Clair scan🛡️
         if: matrix.scanner == 'clair'

@@ -154,7 +154,7 @@ RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=l
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && llvm-strip --strip-all /usr/sbin/nginx \
-    && upx -q --best --lzma /usr/sbin/nginx \
+    && upx -qq --best --lzma /usr/sbin/nginx \
     && ldd /usr/sbin/nginx || true \
     && file /usr/sbin/nginx | grep 'statically linked' \
     && readelf -dn /usr/sbin/nginx | grep -E 'Properties|no dynamic' \
