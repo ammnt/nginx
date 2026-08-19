@@ -76,7 +76,7 @@ RUN mkdir -p /tmp/ngx_brotli/deps/brotli/out \
 
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
-RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=llvm-strip \
+RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib \
     && ./auto/configure \
         --with-debug \
         # Installation paths
