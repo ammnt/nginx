@@ -158,7 +158,14 @@ RUN ./auto/configure \
         --add-module="/tmp/ngx_brotli" \
         --add-module="/tmp/zstd-nginx-module" \
     # Build and install NGINX
-    && make -s -j "$(nproc)" && make -s install && make -s clean \
+    && make -s -j "$(nproc)" \
+        CC=clang \
+        CXX=clang++ \
+        LD=lld \
+        AR=llvm-ar \
+        NM=llvm-nm \
+        RANLIB=llvm-ranlib \
+    && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && llvm-strip --strip-all /usr/sbin/nginx \
     && upx -qq --best --lzma /usr/sbin/nginx \
