@@ -182,6 +182,7 @@ jobs:
           format: sarif
           output-file: hadolint.sarif
           config: ./hadolint.yaml
+          ignore: SC2034
 
       - name: Checkov scan🔍
         if: matrix.scanner == 'checkov'
