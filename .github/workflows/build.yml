@@ -268,7 +268,7 @@ jobs:
       - name: Update Clair DB🔄
         if: matrix.scanner == 'clair'
         continue-on-error: true
-        uses: quay/clair-action@d24c74d7e3eaf5c9e3d6b0d566f6c1ac7d73f682
+        uses: quay/clair-action@a18e7f48119f7b048dd8bbf8a19adf0f4e32e891
         with:
           db-file: matcher.db
           mode: update
@@ -284,7 +284,7 @@ jobs:
       - name: Clair scan🛡️
         if: matrix.scanner == 'clair'
         continue-on-error: true
-        uses: quay/clair-action@d24c74d7e3eaf5c9e3d6b0d566f6c1ac7d73f682
+        uses: quay/clair-action@a18e7f48119f7b048dd8bbf8a19adf0f4e32e891
         with:
           image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
           format: sarif
