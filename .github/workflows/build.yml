@@ -182,8 +182,6 @@ jobs:
           format: sarif
           output-file: hadolint.sarif
           config: ./hadolint.yaml
-          ignore: SC2034
-          failure-threshold: warning
 
       - name: Checkov scan🔍
         if: matrix.scanner == 'checkov'
@@ -207,7 +205,7 @@ jobs:
           format: sarif
           exit-code: "1"
           exit-level: "warn"
-          ignore: "CIS-DI-0005,CIS-DI-0010"
+          ignore: "CIS-DI-0005"
           output: "dockle.sarif"
 
       - name: Docker Scout scan🛡️

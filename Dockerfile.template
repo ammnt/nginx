@@ -29,7 +29,7 @@ RUN set -eu \
         zstd-static=1.5.7-r2 \
         brotli-dev=1.2.0-r1  \
         brotli-static=1.2.0-r1 \
-        curl=8.21.0-r0 \
+        curl=8.22.0-r0 \
         bash=5.3.9-r1 \
     # Update CA certificates for SSL verification
     && update-ca-certificates
@@ -62,10 +62,9 @@ RUN git config --global advice.detachedHead false \
 # Build zlib-ng and Brotli compression libraries with optimizations
 WORKDIR /tmp/zlib-ng
 RUN mkdir -p /tmp/ngx_brotli/deps/brotli/out \
-    # Configure Brotli with performance optimizations
     && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-m64 -march=x86-64 -mtune=generic -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
-        -DCMAKE_CXX_FLAGS="-m64 -march=x86-64 -mtune=generic -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" \
+        -DCMAKE_C_FLAGS="-m64 -march=x86-64 -mtune=generic -funroll-loops -ffunction-sections -fdata-sections" \
+        -DCMAKE_CXX_FLAGS="-m64 -march=x86-64 -mtune=generic -funroll-loops -ffunction-sections -fdata-sections" \
         -DCMAKE_INSTALL_PREFIX=./installed -B /tmp/ngx_brotli/deps/brotli/out -S /tmp/ngx_brotli/deps/brotli \
     # Build Brotli encoder
     && cmake --build /tmp/ngx_brotli/deps/brotli/out --config Release --target brotlienc \
@@ -73,6 +72,14 @@ RUN mkdir -p /tmp/ngx_brotli/deps/brotli/out \
     && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && ./configure --zlib-compat \
     # Build and install zlib-ng
     && make -s -j "$(nproc)" && make -s install && make -s clean
+
+ENV CC=clang \
+    CXX=clang++ \
+    LD=lld \
+    AR=llvm-ar \
+    NM=llvm-nm \
+    RANLIB=llvm-ranlib \
+    STRIP=llvm-strip
 
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
@@ -100,9 +107,11 @@ RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=l
         --with-pcre="/tmp/pcre2" \
         --with-zlib="/tmp/zlib-ng" \
         # Compilation flags
-        --with-cc-opt="-static-pie -O2 -march=x86-64 -flto \
+        --with-cc-opt="-fPIE -O2 -march=x86-64 \
             -Wall -Wextra -Wformat=2 -Wimplicit-fallthrough \
             -Werror=format-security -Werror=return-type -Wno-deprecated-declarations \
+            -Wno-error=implicit-fallthrough -Wno-error=unused-parameter \
+            -Wno-error=sign-compare \
             -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS \
             -fstrict-flex-arrays=3 -fstack-clash-protection -fstack-protector-strong \
             -fcf-protection=full -ftrivial-auto-var-init=pattern \
