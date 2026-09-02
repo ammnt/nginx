@@ -384,7 +384,7 @@ jobs:
           script: |
             cd /home/${{ secrets.SERVER_USERNAME }}/agh
             /usr/bin/docker compose pull web dns
-            /usr/bin/docker compose up -d web dns --wait
+            /usr/bin/docker compose up -d web dns
 
   release:
     needs: [build, security-scans, finalize]
