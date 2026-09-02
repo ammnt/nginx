@@ -122,7 +122,11 @@ jobs:
             --tag ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:latest \
             --http-probe=false --continue-after=5 \
-            --include-path=/etc/shadow --include-path=/etc/group
+            --include-path=/etc/shadow --include-path=/etc/group \
+            --remove-env PATH \
+            --remove-label mintoolkit.version \
+            --remove-label mintoolkit.source.image \
+            --remove-label mintoolkit.source.image.id
           docker push ghcr.io/ammnt/nginx --all-tags
 
       - name: Explore with Dive🔍
