@@ -12,8 +12,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   DOCKER_BUILDKIT: 1
-  # BUILDKIT_PROGRESS: quiet
-  BUILDKIT_PROGRESS: plain
+  BUILDKIT_PROGRESS: quiet
+  # BUILDKIT_PROGRESS: plain
 
 jobs:
   build-and-publish:

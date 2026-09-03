@@ -164,10 +164,6 @@ RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=l
     # Security hardening: strip debug symbols and compress binary
     && llvm-strip --strip-all /usr/sbin/nginx \
     && upx -qq --best --lzma /usr/sbin/nginx \
-    && ldd /usr/sbin/nginx || true \
-    && file /usr/sbin/nginx | grep 'statically linked' \
-    && readelf -dn /usr/sbin/nginx | grep -E 'Properties|no dynamic' \
-    && ls -lash /usr/sbin/nginx \
     # Set proper permissions
     && chown -R "10001:10001" /etc/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
