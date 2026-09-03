@@ -16,7 +16,7 @@ env:
   BUILDKIT_PROGRESS: plain
 
 jobs:
-  build:
+  build-and-publish:
     if: github.actor == 'ammnt'
     runs-on: ubuntu-24.04
     permissions:
@@ -32,15 +32,6 @@ jobs:
       openssl_version: ${{ steps.load_env.outputs.OPENSSL_VERSION }}
       build_date: ${{ steps.load_env.outputs.BUILD_DATE }}
       vcs_ref: ${{ steps.load_env.outputs.VCS_REF }}
-      cosign_version: ${{ steps.load_env.outputs.COSIGN_VERSION }}
-      buildx_version: ${{ steps.load_env.outputs.BUILDX_VERSION }}
-      buildkit_version: ${{ steps.load_env.outputs.BUILDKIT_VERSION }}
-      mint_version: ${{ steps.load_env.outputs.MINT_VERSION }}
-      dive_version: ${{ steps.load_env.outputs.DIVE_VERSION }}
-      grype_version: ${{ steps.load_env.outputs.GRYPE_VERSION }}
-      syft_version: ${{ steps.load_env.outputs.SYFT_VERSION }}
-      trivy_version: ${{ steps.load_env.outputs.TRIVY_VERSION }}
-      checkov_version: ${{ steps.load_env.outputs.CHECKOV_VERSION }}
 
     steps:
       - name: Checkout repository📥
@@ -56,24 +47,6 @@ jobs:
               echo "$key=$value" >> $GITHUB_OUTPUT
             fi
           done < .env
-
-          fetch_ver() {
-            curl -sSfL "https://api.github.com/repos/$1/releases/latest" | \
-            jq -r '.tag_name // empty' | \
-            sed -E 's/^v?([0-9][^"]+).*/\1/'
-          }
-
-          for pair in "COSIGN_VERSION:sigstore/cosign" "BUILDX_VERSION:docker/buildx" \
-                      "BUILDKIT_VERSION:moby/buildkit" "MINT_VERSION:mintoolkit/mint" \
-                      "DIVE_VERSION:wagoodman/dive" "GRYPE_VERSION:anchore/grype" \
-                      "SYFT_VERSION:anchore/syft" "TRIVY_VERSION:aquasecurity/trivy" \
-                      "CHECKOV_VERSION:bridgecrewio/checkov"; do
-            IFS=':' read -r var repo <<< "$pair"
-            ver=$(fetch_ver "$repo")
-            echo "$var=$ver" >> $GITHUB_OUTPUT
-            echo "$var=$ver" >> $GITHUB_ENV
-          done
-
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
           echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
@@ -84,19 +57,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
 
+      - name: Login to Docker Hub🔑
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Setup Docker Buildx🏗️
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e
-        with:
-          version: v${{ env.BUILDX_VERSION }}
-          driver-opts: image=moby/buildkit:v${{ env.BUILDKIT_VERSION }}-rootless
 
       - name: Build Docker image🐳
         id: build
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
-        env:
-          DOCKER_BUILD_RECORD_UPLOAD: false
-          DOCKER_BUILD_CHECKS_ANNOTATIONS: false
-          DOCKER_CONTENT_TRUST: 1
         with:
           provenance: false
           context: .
@@ -116,11 +88,13 @@ jobs:
 
       - name: Slim and push image with Mint🔧
         run: |
-          curl -sSfL "https://github.com/mintoolkit/mint/releases/download/${{ env.MINT_VERSION }}/dist_linux.tar.gz" | tar -zxf -
+          curl -sSfL "https://github.com/mintoolkit/mint/releases/latest/download/dist_linux.tar.gz" | tar -zxf -
           ./dist_linux/mint --quiet build \
             --target ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
             --tag ghcr.io/ammnt/nginx:latest \
+            --tag ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
+            --tag ammnt/nginx:latest \
             --http-probe=false --continue-after=5 \
             --include-path=/etc/shadow --include-path=/etc/group \
             --remove-env PATH \
@@ -128,13 +102,20 @@ jobs:
             --remove-label mintoolkit.source.image \
             --remove-label mintoolkit.source.image.id
           docker push ghcr.io/ammnt/nginx --all-tags
+          docker push ammnt/nginx --all-tags
+
+      - name: Get image digest🔢
+        id: digest
+        run: |
+          DIGEST=$(docker inspect -f='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} | cut -d'@' -f2)
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
       - name: Explore with Dive🔍
         env:
           CI: true
         run: |
-          docker pull ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }}
-          curl -sSfL "https://github.com/wagoodman/dive/releases/download/v${{ env.DIVE_VERSION }}/dive_${{ env.DIVE_VERSION }}_linux_amd64.tar.gz" | tar -zxf -
+          export DIVE_VERSION=$(curl -sSfL "https://api.github.com/repos/wagoodman/dive/releases/latest" | jq -r '.tag_name // empty' | sed -E 's/^([0-9][^"]+).*/\1/')
+          curl -sSfL "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | tar -zxf -
           ./dive --config ./dive-ci.yml -j dive.report.json ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }}
 
       - name: Upload Mint report📁
@@ -149,34 +130,42 @@ jobs:
           name: dive-report
           path: dive.report.json
 
-      - name: Get image digest🔢
-        id: digest
+      - name: Attest image provenance📜
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.digest.outputs.digest }}
+          push-to-registry: true
+          show-summary: false
+          github-token: ${{ secrets.GH_TOKEN }}
+
+      - name: Install Cosign🔐
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
+
+      - name: Sign images✍️
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          DIGEST=$(docker inspect -f='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} | cut -d'@' -f2)
-          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+          cosign sign -y --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ steps.digest.outputs.digest }}
+          cosign sign -y --key env://COSIGN_KEY ammnt/nginx@${{ steps.digest.outputs.digest }}
 
   security-scans:
-    needs: build
+    needs: build-and-publish
     runs-on: ubuntu-24.04
     permissions:
       contents: read
       security-events: write
-      packages: write
+      packages: read
       id-token: write
     strategy:
       matrix:
-        scanner:
-          [hadolint, checkov, dockle, scout, trivy, grype, snyk, syft, clair]
+        scanner: [hadolint, checkov, dockle, scout, trivy, grype, snyk, syft]
       fail-fast: false
     steps:
       - name: Checkout repository📥
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-
-      - name: Login to Docker Hub🔑
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Lint Dockerfile with Hadolint🔍
         if: matrix.scanner == 'hadolint'
@@ -190,7 +179,7 @@ jobs:
       - name: Checkov scan🔍
         if: matrix.scanner == 'checkov'
         run: |
-          curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/download/${{ needs.build.outputs.checkov_version }}/checkov_linux_X86_64.zip"
+          curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/latest/download/checkov_linux_X86_64.zip"
           unzip -q ./checkov_linux_X86_64.zip
           ./dist/checkov \
             --quiet \
@@ -205,11 +194,11 @@ jobs:
         if: matrix.scanner == 'dockle'
         uses: goodwithtech/dockle-action@e30e6af832aad6ea7dca2a248d31a85eab6dbd68
         with:
-          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           format: sarif
           exit-code: "1"
           exit-level: "warn"
-          ignore: "CIS-DI-0005,CIS-DI-0010"
+          ignore: "CIS-DI-0005"
           output: "dockle.sarif"
 
       - name: Docker Scout scan🛡️
@@ -217,7 +206,7 @@ jobs:
         uses: docker/scout-action@7c6b6c3f7844478ace1ffd4e7aef649053d1f87d
         with:
           command: cves,sbom
-          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           sarif-file: scout.sarif
           write-comment: true
           summary: false
@@ -228,7 +217,7 @@ jobs:
         if: matrix.scanner == 'trivy'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
         with:
-          image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          image-ref: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           scan-type: image
           format: sarif
           output: trivy.sarif
@@ -236,18 +225,16 @@ jobs:
           scanners: "vuln,secret"
           exit-code: "1"
           github-pat: ${{ secrets.GH_TOKEN }}
-          version: v${{ needs.build.outputs.trivy_version }}
           trivy-config: trivy.yaml
 
       - name: Grype scan🛡️
         if: matrix.scanner == 'grype'
         uses: anchore/scan-action@27805bf3b4e84b4a5c980df22ed233c00390a439
         with:
-          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           fail-build: false
           severity-cutoff: critical
           output-format: sarif
-          grype-version: v${{ needs.build.outputs.grype_version }}
           output-file: grype.sarif
 
       - name: Snyk scan🛡️
@@ -256,48 +243,15 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           sarif: true
           args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
-
-      - name: Restore Clair DB from cache🗄️
-        if: matrix.scanner == 'clair'
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: matcher.db
-          key: clair-db-${{ github.run_id }}
-          restore-keys: |
-            clair-db-
-
-      - name: Update Clair DB🔄
-        if: matrix.scanner == 'clair'
-        uses: quay/clair-action@a18e7f48119f7b048dd8bbf8a19adf0f4e32e891
-        with:
-          db-file: matcher.db
-          mode: update
-
-      - name: Save Clair DB to cache💾
-        if: matrix.scanner == 'clair'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: matcher.db
-          key: clair-db-${{ github.run_id }}
-
-      - name: Clair scan🛡️
-        if: matrix.scanner == 'clair'
-        uses: quay/clair-action@a18e7f48119f7b048dd8bbf8a19adf0f4e32e891
-        with:
-          image-ref: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          format: sarif
-          output: ./clair.sarif
-          db-file: matcher.db
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
         uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
         with:
-          syft-version: v${{ needs.build.outputs.syft_version }}
-          image: ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
+          image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           format: cyclonedx-json
           upload-artifact: true
           dependency-snapshot: true
@@ -321,73 +275,8 @@ jobs:
           sarif_file: .
           category: ${{ matrix.scanner }}
 
-  finalize:
-    needs: [build, security-scans]
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-      attestations: write
-    steps:
-      - name: Install Cosign🔐
-        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
-        with:
-          cosign-release: v${{ needs.build.outputs.cosign_version }}
-
-      - name: Login to GHCR🔑
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
-
-      - name: Login to Docker Hub🔑
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Push images to Docker Hub🚚
-        run: |
-          docker pull ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }}
-          docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ammnt/nginx:${{ needs.build.outputs.app_version }}
-          docker tag ghcr.io/ammnt/nginx:${{ needs.build.outputs.app_version }} ammnt/nginx:latest
-          docker push ammnt/nginx --all-tags
-
-      - name: Attest image provenance📜
-        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ needs.build.outputs.digest }}
-          push-to-registry: true
-          show-summary: false
-          github-token: ${{ secrets.GH_TOKEN }}
-
-      - name: Sign container images✍️
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: |
-          cosign sign -y --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ needs.build.outputs.digest }}
-          cosign sign -y --key env://COSIGN_KEY ammnt/nginx@${{ needs.build.outputs.digest }}
-          docker system prune -f ; rm -rf ${{ github.workspace }}/*
-
-      - name: Deploy to production server🌐
-        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
-          script: |
-            cd /home/${{ secrets.SERVER_USERNAME }}/agh
-            /usr/bin/docker compose pull web dns
-            /usr/bin/docker compose up -d web dns
-
   release:
-    needs: [build, security-scans, finalize]
+    needs: [build-and-publish]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -400,8 +289,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64
         with:
-          tag_name: ${{ needs.build.outputs.app_version }}
-          name: ${{ needs.build.outputs.app_version }}
+          tag_name: ${{ needs.build-and-publish.outputs.app_version }}
+          name: ${{ needs.build-and-publish.outputs.app_version }}
           draft: false
           prerelease: false
           generate_release_notes: true
+
+      - name: Deploy to production server🌐
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd /home/${{ secrets.SERVER_USERNAME }}/agh
+            /usr/bin/docker compose pull web dns
+            /usr/bin/docker compose up -d web dns
+            rm -rf ${{ github.workspace }}/*
