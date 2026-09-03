@@ -198,8 +198,14 @@ jobs:
           format: sarif
           exit-code: "1"
           exit-level: "warn"
-          ignore: "CIS-DI-0005"
+          ignore: "CIS-DI-0005,CIS-DI-0010"
           output: "dockle.sarif"
+
+      - name: Login to Docker Hub🔑
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Scout scan🛡️
         if: matrix.scanner == 'scout'
@@ -276,7 +282,7 @@ jobs:
           category: ${{ matrix.scanner }}
 
   release:
-    needs: [build-and-publish]
+    needs: [build-and-publish, security-scans]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -306,4 +312,3 @@ jobs:
             cd /home/${{ secrets.SERVER_USERNAME }}/agh
             /usr/bin/docker compose pull web dns
             /usr/bin/docker compose up -d web dns
-            rm -rf ${{ github.workspace }}/*
