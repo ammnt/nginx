@@ -114,7 +114,7 @@ jobs:
         env:
           CI: true
         run: |
-          export DIVE_VERSION=$(curl -sSfL "https://api.github.com/repos/wagoodman/dive/releases/latest" | jq -r '.tag_name // empty' | sed -E 's/^([0-9][^"]+).*/\1/')
+          export DIVE_VERSION=$(curl -sSfL "https://api.github.com/repos/wagoodman/dive/releases/latest" | jq -r '.tag_name // empty' | sed -E 's/^v?([0-9][^"]+).*/\1/')
           curl -sSfL "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | tar -zxf -
           ./dive --config ./dive-ci.yml -j dive.report.json ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }}
 
