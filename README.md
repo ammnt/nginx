@@ -168,7 +168,7 @@ nginx/
 - **Static compilation** - static binary with minimal dependencies
 - **Mint tool integration** - slimmed version of the image
 - **UPX runtime efficiency** - minimal memory overhead with fast decompression (Executable compression)
-- **Binary stripping** and **LTO optimization** (DWARF debugging standard)
+- **Binary stripping and size optimization** - debug symbols removed, dead code eliminated via `-ffunction-sections -fdata-sections` (DWARF debugging standard, ELF size reduction)
 
 ### **Performance Features**
 - **zlib-ng** with modern compression algorithms (RFC 1950, RFC 1951, RFC 1952)
