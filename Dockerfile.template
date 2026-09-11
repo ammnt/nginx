@@ -163,7 +163,11 @@ RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=l
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && llvm-strip --strip-all /usr/sbin/nginx \
+    && strings /usr/sbin/nginx | grep -i "zlib-ng" \
     && upx -qq --best --lzma /usr/sbin/nginx \
+    && ls -lash /usr/sbin/nginx \
+    && readelf -dn /usr/sbin/nginx | grep -E 'Properties|no dynamic' \
+    && file /usr/sbin/nginx | grep 'statically linked' \
     # Set proper permissions
     && chown -R "10001:10001" /etc/nginx && rm -rf /tmp/* \
     && grep -E "(root|nginx)" /etc/passwd > /tmp/passwd \
