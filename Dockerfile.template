@@ -106,7 +106,7 @@ RUN ./auto/configure \
         --with-pcre="/tmp/pcre2" \
         --with-zlib="/tmp/zlib-ng" \
         # Compilation flags
-        --with-cc-opt="-fPIE -O2 -march=x86-64 -flto=full \
+        --with-cc-opt="-fPIE -O3 -march=x86-64 -flto=full \
             -Wall -Wextra -Wformat=2 -Wimplicit-fallthrough \
             -Werror=format-security -Werror=return-type -Wno-deprecated-declarations \
             -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare \
@@ -119,7 +119,7 @@ RUN ./auto/configure \
         --with-ld-opt="-fuse-ld=lld -flto=full -L/usr/local/lib -lz -static-pie \
             -Wl,-z,nodlopen -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
             -Wl,-z,separate-code -Wl,-z,shstk -Wl,-z,force-ibt -Wl,--no-warnings \
-            -Wl,--as-needed -Wl,--no-copy-dt-needed-entries" \
+            -Wl,--as-needed -Wl,--no-copy-dt-needed-entries -lmimalloc" \
         # Core features
         --with-compat \
         --with-pcre-jit \
