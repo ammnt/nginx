@@ -116,10 +116,10 @@ RUN ./auto/configure \
             -fno-delete-null-pointer-checks -fno-strict-overflow \
             -fasynchronous-unwind-tables -fomit-frame-pointer \
             -DTCP_FASTOPEN=23" \
-        --with-ld-opt="-fuse-ld=lld -flto=full -L/usr/local/lib -lz -static-pie \
+        --with-ld-opt="-fuse-ld=lld -flto=full -lmimalloc -L/usr/local/lib -lz -static-pie \
             -Wl,-z,nodlopen -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
             -Wl,-z,separate-code -Wl,-z,shstk -Wl,-z,force-ibt -Wl,--no-warnings \
-            -Wl,--as-needed -Wl,--no-copy-dt-needed-entries -lmimalloc" \
+            -Wl,--as-needed -Wl,--no-copy-dt-needed-entries" \
         # Core features
         --with-compat \
         --with-pcre-jit \
