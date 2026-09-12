@@ -134,15 +134,15 @@ nginx/
 ## 🔥 Why Choose This Image?
 
 ### **Compiler Options Hardening Guide (OpenSSF Best Practices) providing comprehensive security:**
-- **Memory protection** - stack smashing protection (`-fstack-protector-strong`), stack clash protection (`-fstack-clash-protection`)
-- **Control Flow Integrity** - full CFI protection against ROP/JOP attacks via Intel CET (`-fcf-protection=full`)
-- **Initialization hardening** - automatic variable initialization to prevent data leaks (`-ftrivial-auto-var-init=pattern`)
-- **Binary hardening** - position independent executable (`-static-pie`) for full ASLR (PaX, Linux kernel)
-- **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection (`-D_FORTIFY_SOURCE=3`)
-- **C++ assertions** - enhanced standard library security checks (`-D_GLIBCXX_ASSERTIONS`)
-- **Linker hardening** - read-only relocations and immediate binding (`-Wl,-z,relro,-z,now`), no-exec stack (`-Wl,-z,noexecstack`), separate code/data segments (`-Wl,-z,separate-code`), CET enforcement (`-Wl,-z,shstk,-z,ibt`)
-- **Compiler warnings** - comprehensive warning set with errors for critical issues (`-Wall -Wextra -Wformat=2 -Wimplicit-fallthrough -Werror=format-security -Werror=return-type`)
-- **Compiler** - Clang/LLVM 22 toolchain with LLD linker (`CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=llvm-strip`)
+- **Memory protection** - stack smashing protection and stack clash protection
+- **Control Flow Integrity** - full CFI protection against ROP/JOP attacks via Intel CET
+- **Initialization hardening** - automatic variable initialization to prevent data leaks
+- **Binary hardening** - position independent executable for full ASLR (PaX, Linux kernel)
+- **Runtime protections** - FORTIFY_SOURCE level 3 for buffer overflow detection
+- **C++ assertions** - enhanced standard library security checks
+- **Linker hardening** - read-only relocations and immediate binding, no-exec stack, separate code/data segments and CET enforcement
+- **Compiler warnings** - comprehensive warning set with errors for critical issues
+- **Compiler** - Clang/LLVM 22 toolchain with LLD linker
 
 ### **Runtime Security**
 - **Rootless by design** - unprivileged runtime user (Docker Bench Security, OCI Runtime Specification)
@@ -168,7 +168,7 @@ nginx/
 - **Static compilation** - static binary with minimal dependencies
 - **Mint tool integration** - slimmed version of the image
 - **UPX runtime efficiency** - minimal memory overhead with fast decompression (Executable compression)
-- **Binary stripping and size optimization** - debug symbols removed, dead code eliminated via `-ffunction-sections -fdata-sections` (DWARF debugging standard, ELF size reduction)
+- **Binary stripping and size optimization** and **LTO optimization** - debug symbols removed, dead code eliminated (DWARF debugging standard, ELF size reduction)
 
 ### **Performance Features**
 - **zlib-ng** with modern compression algorithms (RFC 1950, RFC 1951, RFC 1952)

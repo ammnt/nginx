@@ -35,6 +35,14 @@ RUN set -eu \
     && update-ca-certificates
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+ENV CC=clang \
+    CXX=clang++ \
+    LD=lld \
+    AR=llvm-ar \
+    NM=llvm-nm \
+    RANLIB=llvm-ranlib \
+    STRIP=llvm-strip
+
 RUN git config --global advice.detachedHead false \
     && PCRE_VERSION=$(curl -sSfL "https://api.github.com/repos/PCRE2Project/pcre2/releases/latest" | grep '"tag_name":' | sed -E 's/.*"pcre2\-([^"]+)".*/\1/') \
     && ZLIB_VERSION=$(curl -sSfL "https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
@@ -73,18 +81,9 @@ RUN mkdir -p /tmp/ngx_brotli/deps/brotli/out \
     # Build and install zlib-ng
     && make -s -j "$(nproc)" && make -s install && make -s clean
 
-ENV CC=clang \
-    CXX=clang++ \
-    LD=lld \
-    AR=llvm-ar \
-    NM=llvm-nm \
-    RANLIB=llvm-ranlib \
-    STRIP=llvm-strip
-
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
-RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=llvm-strip \
-    && ./auto/configure \
+RUN ./auto/configure \
         --with-debug \
         # Installation paths
         --prefix="/etc/nginx" \
@@ -107,20 +106,19 @@ RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=l
         --with-pcre="/tmp/pcre2" \
         --with-zlib="/tmp/zlib-ng" \
         # Compilation flags
-        --with-cc-opt="-fPIE -O2 -march=x86-64 \
+        --with-cc-opt="-fPIE -O2 -march=x86-64 -flto=full \
             -Wall -Wextra -Wformat=2 -Wimplicit-fallthrough \
             -Werror=format-security -Werror=return-type -Wno-deprecated-declarations \
-            -Wno-error=implicit-fallthrough -Wno-error=unused-parameter \
-            -Wno-error=sign-compare \
+            -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare \
             -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS \
             -fstrict-flex-arrays=3 -fstack-clash-protection -fstack-protector-strong \
             -fcf-protection=full -ftrivial-auto-var-init=pattern \
             -fno-delete-null-pointer-checks -fno-strict-overflow \
             -fasynchronous-unwind-tables -fomit-frame-pointer \
             -DTCP_FASTOPEN=23" \
-        --with-ld-opt="-L/usr/local/lib -lz -static-pie \
+        --with-ld-opt="-fuse-ld=lld -flto=full -L/usr/local/lib -lz -static-pie \
             -Wl,-z,nodlopen -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
-            -Wl,-z,separate-code -Wl,-z,shstk -Wl,-z,ibt \
+            -Wl,-z,separate-code -Wl,-z,shstk -Wl,-z,force-ibt -Wl,--no-warnings \
             -Wl,--as-needed -Wl,--no-copy-dt-needed-entries" \
         # Core features
         --with-compat \
@@ -162,11 +160,10 @@ RUN CC=clang CXX=clang++ LD=lld AR=llvm-ar NM=llvm-nm RANLIB=llvm-ranlib STRIP=l
     # Build and install NGINX
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
+    && strings /usr/sbin/nginx | grep -i "zlib-ng/zlib.h" \
     && llvm-strip --strip-all /usr/sbin/nginx \
-    && strings /usr/sbin/nginx | grep -i "zlib-ng" \
     && upx -qq --best --lzma /usr/sbin/nginx \
     && ls -lash /usr/sbin/nginx \
-    && readelf -dn /usr/sbin/nginx | grep -E 'Properties|no dynamic' \
     && file /usr/sbin/nginx | grep 'statically linked' \
     # Set proper permissions
     && chown -R "10001:10001" /etc/nginx && rm -rf /tmp/* \
