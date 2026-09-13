@@ -156,7 +156,7 @@ RUN ./auto/configure \
     # Build and install NGINX
     && make -s -j "$(nproc)" && make -s install && make -s clean \
     # Security hardening: strip debug symbols and compress binary
-    && strings /usr/sbin/nginx | grep -i "zlib-ng/zlib.h" \
+    && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version" \
     && llvm-strip --strip-all /usr/sbin/nginx \
     && upx -qq --best --lzma /usr/sbin/nginx \
     && ls -lash /usr/sbin/nginx \
