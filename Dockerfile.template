@@ -38,9 +38,8 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         brotli-static=1.2.0-r1 \
         curl=8.22.0-r0 \
     # Update CA certificates for SSL verification
-    && update-ca-certificates
-
-RUN git config --global advice.detachedHead false \
+    && update-ca-certificates \
+    && git config --global advice.detachedHead false \
     && PCRE_VERSION=$(curl -sSfL "https://api.github.com/repos/PCRE2Project/pcre2/releases/latest" | grep '"tag_name":' | sed -E 's/.*"pcre2\-([^"]+)".*/\1/') \
     && ZLIB_VERSION=$(curl -sSfL "https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
     && ZSTD_VERSION=$(curl -sSfL "https://api.github.com/repos/tokers/zstd-nginx-module/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
