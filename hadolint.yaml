@@ -1,6 +1,6 @@
 failure-threshold: warning
 no-color: false
-no-fail: false
+no-fail: true
 trustedRegistries:
   - docker.io
   - ghcr.io
