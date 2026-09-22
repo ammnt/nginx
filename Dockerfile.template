@@ -26,7 +26,6 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         git=2.54.0-r0 \
         mimalloc2-dev=2.2.7-r0 \
         build-base=0.5-r4 \
-        ca-certificates=20260909-r0 \
         linux-headers=7.0.0-r1 \
         upx=5.2.0-r0 \
         perl=5.42.2-r0 \
@@ -35,27 +34,23 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         zstd-static=1.5.7-r2 \
         brotli-dev=1.2.0-r1  \
         brotli-static=1.2.0-r1 \
-        curl=8.22.0-r0 \
         autoconf=2.73-r0 \
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \
         python3-dev=3.14.7-r1 \
-    # Update CA certificates for SSL verification
-    && update-ca-certificates \
-    && git config --global advice.detachedHead false \
-    && PCRE_VERSION=$(curl -sSfL "https://api.github.com/repos/PCRE2Project/pcre2/releases/latest" | grep '"tag_name":' | sed -E 's/.*"pcre2\-([^"]+)".*/\1/') \
-    && ZLIB_VERSION=$(curl -sSfL "https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
-    && ZSTD_VERSION=$(curl -sSfL "https://api.github.com/repos/tokers/zstd-nginx-module/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
-    && NJS_VERSION=$(curl -sSfL "https://api.github.com/repos/nginx/njs/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
-    && QJS_VERSION=$(curl -sSfL "https://api.github.com/repos/quickjs-ng/quickjs/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
-    && LIBXML2_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxml2 'v*' | sed 's|.*/||' | grep -v -- '-' | sort -V | tail -1) \
-    && LIBXSLT_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxslt 'v*' | sed 's|.*/||' | grep -v -- '-' | sort -V | tail -1) \
+    && PCRE_VERSION=$(git ls-remote --tags --refs https://github.com/PCRE2Project/pcre2 'pcre2-*' | grep -v -- '-RC' | sed 's|.*/||' | tail -1) \
+    && ZLIB_VERSION=$(git ls-remote --tags --refs https://github.com/zlib-ng/zlib-ng | sed 's|.*/||' | sed 's/^v//' | sort -V | tail -1) \
+    && ZSTD_VERSION=$(git ls-remote --tags --refs https://github.com/tokers/zstd-nginx-module | sed 's|.*/||' | sort -V | tail -1) \
+    && NJS_VERSION=$(git ls-remote --tags --refs https://github.com/nginx/njs '[0-9]*' | sed 's|.*/||' | sort -V | tail -1) \
+    && QJS_VERSION=$(git ls-remote --tags --refs https://github.com/quickjs-ng/quickjs 'v*' | sed 's|.*/||' | sort -V | tail -1) \
+    && LIBXML2_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxml2 'v*' | sed 's|.*/||' | sort -V | tail -1) \
+    && LIBXSLT_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxslt 'v*' | sed 's|.*/||' | sort -V | tail -1) \
     # Clone NGINX webserver and remove documentation
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
     # Clone OpenSSL with HTTP/3 and QUIC support
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
     # Clone PCRE2 for regex with JIT support
-    && git clone -q --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
     # Clone zlib-ng for modern compression performance
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng \
     # Clone Brotli compression module
