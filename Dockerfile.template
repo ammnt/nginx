@@ -2,8 +2,8 @@
 ARG BASE_VERSION=3.24.2
 ARG BASE_HASH=31b6477333eb8257db9e5d7c3a7264fd0467928756f0bbcc27d35bea5d28cdbd
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
-ARG OPENSSL_VERSION
-ARG APP_VERSION
+ARG OPENSSL_VERSION=4.0.2
+ARG APP_VERSION=1.31.6
 
 SHELL ["/bin/ash", "-euo", "pipefail", "-c"]
 ENV CC=clang \
@@ -213,7 +213,7 @@ RUN ./auto/configure \
 
 # Final distroless image
 FROM scratch
-ARG APP_VERSION
+ARG APP_VERSION=1.31.6
 ARG BUILD_DATE
 ARG VCS_REF
 

@@ -40,13 +40,6 @@ jobs:
       - name: Load .env variables☁️
         id: load_env
         run: |
-          while IFS= read -r line; do
-            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
-              key="${line%%=*}"
-              value="${line#*=}"
-              echo "$key=$value" >> $GITHUB_OUTPUT
-            fi
-          done < .env
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
           echo "VCS_REF=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
