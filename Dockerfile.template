@@ -28,7 +28,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         build-base=0.5-r4 \
         linux-headers=7.0.0-r1 \
         upx=5.2.0-r0 \
-        perl=5.42.2-r0 \
+        perl=5.42.2-r1 \
         cmake=4.2.3-r0 \
         zstd-dev=1.5.7-r2 \
         zstd-static=1.5.7-r2 \
@@ -38,6 +38,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \
         python3-dev=3.14.7-r1 \
+    && git config --global advice.detachedHead false \
     && PCRE_VERSION=$(git ls-remote --tags --refs https://github.com/PCRE2Project/pcre2 'pcre2-*' | grep -v -- '-RC' | sed 's|.*/||' | tail -1) \
     && ZLIB_VERSION=$(git ls-remote --tags --refs https://github.com/zlib-ng/zlib-ng | sed 's|.*/||' | sed 's/^v//' | sort -V | tail -1) \
     && ZSTD_VERSION=$(git ls-remote --tags --refs https://github.com/tokers/zstd-nginx-module | sed 's|.*/||' | sort -V | tail -1) \
