@@ -1,6 +1,6 @@
 # Build arguments for version pinning and reproducibility
-ARG BASE_VERSION=3.24.1
-ARG BASE_HASH=bec4ccd3817e7c824eb0388971a0b83fab111d586285511ba0266b77e8dc65a9
+ARG BASE_VERSION=3.24.2
+ARG BASE_HASH=31b6477333eb8257db9e5d7c3a7264fd0467928756f0bbcc27d35bea5d28cdbd
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION
 ARG APP_VERSION
@@ -17,8 +17,8 @@ ENV CC=clang \
 WORKDIR /tmp
 # System setup and dependency installation
 RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell /bin/false --ingroup nginx --uid "10001" --no-create-home nginx \
-    # Update system and install build dependencies
-    && apk -U -q upgrade && apk add -q --no-cache \
+    # Install build dependencies
+    && apk add -q --no-cache \
         clang22=22.1.3-r2 \
         lld22=22.1.3-r0 \
         llvm=22-r0 \
@@ -26,34 +26,46 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         git=2.54.0-r0 \
         mimalloc2-dev=2.2.7-r0 \
         build-base=0.5-r4 \
-        ca-certificates=20260611-r0 \
         linux-headers=7.0.0-r1 \
         upx=5.2.0-r0 \
-        perl=5.42.2-r0 \
+        perl=5.42.2-r1 \
         cmake=4.2.3-r0 \
         zstd-dev=1.5.7-r2 \
         zstd-static=1.5.7-r2 \
-        brotli-dev=1.2.0-r1  \
+        brotli-dev=1.2.0-r1 \
         brotli-static=1.2.0-r1 \
-        curl=8.22.0-r0 \
-    # Update CA certificates for SSL verification
-    && update-ca-certificates \
+        autoconf=2.73-r0 \
+        automake=1.18.1-r1 \
+        libtool=2.6.0-r1 \
+        python3-dev=3.14.7-r1 \
     && git config --global advice.detachedHead false \
-    && PCRE_VERSION=$(curl -sSfL "https://api.github.com/repos/PCRE2Project/pcre2/releases/latest" | grep '"tag_name":' | sed -E 's/.*"pcre2\-([^"]+)".*/\1/') \
-    && ZLIB_VERSION=$(curl -sSfL "https://api.github.com/repos/zlib-ng/zlib-ng/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
-    && ZSTD_VERSION=$(curl -sSfL "https://api.github.com/repos/tokers/zstd-nginx-module/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
+    && PCRE_VERSION=$(git ls-remote --tags --refs https://github.com/PCRE2Project/pcre2 'pcre2-*' | grep -v -- '-RC' | sed 's|.*/||' | tail -1) \
+    && ZLIB_VERSION=$(git ls-remote --tags --refs https://github.com/zlib-ng/zlib-ng | sed 's|.*/||' | sed 's/^v//' | sort -V | tail -1) \
+    && ZSTD_VERSION=$(git ls-remote --tags --refs https://github.com/tokers/zstd-nginx-module | sed 's|.*/||' | sort -V | tail -1) \
+    && NJS_VERSION=$(git ls-remote --tags --refs https://github.com/nginx/njs '[0-9]*' | sed 's|.*/||' | sort -V | tail -1) \
+    && QJS_VERSION=$(git ls-remote --tags --refs https://github.com/quickjs-ng/quickjs 'v*' | sed 's|.*/||' | sort -V | tail -1) \
+    && LIBXML2_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxml2 'v*' | sed 's|.*/||' | sort -V | tail -1) \
+    && LIBXSLT_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxslt 'v*' | sed 's|.*/||' | sort -V | tail -1) \
     # Clone NGINX webserver and remove documentation
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
     # Clone OpenSSL with HTTP/3 and QUIC support
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "openssl-${OPENSSL_VERSION}" https://github.com/openssl/openssl \
     # Clone PCRE2 for regex with JIT support
-    && git clone -q --depth 1 --recursive -j8 --single-branch -b "pcre2-${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${PCRE_VERSION}" https://github.com/PCRE2Project/pcre2 \
     # Clone zlib-ng for modern compression performance
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng \
     # Clone Brotli compression module
     && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
     # Clone ZSTD compression module
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZSTD_VERSION}" https://github.com/tokers/zstd-nginx-module \
+    # Clone NJS module
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${NJS_VERSION}" https://github.com/nginx/njs \
+    # Clone QuickJS-NG engine
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${QJS_VERSION}" https://github.com/quickjs-ng/quickjs.git \
+    # Clone libxml2 for NJS
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${LIBXML2_VERSION}" https://github.com/GNOME/libxml2 \
+    # Clone libxslt for NJS
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${LIBXSLT_VERSION}" https://github.com/GNOME/libxslt \
     # Remove Server header from HTTP responses (HTTP/1.1, HTTP/2, HTTP/3)
     && sed -ie 's@r->headers_out.server == NULL@0@g' \
         /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -61,6 +73,32 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         /tmp/nginx/src/http/v3/ngx_http_v3_filter_module.c \
     # Remove default footer from error pages
     && sed -ie 's@<hr><center>nginx</center>@@g' /tmp/nginx/src/http/ngx_http_special_response.c
+
+# Build QuickJS-NG library
+WORKDIR /tmp/quickjs
+RUN make -s -j "$(nproc)" \
+    && cp ./build/libqjs.a ./libquickjs.a
+
+# Build libxml2 library
+WORKDIR /tmp/libxml2
+RUN ./autogen.sh \
+    && CFLAGS="-fPIC -O3 -march=x86-64 -fstack-protector-strong -fcf-protection=full \
+    -fvisibility=hidden -flto=full" \
+       ./configure \
+        --disable-shared \
+        --enable-static \
+    && make -s -j "$(nproc)" && make -s install && make -s clean
+
+# Build libxslt library
+WORKDIR /tmp/libxslt
+RUN ./autogen.sh \
+    && CFLAGS="-fPIC -O3 -march=x86-64 -fstack-protector-strong -fcf-protection=full \
+    -fvisibility=hidden -flto=full" \
+       ./configure \
+        --disable-shared \
+        --enable-static \
+        --with-libxml-src=/tmp/libxml2 \
+    && make -s -j "$(nproc)" && make -s install && make -s clean
 
 # Build zlib-ng and Brotli compression libraries with optimizations
 WORKDIR /tmp/zlib-ng
@@ -102,6 +140,7 @@ RUN ./auto/configure \
         --with-zlib="/tmp/zlib-ng" \
         # Compilation flags
         --with-cc-opt="-fPIE -O3 -march=x86-64 -flto=full \
+            -I/tmp/quickjs -I/usr/local/include \
             -Wall -Wextra -Wformat=2 -Wimplicit-fallthrough \
             -Werror=format-security -Werror=return-type -Wno-deprecated-declarations \
             -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare \
@@ -109,9 +148,9 @@ RUN ./auto/configure \
             -fstrict-flex-arrays=3 -fstack-clash-protection -fstack-protector-strong \
             -fcf-protection=full -ftrivial-auto-var-init=pattern \
             -fno-delete-null-pointer-checks -fno-strict-overflow \
-            -fasynchronous-unwind-tables -fomit-frame-pointer \
-            -DTCP_FASTOPEN=23" \
-        --with-ld-opt="-fuse-ld=lld -flto=full -lmimalloc -L/usr/local/lib -lz -static-pie \
+            -fasynchronous-unwind-tables -fomit-frame-pointer -DTCP_FASTOPEN=23" \
+        --with-ld-opt="-fuse-ld=lld -flto=full -L/tmp/quickjs -L/usr/local/lib \
+            -lmimalloc -lxml2 -lxslt -lexslt -lz -lm -static-pie \
             -Wl,-z,nodlopen -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
             -Wl,-z,separate-code -Wl,-z,shstk -Wl,-z,force-ibt -Wl,--no-warnings \
             -Wl,--as-needed -Wl,--no-copy-dt-needed-entries" \
@@ -152,10 +191,12 @@ RUN ./auto/configure \
         # Third-party modules
         --add-module="/tmp/ngx_brotli" \
         --add-module="/tmp/zstd-nginx-module" \
+        --add-module="/tmp/njs/nginx" \
     # Build and install NGINX
-    && make -s -j "$(nproc)" && make -s install && make -s clean \
+    && make -s -j "$(nproc)" && make -s install \
+    && file objs/src/http/ngx_http.o objs/src/core/nginx.o | grep -i 'LLVM IR bitcode' && make -s clean \
     # Security hardening: strip debug symbols and compress binary
-    && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version" \
+    && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version|quickjs/quickjs.h" \
     && llvm-strip --strip-all /usr/sbin/nginx \
     && upx -qq --best --lzma /usr/sbin/nginx \
     && ls -lash /usr/sbin/nginx \
