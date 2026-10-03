@@ -37,7 +37,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         autoconf=2.73-r0 \
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \
-        python3-dev=3.14.7-r1 \
+        python3-dev=3.14.8-r0 \
     && git config --global advice.detachedHead false \
     && PCRE_VERSION=$(git ls-remote --tags --refs https://github.com/PCRE2Project/pcre2 'pcre2-*' | grep -v -- '-RC' | sed 's|.*/||' | tail -1) \
     && ZLIB_VERSION=$(git ls-remote --tags --refs https://github.com/zlib-ng/zlib-ng | sed 's|.*/||' | sed 's/^v//' | sort -V | tail -1) \
