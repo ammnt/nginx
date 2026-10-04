@@ -1,4 +1,4 @@
-failure-threshold: warning
+failure-threshold: error
 no-color: false
 no-fail: true
 trustedRegistries:

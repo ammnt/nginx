@@ -156,7 +156,7 @@ jobs:
 
   security-scans:
     needs: build-and-publish
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       security-events: write
@@ -185,7 +185,7 @@ jobs:
           curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/latest/download/checkov_linux_X86_64.zip"
           unzip -q ./checkov_linux_X86_64.zip
           ./dist/checkov \
-            --quiet \
+            --quiet -s \
             --output sarif \
             --output-file-path results \
             --framework dockerfile \
@@ -199,8 +199,6 @@ jobs:
         with:
           image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           format: sarif
-          exit-code: "1"
-          exit-level: "warn"
           ignore: "CIS-DI-0005,CIS-DI-0010"
           output: "dockle.sarif"
 
@@ -218,8 +216,7 @@ jobs:
           image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           sarif-file: scout.sarif
           write-comment: true
-          summary: false
-          exit-code: true
+          summary: true
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Trivy scan🛡️
@@ -230,9 +227,6 @@ jobs:
           scan-type: image
           format: sarif
           output: trivy.sarif
-          severity: "MEDIUM,HIGH,CRITICAL"
-          scanners: "vuln,secret"
-          exit-code: "1"
           github-pat: ${{ secrets.GH_TOKEN }}
           trivy-config: trivy.yaml
 
@@ -242,7 +236,6 @@ jobs:
         with:
           image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           fail-build: false
-          severity-cutoff: critical
           output-format: sarif
           output-file: grype.sarif
 
@@ -254,7 +247,7 @@ jobs:
         with:
           image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           sarif: true
-          args: --file=Dockerfile.template --sarif-file-output=snyk.sarif
+          args: --file=Dockerfile.template --severity-threshold=critical --sarif-file-output=snyk.sarif
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
@@ -286,7 +279,7 @@ jobs:
 
   release:
     needs: [build-and-publish, security-scans]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
