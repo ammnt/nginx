@@ -40,8 +40,9 @@ jobs:
       - name: Load .env variables☁️
         id: load_env
         run: |
+          set -euo pipefail
           while IFS= read -r line; do
-            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
+            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]] && [[ "$line" == *=* ]]; then
               key="${line%%=*}"
               value="${line#*=}"
               echo "$key=$value" >> $GITHUB_OUTPUT
