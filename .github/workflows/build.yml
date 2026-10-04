@@ -92,6 +92,7 @@ jobs:
 
       - name: Slim and push image with Mint🔧
         run: |
+          set -euo pipefail
           curl -sSfL "https://github.com/mintoolkit/mint/releases/latest/download/dist_linux.tar.gz" | tar -zxf -
           ./dist_linux/mint --quiet build \
             --target ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} \
@@ -111,6 +112,7 @@ jobs:
       - name: Get image digest🔢
         id: digest
         run: |
+          set -euo pipefail
           DIGEST=$(docker inspect -f='{{index .RepoDigests 0}}' ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }} | cut -d'@' -f2)
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
@@ -118,6 +120,7 @@ jobs:
         env:
           CI: true
         run: |
+          set -euo pipefail
           export DIVE_VERSION=$(curl -sSfL "https://api.github.com/repos/wagoodman/dive/releases/latest" | jq -r '.tag_name // empty' | sed -E 's/^v?([0-9][^"]+).*/\1/')
           curl -sSfL "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | tar -zxf -
           ./dive --config ./dive-ci.yml -j dive.report.json ghcr.io/ammnt/nginx:${{ steps.load_env.outputs.APP_VERSION }}
@@ -152,6 +155,7 @@ jobs:
           COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
+          set -euo pipefail
           cosign sign -y --key env://COSIGN_KEY ghcr.io/ammnt/nginx@${{ steps.digest.outputs.digest }}
           cosign sign -y --key env://COSIGN_KEY ammnt/nginx@${{ steps.digest.outputs.digest }}
 
@@ -183,6 +187,7 @@ jobs:
       - name: Checkov scan🔍
         if: matrix.scanner == 'checkov'
         run: |
+          set -euo pipefail
           curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/latest/download/checkov_linux_X86_64.zip"
           unzip -q ./checkov_linux_X86_64.zip
           ./dist/checkov \
