@@ -13,9 +13,6 @@
 > [!IMPORTANT]
 > The QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC, ECH and QUIC⚠️
 
-> [!IMPORTANT]
-> NJS module has been removed due to security vulnerabilities in libxml2/libxslt dependencies⚠️
-
 > [!TIP]
 > You can find an example [configuration file](example.conf) in the repository for successfully configuring HTTP/3, ECH and PQC💡
 
@@ -173,6 +170,7 @@ nginx/
 ### **Performance Features**
 - **zlib-ng** with modern compression algorithms (RFC 1950, RFC 1951, RFC 1952)
 - **PCRE2 with JIT** compilation for regex performance
+- **NJS with QuickJS-NG** - JavaScript scripting support with modern engine
 - **Thread pool support** for async I/O operations
 - **TCP Fast Open** and **SSL session resumption** (RFC 7413, RFC 8446)
 - **Graceful shutdown** - SIGQUIT handling for proper connection draining (RFC 7230)
