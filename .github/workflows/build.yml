@@ -139,7 +139,7 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.digest.outputs.digest }}
           push-to-registry: true
-          show-summary: true
+          show-summary: false
           github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Install Cosign🔐
