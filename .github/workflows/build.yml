@@ -253,7 +253,7 @@ jobs:
 
       - name: Generate SBOM with Syft📋
         if: matrix.scanner == 'syft'
-        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c
         with:
           image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           format: cyclonedx-json
