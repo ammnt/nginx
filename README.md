@@ -152,6 +152,7 @@ nginx/
 - **Native PQC support** - hybrid post-quantum key exchange algorithms in elliptic curves (NIST PQC Standardization, FIPS 203/204/205)
 - **Native TLS 1.3 with 0-RTT** (RFC 8446, RFC 9001)
 - **Native support for the Encrypted Client Hello (ECH)** - extension of the TLS 1.3 protocol (RFC 9849)
+- **Native ACME support** - module implementing the automatic certificate management protocol ACMEv2 (RFC 8555)
 
 ### **Supply Chain Integrity**
 - **Signed images** - signatures and **provenance attestation** (SLSA Level 3 requirements, in-toto attestations)

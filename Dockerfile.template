@@ -38,6 +38,8 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \
         python3-dev=3.14.8-r0 \
+        cargo=1.96.1-r0 \
+        rust=1.96.1-r0 \
     && git config --global advice.detachedHead false \
     && PCRE_VERSION=$(git ls-remote --tags --refs https://github.com/PCRE2Project/pcre2 'pcre2-*' | grep -v -- '-RC' | sed 's|.*/||' | tail -1) \
     && ZLIB_VERSION=$(git ls-remote --tags --refs https://github.com/zlib-ng/zlib-ng | sed 's|.*/||' | sed 's/^v//' | sort -V | tail -1) \
@@ -46,6 +48,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
     && QJS_VERSION=$(git ls-remote --tags --refs https://github.com/quickjs-ng/quickjs 'v*' | sed 's|.*/||' | sort -V | tail -1) \
     && LIBXML2_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxml2 'v*' | sed 's|.*/||' | sort -V | tail -1) \
     && LIBXSLT_VERSION=$(git ls-remote --tags --refs https://github.com/GNOME/libxslt 'v*' | sed 's|.*/||' | sort -V | tail -1) \
+    && ACME_VERSION=$(git ls-remote --tags --refs https://github.com/nginx/nginx-acme 'v*' | sed 's|.*/||' | sort -V | tail -1) \
     # Clone NGINX webserver and remove documentation
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "release-${APP_VERSION}" https://github.com/nginx/nginx && rm -rf /tmp/nginx/docs/html/* \
     # Clone OpenSSL with HTTP/3 and QUIC support
@@ -66,6 +69,8 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${LIBXML2_VERSION}" https://github.com/GNOME/libxml2 \
     # Clone libxslt for NJS
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${LIBXSLT_VERSION}" https://github.com/GNOME/libxslt \
+    # Clone ACME module
+    && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ACME_VERSION}" https://github.com/nginx/nginx-acme \
     # Remove Server header from HTTP responses (HTTP/1.1, HTTP/2, HTTP/3)
     && sed -ie 's@r->headers_out.server == NULL@0@g' \
         /tmp/nginx/src/http/ngx_http_header_filter_module.c \
@@ -113,6 +118,35 @@ RUN mkdir -p /tmp/ngx_brotli/deps/brotli/out \
     && sed -i "s/compat=0/compat=1/" /tmp/zlib-ng/configure && ./configure --zlib-compat \
     # Build and install zlib-ng
     && make -s -j "$(nproc)" && make -s install && make -s clean
+
+# Build PCRE2 as static library
+WORKDIR /tmp/pcre2
+RUN ./autogen.sh \
+    && CFLAGS="-fPIC -O3 -march=x86-64 -fstack-protector-strong -fcf-protection=full \
+    -fvisibility=hidden -flto=full" \
+       ./configure \
+        --disable-shared \
+        --enable-static \
+        --enable-pcre2-8 \
+        --enable-unicode \
+        --enable-jit \
+    && make -s -j "$(nproc)" && make -s install && make -s clean
+
+# Build OpenSSL as static library
+WORKDIR /tmp/openssl
+RUN ./Configure \
+        linux-x86_64 \
+        enable-ec_nistp_64_gcc_128 \
+        no-tls1 \
+        no-tls1_1 \
+        no-shared \
+        no-weak-ssl-ciphers \
+        enable-quic \
+        enable-ktls \
+        zlib \
+        --prefix=/tmp/openssl/.openssl \
+        --openssldir=/tmp/openssl/.openssl \
+    && make -s -j "$(nproc)" && make -s install_sw && make -s clean
 
 # Configure and build NGINX with security hardening and optimizations
 WORKDIR /tmp/nginx
@@ -192,8 +226,22 @@ RUN ./auto/configure \
         --add-module="/tmp/ngx_brotli" \
         --add-module="/tmp/zstd-nginx-module" \
         --add-module="/tmp/njs/nginx" \
-    # Build and install NGINX
-    && make -s -j "$(nproc)" && make -s install \
+        --add-module="/tmp/nginx-acme"
+
+WORKDIR /tmp/nginx-acme
+RUN NGINX_BUILD_DIR="$(realpath ../nginx/objs)" \
+    && OPENSSL_DIR="/tmp/openssl/.openssl" \
+    && OPENSSL_INCLUDE_DIR="/tmp/openssl/.openssl/include" \
+    && OPENSSL_LIB_DIR="/tmp/openssl/.openssl/lib64" \
+    && export NGINX_BUILD_DIR \
+    && export OPENSSL_DIR \
+    && export OPENSSL_INCLUDE_DIR \
+    && export OPENSSL_LIB_DIR \
+    && cargo build --release
+
+# Build and install NGINX
+WORKDIR /tmp/nginx
+RUN make -s -j "$(nproc)" && make -s install \
     && file objs/src/http/ngx_http.o objs/src/core/nginx.o | grep -i 'LLVM IR bitcode' && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version|quickjs/quickjs.h" \
