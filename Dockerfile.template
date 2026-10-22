@@ -1,6 +1,6 @@
 # Build arguments for version pinning and reproducibility
-ARG BASE_VERSION=3.24.2
-ARG BASE_HASH=31b6477333eb8257db9e5d7c3a7264fd0467928756f0bbcc27d35bea5d28cdbd
+ARG BASE_VERSION=3.24.3
+ARG BASE_HASH=b3413572228e34bd1c9245f5565e6cd127005655e8a7899aef33d8e83255c9e6
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION
 ARG APP_VERSION
@@ -32,8 +32,8 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         cmake=4.2.3-r0 \
         zstd-dev=1.5.7-r2 \
         zstd-static=1.5.7-r2 \
-        brotli-dev=1.2.0-r1 \
-        brotli-static=1.2.0-r1 \
+        brotli-dev=1.2.1-r0 \
+        brotli-static=1.2.1-r0 \
         autoconf=2.73-r0 \
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \

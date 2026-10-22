@@ -5,7 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/ammnt/nginx.svg)](https://github.com/ammnt/nginx/stargazers)
 ![Feature](https://img.shields.io/badge/feature-distroless-blue)
 [![GitHub issues open](https://img.shields.io/github/issues/ammnt/nginx.svg)](https://github.com/ammnt/nginx/issues)
-![GitHub Maintained](https://img.shields.io/badge/open%20source-yes-orange)
+![GitHub Open Source](https://img.shields.io/badge/open%20source-yes-orange)
 ![GitHub Maintained](https://img.shields.io/badge/maintained-yes-yellow)
 
 > **Production-ready, security-focused NGINX image with HTTP/3, QUIC, ECH and PQC support.**
