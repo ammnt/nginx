@@ -1,6 +1,6 @@
 # Build arguments for version pinning and reproducibility
 ARG BASE_VERSION=3.24.3
-ARG BASE_HASH=b3413572228e34bd1c9245f5565e6cd127005655e8a7899aef33d8e83255c9e6
+ARG BASE_HASH=be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION
 ARG APP_VERSION
@@ -20,6 +20,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
     # Install build dependencies
     && apk add -q --no-cache \
         clang22=22.1.3-r2 \
+        clang22-dev=22.1.3-r2 \
         lld22=22.1.3-r0 \
         llvm=22-r0 \
         make=4.4.1-r4 \
@@ -40,6 +41,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         python3-dev=3.14.8-r0 \
         cargo=1.96.1-r0 \
         rust=1.96.1-r0 \
+        pkgconf=2.5.1-r0 \
     && git config --global advice.detachedHead false \
     && PCRE_VERSION=$(git ls-remote --tags --refs https://github.com/PCRE2Project/pcre2 'pcre2-*' | grep -v -- '-RC' | sed 's|.*/||' | tail -1) \
     && ZLIB_VERSION=$(git ls-remote --tags --refs https://github.com/zlib-ng/zlib-ng | sed 's|.*/||' | sed 's/^v//' | sort -V | tail -1) \
@@ -228,20 +230,32 @@ RUN ./auto/configure \
         --add-module="/tmp/njs/nginx" \
         --add-module="/tmp/nginx-acme"
 
+# Build ACME module for NGINX
 WORKDIR /tmp/nginx-acme
 RUN NGINX_BUILD_DIR="$(realpath ../nginx/objs)" \
     && OPENSSL_DIR="/tmp/openssl/.openssl" \
     && OPENSSL_INCLUDE_DIR="/tmp/openssl/.openssl/include" \
     && OPENSSL_LIB_DIR="/tmp/openssl/.openssl/lib64" \
+    && PKG_CONFIG_PATH="/tmp/openssl/.openssl/lib/pkgconfig" \
     && export NGINX_BUILD_DIR \
     && export OPENSSL_DIR \
     && export OPENSSL_INCLUDE_DIR \
     && export OPENSSL_LIB_DIR \
+    && export PKG_CONFIG_PATH \
     && cargo build --release
 
 # Build and install NGINX
 WORKDIR /tmp/nginx
-RUN make -s -j "$(nproc)" && make -s install \
+RUN OPENSSL_DIR="/tmp/openssl/.openssl" \
+    && OPENSSL_INCLUDE_DIR="/tmp/openssl/.openssl/include" \
+    && OPENSSL_LIB_DIR="/tmp/openssl/.openssl/lib64" \
+    && PKG_CONFIG_PATH="/tmp/openssl/.openssl/lib/pkgconfig" \
+    && export NGINX_BUILD_DIR \
+    && export OPENSSL_DIR \
+    && export OPENSSL_INCLUDE_DIR \
+    && export OPENSSL_LIB_DIR \
+    && export PKG_CONFIG_PATH \
+    && make -s -j "$(nproc)" && make -s install \
     && file objs/src/http/ngx_http.o objs/src/core/nginx.o | grep -i 'LLVM IR bitcode' && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version|quickjs/quickjs.h" \
