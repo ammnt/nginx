@@ -230,32 +230,20 @@ RUN ./auto/configure \
         --add-module="/tmp/njs/nginx" \
         --add-module="/tmp/nginx-acme"
 
+# Global ENVs for OpenSSL
+ENV OPENSSL_DIR="/tmp/openssl/.openssl" \
+    OPENSSL_INCLUDE_DIR="/tmp/openssl/.openssl/include" \
+    OPENSSL_LIB_DIR="/tmp/openssl/.openssl/lib64" \
+    PKG_CONFIG_PATH="/tmp/openssl/.openssl/lib/pkgconfig"
+
 # Build ACME module for NGINX
 WORKDIR /tmp/nginx-acme
 RUN NGINX_BUILD_DIR="$(realpath ../nginx/objs)" \
-    && OPENSSL_DIR="/tmp/openssl/.openssl" \
-    && OPENSSL_INCLUDE_DIR="/tmp/openssl/.openssl/include" \
-    && OPENSSL_LIB_DIR="/tmp/openssl/.openssl/lib64" \
-    && PKG_CONFIG_PATH="/tmp/openssl/.openssl/lib/pkgconfig" \
-    && export NGINX_BUILD_DIR \
-    && export OPENSSL_DIR \
-    && export OPENSSL_INCLUDE_DIR \
-    && export OPENSSL_LIB_DIR \
-    && export PKG_CONFIG_PATH \
-    && cargo build --release
+    && export NGINX_BUILD_DIR && cargo build --release
 
 # Build and install NGINX
 WORKDIR /tmp/nginx
-RUN OPENSSL_DIR="/tmp/openssl/.openssl" \
-    && OPENSSL_INCLUDE_DIR="/tmp/openssl/.openssl/include" \
-    && OPENSSL_LIB_DIR="/tmp/openssl/.openssl/lib64" \
-    && PKG_CONFIG_PATH="/tmp/openssl/.openssl/lib/pkgconfig" \
-    && export NGINX_BUILD_DIR \
-    && export OPENSSL_DIR \
-    && export OPENSSL_INCLUDE_DIR \
-    && export OPENSSL_LIB_DIR \
-    && export PKG_CONFIG_PATH \
-    && make -s -j "$(nproc)" && make -s install \
+RUN make -s -j "$(nproc)" && make -s install \
     && file objs/src/http/ngx_http.o objs/src/core/nginx.o | grep -i 'LLVM IR bitcode' && make -s clean \
     # Security hardening: strip debug symbols and compress binary
     && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version|quickjs/quickjs.h" \
