@@ -38,7 +38,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         autoconf=2.73-r0 \
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \
-        python3-dev=3.14.8-r0 \
+        python3-dev=3.14.10-r0 \
         cargo=1.96.1-r0 \
         rust=1.96.1-r0 \
         pkgconf=2.5.1-r0 \
