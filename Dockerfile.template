@@ -239,7 +239,7 @@ ENV OPENSSL_DIR="/tmp/openssl/.openssl" \
 # Build ACME module for NGINX
 WORKDIR /tmp/nginx-acme
 RUN NGINX_BUILD_DIR="$(realpath ../nginx/objs)" \
-    && export NGINX_BUILD_DIR && cargo build --release
+    && export NGINX_BUILD_DIR && cargo build -qr
 
 # Build and install NGINX
 WORKDIR /tmp/nginx
