@@ -7,13 +7,13 @@
 > **Production-ready, security-focused NGINX image with HTTP/3, QUIC, ECH and PQC support.**
 
 > [!IMPORTANT]
-> The QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC, ECH and QUIC⚠️
+> The QuicTLS is now deprecated. I use OpenSSL, since this library natively supports OCSP, PQC, ECH and QUIC❗
 
 > [!TIP]
 > You can find an example [configuration file](example.conf) in the repository for successfully configuring HTTP/3, ECH and PQC💡
 
-> [!CAUTION]
-> UID/GID changed to 10001 - it's [recommended](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Kubernetes and prevents conflicts with system users❗
+> [!WARNING]
+> UID/GID changed to 10001 - it's [recommended](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Kubernetes and prevents conflicts with system users⚠️
 
 ## 🌐 Image Variants
 
