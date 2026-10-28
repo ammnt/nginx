@@ -38,7 +38,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         autoconf=2.73-r0 \
         automake=1.18.1-r1 \
         libtool=2.6.0-r1 \
-        python3-dev=3.14.10-r0 \
+        python3-dev=3.14.10-r1 \
         cargo=1.96.1-r0 \
         rust=1.96.1-r0 \
         pkgconf=2.5.1-r0 \
@@ -249,7 +249,7 @@ RUN make -s -j "$(nproc)" && make -s install \
     && strings /usr/sbin/nginx | grep -iE "zlib-ng/zlib.h|mimalloc_version|quickjs/quickjs.h" \
     && llvm-strip --strip-all /usr/sbin/nginx \
     && upx -qq --best --lzma /usr/sbin/nginx \
-    && ls -lash /usr/sbin/nginx \
+    && ls -lash /usr/sbin/nginx && /usr/sbin/nginx -V \
     && file /usr/sbin/nginx | grep 'statically linked' \
     && readelf -dn /usr/sbin/nginx | grep -E 'Properties|no dynamic' \
     # Set proper permissions
