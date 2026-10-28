@@ -12,8 +12,8 @@
 > [!TIP]
 > You can find an example [configuration file](example.conf) in the repository for successfully configuring HTTP/3, ECH and PQC💡
 
-> [!IMPORTANT]
-> UID/GID changed to 10001 - it's [recommended](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Kubernetes and prevents conflicts with system users⚠️
+> [!CAUTION]
+> UID/GID changed to 10001 - it's [recommended](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Kubernetes and prevents conflicts with system users❗
 
 ## 🌐 Image Variants
 
