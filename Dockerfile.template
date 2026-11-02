@@ -60,7 +60,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
     # Clone zlib-ng for modern compression performance
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZLIB_VERSION}" https://github.com/zlib-ng/zlib-ng \
     # Clone Brotli compression module
-    && git clone -q --depth 1 --recurse-submodules -j8 https://github.com/google/ngx_brotli \
+    && git clone -q --depth 1 --recurse-submodules -j8 --single-branch https://github.com/google/ngx_brotli \
     # Clone ZSTD compression module
     && git clone -q --depth 1 --recursive -j8 --single-branch -b "${ZSTD_VERSION}" https://github.com/tokers/zstd-nginx-module \
     # Clone NJS module
