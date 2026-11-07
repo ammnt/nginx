@@ -1,6 +1,6 @@
 # Build arguments for version pinning and reproducibility
-ARG BASE_VERSION=3.24.3
-ARG BASE_HASH=be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
+ARG BASE_VERSION=3.24.4
+ARG BASE_HASH=93b41ef40b1677fce8fcc64ff4af09daddfacf5040afde618bc46c1e2d1cc7d4
 FROM alpine:${BASE_VERSION}@sha256:${BASE_HASH} AS builder
 ARG OPENSSL_VERSION
 ARG APP_VERSION
@@ -29,7 +29,7 @@ RUN addgroup --system --gid "10001" nginx && adduser --disabled-password --shell
         build-base=0.5-r4 \
         linux-headers=7.0.0-r1 \
         upx=5.2.0-r0 \
-        perl=5.42.2-r1 \
+        perl=5.42.3-r0 \
         cmake=4.2.3-r0 \
         zstd-dev=1.5.7-r2 \
         zstd-static=1.5.7-r2 \
