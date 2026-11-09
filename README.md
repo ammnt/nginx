@@ -116,7 +116,8 @@ nginx/
 │   └── 📁 workflows/                    # GitHub Actions CI/CD pipelines
 │       ├── 🔨 build.yml                 # Build and testing workflow
 │       ├── 🔒 codeql.yml                # Static security analysis (CodeQL)
-│       └── 🏷️ label.yml                 # Workflow for triage PR and apply labels
+│       ├── 🏷️ label.yml                 # Workflow for triage PR and apply labels
+│       └── ⬆️ renovate.yml              # Workflow for update tag and digest of base image
 ├── 🙈 .gitignore                        # Git ignore rules
 ├── ✅ hadolint.yaml                     # Hadolint configuration (Dockerfile linter)
 ├── ⚖️ LICENSE                           # License agreement
@@ -124,6 +125,7 @@ nginx/
 ├── 🛡️ nginx-seccomp.json                # Seccomp profile for NGINX security
 ├── 📦 nginx.toml                        # Additional NGINX configuration (TOML format)
 ├── 📖 README.md                         # Main project documentation
+├── 🔄 renovate.json                     # Renovatebot config for his workflow
 ├── 🔒 SECURITY.md                       # Security policy and vulnerability reporting
 └── 🔍 trivy.yaml                        # Trivy configuration (vulnerability scanning)
 ```
