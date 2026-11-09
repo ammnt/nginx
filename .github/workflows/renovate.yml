@@ -1,9 +1,12 @@
 name: Renovate
-
 on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   renovate:
