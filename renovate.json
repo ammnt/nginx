@@ -10,7 +10,17 @@
     {
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["digest"],
-      "automerge": true
+      "groupName": "base image & apk packages",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["Dockerfile.template"],
+      "matchDatasources": ["apk"],
+      "registryUrls": [
+        "https://dl-cdn.alpinelinux.org/alpine?branch=v3.24&components=main,community&arch=x86_64"
+      ],
+      "groupName": "base image & apk packages",
+      "automerge": false
     }
   ]
 }
