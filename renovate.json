@@ -19,7 +19,7 @@
       "matchFileNames": ["Dockerfile.template"],
       "matchDatasources": ["apk"],
       "registryUrls": [
-        "https://dl-cdn.alpinelinux.org/alpine?branch=v3.24&components=main,community&arch=x86_64"
+        "https://cdn.alpinelinux.org/?branch=v3.24&components=main,community&arch=x86_64"
       ],
       "groupName": "base image & apk packages",
       "automerge": true,
