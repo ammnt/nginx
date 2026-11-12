@@ -4,6 +4,7 @@
   "dependencyDashboard": {
     "enabled": false
   },
+  "configMigration": true,
   "assignees": ["ammnt"],
   "enabledManagers": ["dockerfile"],
   "dockerfile": {
