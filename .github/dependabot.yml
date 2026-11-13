@@ -10,3 +10,7 @@ updates:
     target-branch: "main"
     assignees:
       - "ammnt"
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
