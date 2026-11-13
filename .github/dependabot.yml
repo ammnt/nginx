@@ -11,6 +11,6 @@ updates:
     assignees:
       - "ammnt"
     groups:
-      codeql-action:
+      github-actions:
         patterns:
-          - "github/codeql-action*"
+          - "*"
