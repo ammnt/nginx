@@ -3,7 +3,9 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "cron"
+      cronjob: "30 0 1 * *"
+      timezone: "UTC"
     open-pull-requests-limit: 50
     target-branch: "main"
     assignees:
