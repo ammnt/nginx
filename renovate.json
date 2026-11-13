@@ -16,7 +16,7 @@
       "matchUpdateTypes": ["digest"],
       "groupName": "base image & apk packages",
       "automerge": true,
-      "automergeType": "branch"
+      "automergeType": "pr"
     },
     {
       "matchFileNames": ["Dockerfile.template"],
@@ -26,7 +26,7 @@
       ],
       "groupName": "base image & apk packages",
       "automerge": true,
-      "automergeType": "branch"
+      "automergeType": "pr"
     }
   ]
 }
