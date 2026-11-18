@@ -24,3 +24,4 @@ jobs:
         env:
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_PLATFORM_COMMIT: "enabled"
+          LOG_LEVEL: "debug"
