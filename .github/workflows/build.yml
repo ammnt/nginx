@@ -186,7 +186,7 @@ jobs:
         if: matrix.scanner == 'checkov'
         run: |
           set -euo pipefail
-          curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/latest/download/checkov_linux_X86_64.zip"
+          curl -sSfLO "https://github.com/bridgecrewio/checkov/releases/download/3.4.5/checkov_linux_X86_64.zip"
           unzip -q ./checkov_linux_X86_64.zip
           ./dist/checkov \
             --quiet -s \
