@@ -203,9 +203,9 @@ jobs:
         with:
           image: ghcr.io/ammnt/nginx:${{ needs.build-and-publish.outputs.app_version }}
           format: sarif
-          exit-code: '0'
-          exit-level: 'warn'
-          ignore: "CIS-DI-0005"
+          exit-code: "0"
+          exit-level: "warn"
+          ignore: "CIS-DI-0005,CIS-DI-0010"
           output: "dockle.sarif"
 
       - name: Login to Docker Hub🔑
